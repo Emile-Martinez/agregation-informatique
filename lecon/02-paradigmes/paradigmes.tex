@@ -1,0 +1,174 @@
+\dev{Emile Martinez}{}{}{}
+
+Programmer, c'est mettre en relation un cahier des charges et des instructions compréhensibles par la machine.
+\begin{definition}
+	Un \textbf{paradigme de programmation} définit la façon d'approcher la programmation informatique.
+\end{definition}
+
+Suivant le contexte il en existe plusieurs que nous verrons ici.
+
+
+\subsection{La programmation impérative}
+
+C'est la plus classique.
+
+\begin{definition}
+	La \textbf{programmation impérative} consiste à donner une suite d'instructions, chacune ayant pour seul effet de modifier l'état du programme (la mémoire, la valeur des variables, l'endroit où on en est etc...).
+\end{definition}
+
+\begin{rem}
+	Ainsi, dans la programmation impérative, il n'existe pas de valeurs de retour. Si on en veut une, il faut écrire la valeur que l'on veut dans la mémoire.
+\end{rem}
+
+\begin{rem}
+	Informellement, programmer impérativement, c'est utiliser des variables, des affectations, des tableaux, des boucles for et while, etc...
+\end{rem}
+
+\begin{example}
+	La majorité du code en python est impératif\\\\
+	\begin{minipage}{0.2\linewidth}
+		\begin{lstlisting}
+x = 1
+y = x + 3
+while (x != y):
+    print(y)
+    y -= 1
+		\end{lstlisting}
+	\end{minipage} \quad \begin{minipage}{0.75 \linewidth}
+		Ce programme écrit 1 dans la case mémoire de x, puis y accède pour écrire 4 dans celle de y, puis écrit la valeur de y dans l'espace mémoire dédié à l'affichage, etc...
+	\end{minipage}
+\end{example}
+
+\begin{rem}
+	Impératif est pris ici dans son sens courant (en informatique). Une autre définition d'impératif est qu'on dit exactement ce que la machine doit faire (ex : l'assembleur), ce qui s'opose alors au déclaratif (comme SQL). Mais cette notion est à degré (dans tous langage il y a une marge plus ou moins grande pour la machine) et n'est pas nécessairement celle à laquelle on pense quand on pense à de la programmation impérative (même si les deux sont très liées).
+\end{rem}
+
+\subsection{Programmation fonctionnelle}
+
+\begin{definition}
+	La \textbf{programmation fonctionnelle} consiste à composer le programme de fonctions
+	(au sens mathématiques), et de récupérer la valeur de retour.\\
+	Les changements d'état ne peuvent pas être représentés par des évaluations de fonctions, donc la programmation fonctionnelle ne les admet pas. On dit que les structures de données fonctionnelles sont immuables.
+\end{definition}
+
+\begin{example}
+		\lstinline|let max (x,y) = if x > y then x else y| \\ (fonction de type \lstinline|int*int -> int|) \label{2-1}
+\end{example}
+
+Informellement, programmer en fonctionnel, c'est considérer les fonctions comme des objets comme les autres, et n'avoir que des structures de données immuables.
+
+\begin{rem}
+	Un argument d'une fonction ou la valeur de retour d'une fonction peut être une fonction. C'est ce que l'on appelle la  programmation d'ordre supérieure.
+\end{rem}
+
+\begin{definition}
+	La \textbf{curryfication} est la transformation d'une fonction à plusieurs arguments en une fonction à un argument qui retourne une fonction sur le reste des arguments
+\end{definition}
+
+\begin{example}
+	On peut transformer la fonction \lstinline|max| de l'exemple \ref{2-1} en la fonction \lstinline|let max x y = if x > y yhen x else y de type int -> int -> int| \label{2-2}
+\end{example}
+
+\begin{example}
+	Si, sur l'exemple \ref{2-2}, on veut que max puisse comparer des éléments sur lesquels on ne connait pas l'ordre, on peut en faire une fonction d'ordre supérieur en lui fournissant une fonction de comparaison : \\
+	\lstinline|let max compar x y = if compar x y then x else y| de type \lstinline|('a -> 'a -> bool) -> 'a -> 'a -> 'a|\\
+	On a alors \begin{itemize}[label =]
+		\item \lstinline|max (fun x y -> x > y)| qui calcule le max 
+		\item \lstinline|max (fun x y -> x > y) 3| qui est une fonction de type \lstinline|int -> int| renvoyant le maxmimum de son argument et 3
+		\item \lstinline|max (fun x y -> x < y)| qui calcule le min
+	\end{itemize}
+\end{example}
+
+\begin{rem}
+	La puissance du fonctionnel vient de la récursivité
+\end{rem}
+
+\subsection{Programmation orientée objet}
+
+\subsubsection{Obtenir de la modularité}
+
+\begin{definition}
+	Une \textbf{classe} est un ensemble de types de données appelés \textbf{attributs} et de \textbf{fonction} appelées méthodes. \newline
+	Un \textbf{objet} est un représentant d'une classe. C'est un espace en mémoire contenant les valeurs des différentes attribut, les méthodes étant communes à tous les objets.
+\end{definition}
+
+\begin{example} \label{2-3}\enspace \\ \\
+	\begin{minipage}{0.60 \linewidth}
+		\begin{lstlisting}
+class Noeud:
+    def __init__(self, x):
+        self.valeur = x
+    def afficher(self):
+        print(self.valeur)
+    def est_egal(self, autre):
+        return self.valeur == autre.valeur
+a = Noeud(5)
+a.afficher()
+		\end{lstlisting}
+	\end{minipage}\quad \begin{minipage}{0.35\linewidth}
+		Ici Noeud est une classe, valeur un attribut de la classe Noeud, afficher et est\_egale des méthodes de la classe Noeud et a un objet (représentant) de la classe Noeud
+	\end{minipage}
+\end{example}
+
+\begin{definition}
+	La \textbf{programmation orienté objet} consiste à utiliser des classes et des objets de ces classes quand on programme.
+\end{definition}
+
+\begin{rem}
+	Une utilisation massive des classes et de permettre de la modularité : on peut avoir une interface entre un type abstrait et son utilisation, rendant l'utilisation et la structure implémentant le type indépendant.
+\end{rem}
+
+\begin{example}
+	En python, le package numpy propose les objets numpy.array que l’on crée via la commande
+	a = numpy.array([...]). Un tel objet possède des attributs comme sa taille (a.size) mais aussi des
+	méthodes tq a.sort()). Cette classe implémente des tableaux de taille fixe et de nombreuses méthodes dessus. On peut les utiliser en ne comprenant rien à comment elles fonctionnent, seulement ce qu'elles font, mais on peut aussi les réimplenter sans rien changer à l'utilisation de ces tableaux par des millions de personnes.
+\end{example}
+
+\subsubsection{Pour résoudre un problème}
+
+Une autre utilité de la programmation orienté objet, et de représenter un problème avec ses différents objets que l'on fera intéragir entre eux.
+
+\begin{example}
+	Sur l'exemple \ref{2-3}, on peut rajouter la classe \lstinline|Arbre| contenant des noeuds.
+	\begin{lstlisting}
+class Arbre:
+    def __init__(self, n, liste_arbre):
+        self.noeud = n
+        self.fils = liste_arbre
+    def afficher(self):
+        n.afficher()
+        for x in self.fils:
+        x.afficher()
+	\end{lstlisting}
+\end{example}
+
+\subsection{Dans la vraie vie ?}
+
+\subsubsection{Le multiparadigme}
+
+	Dans la vraie vie, la plupart des langages de programmation implémente plusieurs paradigmes. En effet, python, comme C ou Ocaml, permettent de faire des boucles while, de faire des tableaux, de faire des structures et des fonctions récurisves, et même les fonctions d'ordre supérieur dans une certaine mesure.\\
+	
+	On appelle cela le multiparadigme. Néanmoins, certains langages sont plus adapatés à certains paradigmes, eux-mêmes plus adaptés à certaines contraintes.\\
+	
+	Des langages comme C, C++, Fortran, python, Java sont des langages impératifs, quand Haskell, ML, OcamL sont fonctionnels. De plus, python, C++ sont orientés objets.
+
+\subsubsection{Comparaison des paradigmes}
+	\begin{itemize}[label=$\star$]
+		\item Pour des structures récursives comme des arbres (ou des graphes peu denses), le paradigme fonctionnel est approprié
+		\item Le paradigme fonctionnel offre également élégance et lisibilité au code, avec moins d'instructions «superflues»
+		\item Le caractère intrinséquement modulaire et sans effet de vord le rend aussi plus facile à tester et sécuriser : C'est en OcamL (en Coq) qu'est implémenté CompCert, un compilateur C vérifié.
+		\item La programmation impérative est beaucoup plus proche de la machine et rend donc la compilation plus simple, et le développement intelligent potentiellement plus efficace.
+		\item Il est aussi très performant pour des structures de données séquentilles et des accès «aléatoires» à des données. Par exemple représenter une matrice, en faire des multiplications, etc... paraît beaucoup plus simple en C qu'en OcamL.
+		\begin{exercise}
+			Implémenter un tas min en C et en OCamL
+		\end{exercise}
+		\item L'orienté objet est quant à lui de plus haut niveau et repose souvent sur d'autres paradigmes plus bas niveau.
+		\item Il est souvent utilisé pour représenter des situtations complexes grâce à sa modularité
+		\begin{exercise}
+			Implémenter les classes représentant un personnage de jeu vidéo, ses objets, ses compétences, etc...
+		\end{exercise}
+	\end{itemize}
+
+\subsubsection{Et SQL ?}
+
+	Il existe néanmoins bien d'autres paradigmes, comme par exemple le paradigme logique, où seul le résultat est présenté par le code, et non la manière de l'obtenir. C'est par exemple le cas du SQL pour les bases de données, où l'exécution n'est pas dicté par la requête, seul son sens l'est, laissant le SGBD se charger du déroulement.

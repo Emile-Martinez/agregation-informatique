@@ -1,0 +1,29 @@
+\input{Headers/headers}
+
+
+\begin{document}
+
+\input{Headers/titlepage}
+
+
+\tableofcontents
+
+\chapter*{Préface}
+%\input{Préface/préface.tex}
+
+\part{Leçons}
+
+\chapter{Paradigmes de programmation : impératif, fonctionnel, objet. Exemples et applications.} \label{L2}
+\input{lecon/02-paradigmes/paradigmes}
+
+
+\makeatletter
+\renewcommand{\@chapapp}{Développement}
+\setcounter{chapter}{0}
+\makeatother
+\renewcommand\theHchapter{sec.\thechapter} %unique prefix
+
+\part{Développements}
+ 
+
+\end{document}
