@@ -126,6 +126,20 @@ frametitlefont={\sffamily\bfseries},
 {\color{ProcessBlue}Définition}[chapter]
 
 
+\newmdtheoremenv[
+outerlinewidth=1pt,
+innerlinewidth=0pt,
+roundcorner=2pt,
+linecolor=black,
+shadow=true,
+tikzsetting={shading=axis,top color=gray!10},
+innertopmargin=1\baselineskip,
+skipabove={\dimexpr0.5\baselineskip+\topskip\relax},
+needspace=3\baselineskip ,
+frametitlefont={\sffamily\bfseries},
+]{principe}%
+{\color{DarkGreen}Principe}[chapter]
+
 
 \makeatletter
 \def\newframedGtheorem#1{%
