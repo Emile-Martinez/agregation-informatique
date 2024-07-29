@@ -1,0 +1,233 @@
+\dev{Emile Martinez, Malory Marin}{}{}{}
+
+\subsection{Introduction}
+
+\subsubsection{Qu'est-ce qu'un test}
+
+Tester est un anglicisme pour le mot français essayer (ou éprouver). Me soumettant à la folie anglomane ambiante je garderai ce mot, soucieux de ma cohérence avec le monde extérieur.
+
+\begin{definition}
+	\textbf{Tester} un programme consiste à essayer d'y trouver des erreurs
+\end{definition}
+
+\begin{rem}
+	On ne cherche pas ici à prouver directement que le programme est correct, mais à prouver qu'on n'arrive pas à se rendre compte qu'il est incorrect.
+\end{rem}
+
+\subsubsection{Données de tests}
+
+\begin{definition}
+	\textbf{Une donnée de test} est un couple (valeur d'entrée, valeur de sortie), où à l'évidence, le deuxième élément représente la valeur de sortie quand la fonction est appelée sur le premier élément.
+\end{definition}
+
+\begin{definition}
+	\textbf{Un jeu de données de test} (ou jeu de tests) est alors un ensemble de tels couples, permettant de vérifier la validité du programme sur certaines entrées.
+\end{definition}
+
+\begin{rem}
+	Certaines sorties (attendues) peuvent être des erreurs.
+\end{rem}
+
+\begin{example}
+	Un jeu de tests pour une fonction calculant le pgcd peut être \\$\left\{ \big((1,2), 1\big), \big((-3, 6), 3\big), \big((0, 0), 0\big), \big((2, 2.45), \text{Erreur de type}\big) \right\}$
+\end{example}
+
+\subsubsection{Types de tests}
+
+Il existe deux types de tests : 
+\begin{itemize}
+	\item Les tests en boites noires : On ne connait pas le code de la fonction, on peut simplement l'appeler. 
+	\item Les tests en boites blanches : On connait le code et on génère un jeu de test en fonction. 
+\end{itemize}
+
+\subsection{Tests en boîtes noires}
+
+\subsubsection{Caractéristiques}
+
+Pour un test en boîtes noires, comme on ne connait pas le code, il faut tester beaucoup de données. Idéalement, toutes, mais cela se trouve souvent impossible.
+
+\begin{example}
+	On peut tester toutes les valeurs d'une fonction qui implémente une fonction booléenne mais pas celles de notre fonction calculant le pgcd de deux nombres
+\end{example}
+
+Viennent alors deux problèmes : Générer suffisament de données d'entrées et effectuer le test suiffisament rapidement.
+
+\subsubsection{Générer des données d'entrée}
+
+Dans de nombreux cas, ne pouvant pas essayer toutes les données d'entrées, on va devoir faire des choix.
+
+\begin{idee}
+	La première approche consisterait à générer des valeurs aléatoires dans un domaine, et espérer en prendre suffisamment pour que cela fonctionne.
+\end{idee}
+
+\begin{principe}
+	Une approche plus maline, à partitionner le domaine, puis à appliquer l'approche naïve sur chaque domaine.
+\end{principe}
+
+\begin{example}
+	Pour le calcul de pgcd($a$,$b$), on peut parititionner le domaine d'entrées en comparant $a$, $b$, et $0$, (avec donc 6 domaines : $a <= 0 <= b$, $0 <= a <= b$, $0 <= b <= a$, $a <= b <= 0$, $b <= a <= 0$, $b <= 0 <= a$)
+\end{example}
+
+\begin{rem}
+	On se contente souvent de prendre un seul test par classe.
+\end{rem}
+
+\begin{rem}
+	Le choix du partitionnement est arbitraire et doit donc être fait suivant la manière d'approcher le problème
+\end{rem}
+
+
+Une fois cela fait, il est très commun que les erreurs puissent venir des cas limites. 
+
+\begin{principe}
+	On essaye alors de se placer au limites des domaines, et de vérifier spécifiquement ces cas là.
+\end{principe}
+
+\begin{example}
+	Pour l'exemple précédent, on testerai les cas d'égalité : $0 <= a = b$, $a = 0 = b$, $a  = 0 <= b$ etc... (en effet par exemple, le cas 0, 0 est différent des autres, la valeur pouvant être $+\infty$ ou $0$ suivant les définitions).
+\end{example}
+
+\subsubsection{Utiliser les caleurs de sorties efficacement}
+
+Néanmoins, maintenant que l'on a les valeurs d'entrées, il faut pour avoir notre jeu de tests avoir également les valeurs de sorties.
+
+\begin{example}
+	si l'on veut générer la sortie du pgcd sur des entrées que l'on a pris au hasard, il faut connaitre déjà le pgcd. Quel intérêt d'avoir notre fonction alors si on a déjà une fonction qui le fait
+\end{example}
+
+\noindent On a alors plusieurs méthodes : \begin{enumerate}
+	\item Générer un jeu de tests à la main
+	\item Utiliser un programme moins performant mais que l'on sait correct.
+	\begin{example}
+		Si on calcule le pgcd par soustraction successives, on peut tester en calculant le pgcd en testant tous les nombres inférieurs à $a$ et a garder le plus grand qui divise $a$ et $b$.
+	\end{example}
+	\item Ne pas calculer la réponse mais simplement vérifier que la réponse fourni est correcte.
+	\begin{example}
+		Si on a un programme qui nous donne la décomposition en facteurs premiers d'un nombre, il nous suffit de tester la primalité de chaque sortie et de vérifier que leur produit fait l'entrée.
+	\end{example}
+\end{enumerate}
+
+\begin{example}
+	Si on a un algorithme performant effectuant le produit de matrice, on peut : \begin{enumerate}
+		\item Créer à la main quelque petite matrice et faire leur produit pour vérifier que tout fonctionne
+		\item Comparer avec l'algorithme naif du calcul de produit de matrice
+		\item Vérifier de manière probabiliste que le résultat est bien le bon.\\
+		\textbf{Developpement \ref{D?}} Vérification probabiliste du produit de matrice.
+	\end{enumerate}
+\end{example}
+
+\subsection{Tests en boite blanche}
+
+\subsubsection{Graphe de flot de contrôle}
+
+Pour un test en boîte blanches, on connaît le code, et on va vouloir générer des données d'entrées en fonction de ce code là.\\
+
+Pour cela, on extrait du code le graphe de flot de contrôle.
+
+\begin{definition}
+	Le graphe de flot de contrôle est un graphe où chaque boîte contient des lignes de codes, les boites sont reliés si on peut exécuter l'une puis l'autre.
+\end{definition}
+
+\begin{example}
+	\label{3-1}
+	On prend l'exemple du pgcd pour $a, b \in \N^*$\\
+	
+	\noindent \begin{minipage}{0.5\linewidth}
+		\begin{algorithm}[H]
+			\Tq{$a \neq b$}{
+				\eSi{$a < b$}{
+					$b \gets b - a$
+				}{
+					$a \gets a - b$
+				}
+			}
+			\Retour{$a$}
+		\end{algorithm}
+	\end{minipage}\begin{minipage}{0.5\linewidth}
+		\begin{tikzpicture}[->, node distance=2cm]
+			\node[elliptic state, scale = 1] (q0) {Début};
+			\node[elliptic state, scale = 1, below right of = q0] (q1) {$a \neq b$};
+			\node[elliptic state, scale = 1, above right of = q1] (q2) {Fin};
+			\node[elliptic state, scale = 1, below left = 0.8cm and 1.5cm of q1] (q3) {$b \gets b - a$};
+			\node[elliptic state, below right = 0.8cm and 1.5cm of q1] (q4) {$a \gets a - b$};
+			\node[elliptic state, below right = 0.8cm and 1.5cm of q3] (q5) {$a < b$};
+			
+			\draw (q0) edge[] node{} (q1);
+			\draw (q1) edge[left] node{Oui} (q2);
+			\draw (q1) edge[left] node{Non} (q5);
+			\draw (q3) edge[] node{} (q1);
+			\draw (q4) edge[] node{} (q1);
+			\draw (q5) edge[left] node{Oui} (q3);
+			\draw (q5) edge[right] node{Non} (q4);
+		\end{tikzpicture}
+	\end{minipage}
+\end{example}
+
+\subsubsection{Utilisation du graphe}
+
+On essaye alors de générer un jeu de données qui parcourt une bonne partie du graphe.
+
+Par exemple, un jeu couvrant : \begin{itemize}
+	\item Tous les nœuds (On veut un jeu de tests tel que tous les tests pris ensemble, chaque nœud du graphe est parcouru au moins une fois).
+	\item Tous les arcs
+	\item Tous les chemins
+\end{itemize}
+
+\begin{com}
+	Si on veut aller plus loin, on peut aussi rajouter toutes les conditions décisions, toutes les p utilisations, etc... On peut alors rajouter un exercice proposant de montrer la hiérarchie entre ces tests.
+\end{com}
+
+\begin{example}
+	Sur l'exemple \label{3-1}, $\left\{ \big( (1,1), 1\big), \big((1,3), 3)\big)\right\} $ ne couvre pas tous les nœuds quand $\left\{ \big((1,3), 3), \big( (3, 1), 3 \big) \right\}$ couvre tous les nœuds et tous les arcs mais pas tous les chemins.
+\end{example}
+
+\begin{rem}
+	Quand il y a une boucle, tous les chemins peut-être un critère infini. On peut alors se limiter aux chemins d'une certaine taille.
+\end{rem}
+
+\begin{rem}
+	Parfois les critères sont insatisfiables.
+\end{rem}
+
+\begin{rem}
+	Aucun de ces critères ne garantissent la validité d'un algorithme. Elles permettent simplement de vérifier que notre jeu de tests n'est pas trop lacunaire.
+\end{rem}
+
+\noindent \textbf{Developpement \ref{D?}} Intérets et insuffisances de ces critères
+
+\subsubsection{Test exhaustif de condition}
+
+\begin{idee}
+	Une autre approche consiste à avoir un jeu qui satisfait ou invalide toutes les conditions de toutes les manières possibles.
+\end{idee}
+
+\begin{example}
+	On voit l'utilité sur l'exemple suivant :\\
+	\begin{minipage}{0.5\linewidth}
+		\begin{lstlisting}[style=CStyle]
+int max(int a, int b){
+	if(a > b || a == 500){
+        return a;
+    else
+        return b;
+}
+\end{lstlisting}
+	\end{minipage}
+	\begin{minipage}{0.5\linewidth}
+		Pour détecter le problème (que max ne calcule pas le $\max$), il faut des tests où on mets à vrai le premier if à cause de $a == 500$, donc des tests où $a$ vaut $500$.
+	\end{minipage}
+\end{example}
+
+\subsection{Pratiques pour éviter d'avoir à déboguer}
+
+
+Dans la pratique, de bonne pratique de code sont très efficace pour éviter de passer trop de temps à debugguer son code.
+
+\begin{itemize}[label=$\star$]
+	\item Compiler avec -Wall (activant tous les warnings, donnant beaucoup de bugs stupides)
+
+	\item Respecter la ponctuation et éventuellement utiliser un linter (de manière à rendre lisible le code par d'autres personnes)
+
+	\item Faire de la programmation défensive en utilisant assert par exemple
+\end{itemize}
+
