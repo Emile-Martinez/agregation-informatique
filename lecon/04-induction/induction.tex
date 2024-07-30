@@ -1,0 +1,316 @@
+\dev{Emile Martinez}{}{}{}
+
+\subsection{Principe}
+\subsubsection{Definition}
+
+\begin{definition}
+	$(\mathcal B, (f_i))$ est une signature sur $X$ si : \begin{itemize}	
+	\item $\mathcal B \subset X$ (appelé cas de base)
+	
+	\item $f_i : X^{\alpha(i)} \to X$ appelé constructeurs, d'arité $\alpha(f_i)$ avec $f_i$ injectif et $\Im(f_i) \cap \Im(f_j) = \empty$ et $\Im(f_i) \cap \mathcal B = \empty$ pour tout $i \neq j$
+	\end{itemize}
+\end{definition}
+
+\begin{rem}
+	On se contente souvent de dire que les constructeurs existent, sans donner leur définition. (de même pour les cas de bases, et pour X) \label{4-3}
+\end{rem}
+
+\begin{example}
+	\label{4-1}
+	On prend une constante $Z$ et un constructeur d'arité 1 $Succ$
+\end{example}
+
+\begin{example}
+	\label{4-2}
+	On peut prendre les constructeurs $\oplus$, $\ominus$ $\otimes$ et $\otimes$ avec $\alpha(\oplus) = 2$, $\alpha(\ominus) = 1$ et $\alpha(\otimes) = 2$ et comme cas de bases $\N$. 
+\end{example}
+
+\begin{definition}
+	\label{4-4}
+	Un ensemble inductif est définit par une signature $(\mathcal B, (f_i))$: \begin{enumerate}
+		\item Le plus petit ensemble contenant $\mathcal B$ et stable par tous les $f_i$ (définition par le haut)
+		
+		ou de manière équivalente
+		
+		\item $\bigcup T_i$ où $T_0 = \mathcal B$ et $T_{n+1} = T_{n} \cup \bigcup\limits_{i} f_i( T_{n} ^ {\alpha(f_i)})$ (définition par le bas)
+	\end{enumerate}
+\end{definition}
+
+\begin{example}
+	L'ensemble inductif définit par l'exemple \ref{4-1} peut être une définition des entiers naturels \label{4-6}
+\end{example}
+
+\begin{example}
+	Exemple : L'ensemble inductif $\mathcal A_{simp}$ définit par l'exemple $\ref{4-2}$ est l'ensemble des expressions arithmétiques simplifiées.
+\end{example}
+
+\begin{rem}
+	$\oplus(1, 1) \neq \otimes(1, 2) \neq \otimes(2, 1)$. On s'intéresse à l'expression et non au résultat.
+\end{rem}
+
+\noindent \textbf{Développement \ref{D?}} Validité de la construction d'un ensemble inductif (remarque \ref{4-3} et définition \ref{4-4})
+
+\subsubsection{Induction structurelle}
+On prendra maintenant $(\mathcal B, (f_i)_{i \in I})$ une signature.
+
+\begin{proposition}
+	\label{4-5}
+	Soit $E$ un ensemble inductif construit par $(\mathcal B, (f_i))$\\
+	
+	Alors la donné de fonction $g_i$ (avec $\alpha(g_i) = \alpha(f_i)$ et $\Im(g_i) \subset Dom(g_j)$ ) et de $f(b)$ pour $b \in \mathcal B$ définit une unique fonction $f$ sur $E$ ayant la propriété:
+	$$\forall i \in I, \forall x_1, \, \dots , \, x_{\alpha(i)} \in X, \, f\left(f_i(x_1, \, \dots, \, x_{\alpha(i)})\right) =  g_i\left(f(x_1), \dots, \, f(x_{\alpha(i)})\right)$$
+\end{proposition}
+
+\begin{example}
+	Sur $\mathcal A_{Simp}$, on peut définir $eval : \mathcal A_{Simp} \to \N$ par \begin{itemize}
+		\item $eval(a) = a$ pour $a \in \N$
+		\item $eval(\oplus(a, b)) = eval(a) + eval(b)$
+		\item $eval(\otimes(a, b)) = eval(a) \times  eval(b)$
+		\item $eval(\ominus(a)) = - eval(a)$
+	\end{itemize}
+\end{example}
+
+\begin{theorem}[Induction structurelle]~
+	Soit $E$ l'ensemble inductif définit par $(\mathcal B, (f_i)_{i\in I})$, et $\mathcal P$ une propriété définie pour tout $x\in E$.\\
+	
+	Alors $\left\{ \begin{array}{cl}
+		(i) & \forall b \in \mathcal B, \mathcal P(b)\\
+		(ii) & \forall i \in I, \, \forall x_1, \, \dots, x_{\alpha(i)}, \, \left( \forall j, \, \mathcal P(x_j)\right) \implies \mathcal P \big( f_i(x_1, \, \dots, \, x_{\alpha(i)})\big)
+	\end{array} \right.$	
+\end{theorem}
+
+\begin{rem}
+	La récurrence est un cas particulier dans le cas de la définition des entiers par l'exemple \ref{4-6}
+\end{rem}
+
+\begin{example}
+	On montre par induction structurelle que $eval(e)$ pour $e \in \mathcal A_{simp}$ est multiple du pgcd des constantes apparaissant dans $e$
+\end{example}
+
+\begin{definition}
+	Un ordre bien fondé est un ordre où toute partie non vide admet un élément minimal (plus grand que personne)
+\end{definition}
+
+\begin{proposition}
+	L'ordre produit et l'ordre lexicographique d'ordres bien fondés sont bien fondés
+\end{proposition}
+
+\begin{example}
+	$\N$ avec l'ordre naturel est bien fondé, donc $\N^k$ avec l'ordre produit ou lexicographique aussi.
+\end{example}
+
+\begin{theorem}
+	Soit $(A, \preceq)$ un ensemble muni d'un ordre bien fondé et $\mathcal P$ une propriété sur $A$, alors $\forall x \in A, \, (\forall y \in A, \, y \preceq A \enspace \Rightarrow \enspace \mathcal P(y) \Rightarrow \mathcal P(x)) \enspace \Rightarrow \enspace \forall x ,\, \mathcal P(x)$
+\end{theorem}
+
+\begin{rem}
+	Cela étend le principe de réccurence forte.
+\end{rem}
+
+\begin{definition}
+	Soit $E$ l'ensemble inductif défini par $(\mathcal B, (f_i)_{i \in I})$
+	
+	On définit l'ordre structurel $\leq_s$ sur $E$ comme la clôture transitive réflexive de $x_j \leq_s f_i(x_1, \, \dots, \, x_{\alpha(i)})$
+\end{definition}
+
+\begin{proposition}
+	$\leq_s$ est une relation d'ordre bien fondé
+\end{proposition}
+
+\begin{corollary}
+	On peut alors réécrire l'induction structurelle comme une induction sur l'ordre structurelle
+\end{corollary}
+
+\begin{com}
+	Si on manque de place, on peut mettre les ordres bien fondés en prérequis (mais alors écrire la formule dans le corollaire)
+\end{com}
+
+\subsubsection{En OCaml}
+
+\begin{syntaxe}
+	En OcamL on peut créer un type représentant un ensemble inductif avec cette syntaxe :
+	\begin{lstlisting}
+type  t = Casdebase1 | Casedebase2 | ... 
+        | Constructeur1 of type11 *type12 * .... 
+        | Constructeur2 of type21 * tpye22 * ...
+	\end{lstlisting}
+	
+	Où : \begin{itemize}
+		\item \texttt{Casdebase} peut soit être un type déjà défini d'OcamL, soit une constante (nom commençant par une majuscule)
+		\item \texttt{Constructeur} est une étiquette commencée par une majuscule 
+		\item \texttt{typei} est est un type OCamL (pouvant contenir \texttt t)
+	\end{itemize}
+\end{syntaxe}
+
+\begin{example}
+	Pour définir les entiers de l'exemple \ref{4-6}, on peut écrire \begin{lstlisting}
+type entier = Zero | Succ of entier
+	\end{lstlisting}
+\end{example}
+
+\begin{syntaxe}
+	Pour gérer les types, on peut utiliser le filtrage comme pour les listes.
+\end{syntaxe}
+
+\begin{example}
+	Pour l'addition sur notre type entier, on peut écrire :
+	\begin{lstlisting}
+let rec ajouter x y = match y with
+  | Zero -> x
+  | Succ(z) -> ajouter (Succ(x)) z
+	\end{lstlisting}
+\end{example}
+
+\begin{example}
+	La validité de cette définition vient de la propriété \ref{4-5}
+\end{example}
+
+\subsection{Structures de données inductives}
+
+\subsubsection{Les listes chaînées}
+
+
+En OcamL on peut définir des listes d'entier simplement chaînés par \begin{lstlisting}
+type liste = V | Cons of int * liste
+\end{lstlisting}
+
+Ainsi, une liste c'est soit une liste vide, soit un entier et le reste de la liste.
+
+\begin{rem}
+	Ici \texttt V est le cas de base, et \texttt{Cons} le constructeur. $Cons$ est défini sur $\N \times \{\text{ensemble des listes}\}$ et non $\{\text{ensemble des listes}\}^2$. Cela est un raccourci d'OCamL, où en réalité on définit un constructeur pour chaque premier argument, et donc on construit non pas $Cons(x, l)$ mais $Cons_x(l)$.
+\end{rem}
+
+\begin{rem}
+	Cela correspond au type \texttt{int list} d'OCamL ;-)
+\end{rem}
+
+\begin{exercise}
+	Définir inductivement la taille d'une liste chaînée
+\end{exercise}
+
+\subsubsection{Les arbres binaires}
+
+\begin{exercise}
+	Définir inductivement la taille d'une liste chaînée.
+\end{exercise}
+
+\subsubsection{Les arbres binaires}
+
+\begin{definition}[Arbre binaires]
+	Soit $A$ un ensemble. On définit de manière inductive les arbres binaires sur $A$ par : \begin{itemize}
+		\item l'arbre vide $E$ (cas de base)
+		\item si $e\in A$ et $g$ et $d$ sont des arbres binaires, alors $Noeud(e,g,d)$ est un arbre binaire.
+	\end{itemize}
+\end{definition}
+
+\begin{impl}
+	Ce qui en OCamL nous donne \texttt{type 'a arbre = E | Noeud of 'a * 'a arbre * 'a arbre}
+\end{impl}
+
+\begin{example}
+	La hauteur d'un arbre binaire se calcule alors inductivement par \begin{lstlisting}
+let rec hauteur arb = match arb with
+  | E -> 0
+  | Noeud(e, g, d) -> 1 + max (hauteur g) (hauteur d)
+	\end{lstlisting}
+\end{example}
+
+\begin{exercise}
+	Prouver par induction structurelle la terminaison de la fonction hauteur
+\end{exercise}
+
+\begin{exercise}
+	Donner la définition inductive de la taille d'un arbre binaire (son nombre d'éléments)
+\end{exercise}
+
+\subsubsection{Les arbres généraux}
+
+\begin{definition}
+	Un arbre général est un noeud (la racine) et une liste d'arbre (ses fils)
+\end{definition}
+
+On voudrait alors définir le type \texttt{arbre} par (pour les arbres d'entier)
+\begin{lstlisting}
+type arbre = Noeud of int * arbre_liste
+\end{lstlisting}
+Il faut alors définir le type \texttt{arbre\_liste}, par
+\begin{lstlisting}
+type arbre_liste = Vide | Cons of arbre * arbre_liste
+\end{lstlisting}
+
+On remarque que chaque type a besoin de l'autre pour exister. On écrit alors
+\begin{lstlisting}
+type arbre = Noeud of int * arbre_liste
+and type arbre_liste = Vide | Cons arbre*arbre_liste
+\end{lstlisting}
+
+\begin{rem}
+	On passe souvent cela sous le tapis grâce au polymorphisme qui définit des manières de construire des types et non des types directement
+\end{rem}
+
+\begin{com}
+	Dans la défense de plan, on peut parler ici des différentes définition des arbres (par coinduction, avec une infinité de constructeur (pour chaque $k \in \N^*$ d'arité $k$, pour les arbres à $k$ fils), par un constructeur $Ajout\_fils$ d'arité 2 où le premier argument est l'arbre sans son premier fils, et le dernier argument le premier fils (on en déduit les cas de bases))
+\end{com}
+
+\subsection{Ensembles inductifs}
+
+\subsubsection{Formules propositionnelles}
+
+\begin{definition}[formule propositionelle]~
+	Soit $V$ un ensemble de variables et la signature \begin{itemize}
+		\item $\mathcal B = \{ \top, \bot\} \cup V$
+		\item le constructeur $\neg$ d'arité 1
+		\item les constructeurs $\vee$, $\wedge$ et $\to$ d'arité 2 (en forme infixe)
+	\end{itemize}
+	Les formules propositionnelles forment l'ensemble inductif défini par cette signature
+\end{definition}
+
+\begin{exercise}
+	Défini inductivement le nombre de variables présent dans la formule
+\end{exercise}
+
+\begin{definition}
+	On appelle valuation (ou distribution de vérité) toute fonction $v : V \to \{0, 1\}$
+\end{definition}
+
+\begin{definition}[Evaluation d'une formule] Soit $v$ une valuation. La fonction d'évaluation d'une formule $[.]_v : F \to \{0,1\}$ se définit inductivement par \begin{itemize}[label=$\bullet$]
+		\item $[\top]_v = 1$
+		\item $[\bot]_v = 0$
+		\item $[x]_v = v(x)$ pour $x \in V$
+		\item $[\neg F]_v = 1 - [F]_v$
+		\item $[f_1 \wedge f_2]_v = \min([f_1]_v, [f_2]_v)$
+		\item $[f_1 \vee f_2]_v = \max([f_1]_v, [f_2]_v)$
+		\item $[f_1 \to f_2]_v = \left\{ \begin{array}{ll}
+			0 & \text{si } [f_1]_v = 0 \text{ et } [f_2]_v = 1\\
+			1 & \text{sinon}
+		\end{array} \right.$
+\end{itemize}
+\end{definition}
+
+\begin{exercise}
+	Définir l'équivalence entre formules et montrer par induction structurelle que, à équivalence près, on peut ne garder que les constructeurs $\neg$ et $\vee$
+\end{exercise}
+
+\subsubsection{Langages}
+
+\begin{definition}
+	Soit $\Sigma$ un ensemble (appelé alphabet) fini et non vides d'éléments (appelés lettres). On définit inductivement l'ensemble des mots sur $\Sigma$, $\Sigma^*$ par la signature : \begin{itemize}
+		\item $\varepsilon$ (le mot vide) comme cas de base
+		\item Si $a \in \Sigma$ et $w \in \Sigma^*$, $wa\in \Sigma^*$
+	\end{itemize}
+\end{definition}
+
+\begin{rem}
+	On aurait aussi pu prendre comme définition de $\Sigma^*$, $\bigcup\limits_{n \geq 0} \Sigma^n$
+\end{rem}
+
+\begin{definition}
+	La concaténation de deux mots $w_1, w_2 \in \Sigma^*$ se définit inductivement comme : \begin{itemize}
+		\item $concat(w_1, \varepsilon) = w_1$
+		\item $concat(w_1, w_2.a) = concat(w_1, w_2).a$
+	\end{itemize}
+\end{definition}
+
+\begin{exercise}
+	Montrer par induction structurelle que $concat(w_1, concat(a, w_2)) = concat(w_1.a, w_2)$ 
+\end{exercise}
