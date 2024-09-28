@@ -11,6 +11,10 @@
 	\end{itemize}
 \end{definition}
 
+\begin{com}
+	L'intérêt de cette définition est d'être rigoureux. Néanmoins le programme demande de se contenter de présenter des choses proches de ce que l'on rencontrera, or là c'est plus ou moins la version formelle de ce qui se passe en OcamL. Donc meme si ce cadre théorique n'est pas explicitement au programme, sa présence là est justifiée par sa proximité avec OcamL
+\end{com}
+
 \begin{rem}
 	On se contente souvent de dire que les constructeurs existent, sans donner leur définition. (de même pour les cas de bases, et pour X) \label{4-3}
 \end{rem}
@@ -60,6 +64,11 @@ On prendra maintenant $(\mathcal B, (f_i)_{i \in I})$ une signature.
 	Alors la donné de fonction $g_i$ (avec $\alpha(g_i) = \alpha(f_i)$ et $\Im(g_i) \subset Dom(g_j)$ ) et de $f(b)$ pour $b \in \mathcal B$ définit une unique fonction $f$ sur $E$ ayant la propriété:
 	$$\forall i \in I, \forall x_1, \, \dots , \, x_{\alpha(i)} \in X, \, f\left(f_i(x_1, \, \dots, \, x_{\alpha(i)})\right) =  g_i\left(f(x_1), \dots, \, f(x_{\alpha(i)})\right)$$
 \end{proposition}
+
+\begin{com}
+	Cette propriété est fondamentale, et justifie en partie (parce que la il ne faut pas un matching complet mais directement les constructeurs) la bonne définition des fonctions OcamL. D'où d'ailleurs les références à cette propriété dans la suite.
+\end{com}
+
 
 \begin{example}
 	Sur $\mathcal A_{Simp}$, on peut définir $eval : \mathcal A_{Simp} \to \N$ par \begin{itemize}
@@ -127,6 +136,10 @@ On prendra maintenant $(\mathcal B, (f_i)_{i \in I})$ une signature.
 
 \subsubsection{En OCaml}
 
+\begin{com}
+	On essaye de faire au maximum le lien entre les définitions formelles et OcamL
+\end{com}
+
 \begin{syntaxe}
 	En OcamL on peut créer un type représentant un ensemble inductif avec cette syntaxe :
 	\begin{lstlisting}
@@ -193,8 +206,6 @@ Ainsi, une liste c'est soit une liste vide, soit un entier et le reste de la lis
 \begin{exercise}
 	Définir inductivement la taille d'une liste chaînée.
 \end{exercise}
-
-\subsubsection{Les arbres binaires}
 
 \begin{definition}[Arbre binaires]
 	Soit $A$ un ensemble. On définit de manière inductive les arbres binaires sur $A$ par : \begin{itemize}
@@ -292,6 +303,10 @@ and type arbre_liste = Vide | Cons arbre*arbre_liste
 \end{exercise}
 
 \subsubsection{Langages}
+
+\begin{com}
+	Ici comme exemple on aurait aussi pu prendre les langages réguliers, cela est plus pertinent comme construction, mais nécessite d'avoir déjà les définitions de bases sur les langages. Et de plus trouver des inductions parait non trivial
+\end{com}
 
 \begin{definition}
 	Soit $\Sigma$ un ensemble (appelé alphabet) fini et non vides d'éléments (appelés lettres). On définit inductivement l'ensemble des mots sur $\Sigma$, $\Sigma^*$ par la signature : \begin{itemize}

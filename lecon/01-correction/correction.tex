@@ -1,5 +1,14 @@
 \dev{Emile Martinez}{}{}{}
 
+
+\begin{com}
+	Ici correction est pris majoritairement dans le sens «est correct» et non dans le sens de «corriger», à savoir rectifier car c'est souvent dans ce sens là qu'on parle de correction de programme.
+\end{com}
+
+\begin{com}
+	On se concentre ici surtout sur les outils théoriques, en estimant que le terme «méthode» de l'intitulé de la leçon laisse penser que c'est sur ceux-là qu'il faut se concentrer
+\end{com}
+
 La conjecture de Syracuse est un problème ouvert de Mathématiques : \\
 La suite $u$ définie par : $\left\{ \begin{array}{l}
 	u_0 = a \in \N^*\\
@@ -25,6 +34,9 @@ Cela revient à savoir si l'algorithme \\
 \end{algorithm}
 renvoie toujours 1, 2 ou 4.
 
+\begin{com}
+	C'est un exemple fleuve qui nous permettra d'illustrer toutes les notions autour de la correction et leur non trivialité
+\end{com}
 \subsection{Terminaison}
 Une première question est de savoir si \texttt{Syracuse} finit (ne boucle pas à l'infini) sur toute entrée.
 
@@ -75,6 +87,10 @@ Tant que a > 0:
 		La fonction \texttt{pgcd(a,b)} qui calcule le pgcd de $a$ et $b$ pour $a, b \in \N$ admet comme variant $a+b$ (qui est en effet toujours positif, et décroit à chaque fois)
 	\end{minipage}
 \end{example}
+
+\begin{com}
+	Nous réutiliserons plusieurs fois cet exemple du pgcd
+\end{com}
 
 \begin{proposition}
 	\label{1-1}
@@ -186,6 +202,9 @@ Pour prouver la correction partielle des langages impératifs, on utilise un inv
 
 \subsubsection{Correction partielle des algorithmes récursifs}
 
+\begin{com}
+	On ne présente souvent pas la correction partielle des algorithmes récursifs, en se contentant de la correction totale directement. Néanmoins on présente quand cela, car cela illustre très bien la manière de raisonner quand on veut coder en récursif (et que tout est vrai)
+\end{com}
 
 \begin{principe}
 	Pour prouver la correction partielle d'un algorithme récursif, on vérifie que si \begin{itemize}[label=$\bullet$]
@@ -306,7 +325,7 @@ L'ordre bien fondé nous donne alors le variant et la propriété l'invariant. O
 	Ici on suppose que exp($a$,$n$)$ = a^n$ veut dire que exp termine et renvoie $a^n$
 \end{com}
 
-\subsection{Outils}
+\subsection{Outils pratiques}
 
 \begin{itemize}[label=$\star$]
 	\item Typer : Le fait d'utiliser un typage fort comme en OCamL permet d'éviter beaucoup d'erreurs bêtes
@@ -315,3 +334,8 @@ L'ordre bien fondé nous donne alors le variant et la propriété l'invariant. O
 	\item Utiliser des logiciels comme GDB ou valgrind pour détecter les fuites mémoires, ou l'inspecter au cours du programme.
 	\item Commentez ! C'est primordial pour déclarer la spécification des fonctions et rendre le code compréhensible, donc déboguable.
 \end{itemize}
+
+
+\begin{com}
+	On pourrait développer cette partie également en parlant plus longuement des tests (cf lecon \ref{L3}) qui est un autre type d'outils pour éprouver la correction d'un programme. Mais ca nous emmène un peu loin pour cette leçon (il faut bien faire des choix)
+\end{com}

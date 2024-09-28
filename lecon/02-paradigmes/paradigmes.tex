@@ -61,12 +61,16 @@ Informellement, programmer en fonctionnel, c'est considérer les fonctions comme
 	Un argument d'une fonction ou la valeur de retour d'une fonction peut être une fonction. C'est ce que l'on appelle la  programmation d'ordre supérieure.
 \end{rem}
 
+%\begin{com}
+%	On ne mets pas ici d'exemple car il nous faut à la fois l'ordre supérieur et la curryfication pour faire des choses intéressantes
+%\end{com}
+
 \begin{definition}
 	La \textbf{curryfication} est la transformation d'une fonction à plusieurs arguments en une fonction à un argument qui retourne une fonction sur le reste des arguments
 \end{definition}
 
 \begin{example}
-	On peut transformer la fonction \lstinline|max| de l'exemple \ref{2-1} en la fonction \lstinline|let max x y = if x > y yhen x else y de type int -> int -> int| \label{2-2}
+	On peut transformer la fonction \lstinline|max| de l'exemple \ref{2-1} en la fonction \\ \lstinline|let max x y = if x > y yhen x else y de type int -> int -> int| \label{2-2}
 \end{example}
 
 \begin{example}
