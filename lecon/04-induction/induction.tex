@@ -1,7 +1,7 @@
 \dev{Emile Martinez}{}{}{}
 
-\subsection{Principe}
-\subsubsection{Definition}
+\section{Principe}
+\subsection{Definition}
 
 \begin{definition}
 	$(\mathcal B, (f_i))$ est une signature sur $X$ si : \begin{itemize}	
@@ -54,7 +54,7 @@
 
 \noindent \textbf{Développement \ref{D?}} Validité de la construction d'un ensemble inductif (remarque \ref{4-3} et définition \ref{4-4})
 
-\subsubsection{Induction structurelle}
+\subsection{Induction structurelle}
 On prendra maintenant $(\mathcal B, (f_i)_{i \in I})$ une signature.
 
 \begin{proposition}
@@ -134,7 +134,7 @@ On prendra maintenant $(\mathcal B, (f_i)_{i \in I})$ une signature.
 	Si on manque de place, on peut mettre les ordres bien fondés en prérequis (mais alors écrire la formule dans le corollaire)
 \end{com}
 
-\subsubsection{En OCaml}
+\subsection{En OCaml}
 
 \begin{com}
 	On essaye de faire au maximum le lien entre les définitions formelles et OcamL
@@ -178,9 +178,9 @@ let rec ajouter x y = match y with
 	La validité de cette définition vient de la propriété \ref{4-5}
 \end{example}
 
-\subsection{Structures de données inductives}
+\section{Structures de données inductives}
 
-\subsubsection{Les listes chaînées}
+\subsection{Les listes chaînées}
 
 
 En OcamL on peut définir des listes d'entier simplement chaînés par \begin{lstlisting}
@@ -201,7 +201,7 @@ Ainsi, une liste c'est soit une liste vide, soit un entier et le reste de la lis
 	Définir inductivement la taille d'une liste chaînée
 \end{exercise}
 
-\subsubsection{Les arbres binaires}
+\subsection{Les arbres binaires}
 
 \begin{exercise}
 	Définir inductivement la taille d'une liste chaînée.
@@ -234,7 +234,7 @@ let rec hauteur arb = match arb with
 	Donner la définition inductive de la taille d'un arbre binaire (son nombre d'éléments)
 \end{exercise}
 
-\subsubsection{Les arbres généraux}
+\subsection{Les arbres généraux}
 
 \begin{definition}
 	Un arbre général est un noeud (la racine) et une liste d'arbre (ses fils)
@@ -263,9 +263,9 @@ and type arbre_liste = Vide | Cons arbre*arbre_liste
 	Dans la défense de plan, on peut parler ici des différentes définition des arbres (par coinduction, avec une infinité de constructeur (pour chaque $k \in \N^*$ d'arité $k$, pour les arbres à $k$ fils), par un constructeur $Ajout\_fils$ d'arité 2 où le premier argument est l'arbre sans son premier fils, et le dernier argument le premier fils (on en déduit les cas de bases))
 \end{com}
 
-\subsection{Ensembles inductifs}
+\section{Ensembles inductifs}
 
-\subsubsection{Formules propositionnelles}
+\subsection{Formules propositionnelles}
 
 \begin{definition}[formule propositionelle]~
 	Soit $V$ un ensemble de variables et la signature \begin{itemize}
@@ -302,7 +302,7 @@ and type arbre_liste = Vide | Cons arbre*arbre_liste
 	Définir l'équivalence entre formules et montrer par induction structurelle que, à équivalence près, on peut ne garder que les constructeurs $\neg$ et $\vee$
 \end{exercise}
 
-\subsubsection{Langages}
+\subsection{Langages}
 
 \begin{com}
 	Ici comme exemple on aurait aussi pu prendre les langages réguliers, cela est plus pertinent comme construction, mais nécessite d'avoir déjà les définitions de bases sur les langages. Et de plus trouver des inductions parait non trivial

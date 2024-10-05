@@ -4,11 +4,11 @@
 	Comme il y a beaucoup à dire, et que le titre ne mentionne pas d'aspects théoriques sur les structures, on suppose ici les structures déjà définie dans le cours. Ainsi, on rappelera uniquement, pour uniformisation les méthodes caractéristiques. On se concentre ainsi sur les implémentations et les applications.
 \end{com}
 
-\subsection{Les piles}
+\section{Les piles}
 
 \textbf{Rappel :} Une pile est une structure de données avec les méthodes \texttt{vide}, \texttt{est\_vide}, \texttt{empiler}, \texttt{depiler}.
 
-\subsubsection{Implémentation par listes}
+\subsection{Implémentation par listes}
 
 Cette manière est immédiate et donc naturelle.
 
@@ -18,7 +18,7 @@ Cette manière est immédiate et donc naturelle.
 
 Les listes étant naturelles en OCaml, nous les implémenterons de cette manière en Ocaml. Néanmoins cette pile est immuable.
 
-\subsubsection{Implémentation par tableaux}
+\subsection{Implémentation par tableaux}
 
 La deuxième manière est en utilisant un tableau. \\
 
@@ -52,15 +52,15 @@ La deuxième manière est en utilisant un tableau. \\
 	Laquelle de ces deux implémentations est mutable ? Immuable ?
 \end{exercise}
 
-\subsubsection{Complexité}
+\subsection{Complexité}
 
 Toutes ces opérations sont en $O(1)$. De plus sa complexité spatiale n'est, si l'implémentation est bien effectuée, que O(hauteur maximale de la pile)
 
-\subsection{Les files}
+\section{Les files}
 
 \textbf{Rappel :} Une file est une structure de données avec les méthodes \texttt{vide}, \texttt{est\_vide}, \texttt{enfiler}, \texttt{defiler}.
 
-\subsubsection{Par une liste chaînée}
+\subsection{Par une liste chaînée}
 
 \begin{idee}
 	On stocke les entrées dans une liste et on à l'aide de pointeurs le début et la fin de la file.
@@ -83,7 +83,7 @@ Toutes ces opérations sont en $O(1)$. De plus sa complexité spatiale n'est, si
 \end{exercise}
 
 
-\subsubsection{Par un tableau}
+\subsection{Par un tableau}
 
 \begin{idee}
 	Les éléments sont stockés consécutivement dans un tableau avec deux indices début et fin indiquant dans le tableau le début de la liste et la fin de la liste.
@@ -106,7 +106,7 @@ Toutes ces opérations sont en $O(1)$. De plus sa complexité spatiale n'est, si
 
 Ces deux implémentations sont mutables.
 
-\subsubsection{Par deux listes mais de manière immuable}
+\subsection{Par deux listes mais de manière immuable}
 
 
 \begin{idee}
@@ -130,15 +130,15 @@ Ces deux implémentations sont mutables.
 
 \textbf{Développement} Implémentation d'une file PAPS avec deux listes et (au choix) introduction à la complexité amortie / implémentation par une liste doublement chaînées
 
-\subsubsection{Pour aller plus loin}
+\subsection{Pour aller plus loin}
 
 Une liste doublement chaînée peut, au pris d'une lourdeur relative dans l'implémentation, fournir immédiatement les opérations de la pile et de la file combinée en O(1)
 
-\subsection{File de priorité}
+\section{File de priorité}
 
 \textbf{Rappel :} Une file de priorité est une structure de donnée ayant les méthodes \texttt{vide}, \texttt{est\_vide}, \texttt{insérer}, \texttt{extraire\_min}
 
-\subsubsection{En théorie}
+\subsection{En théorie}
 
 \begin{idee} 
 	Nous implémenterons les files de priorité à l'aide de tas min.
@@ -177,7 +177,7 @@ Une liste doublement chaînée peut, au pris d'une lourdeur relative dans l'impl
 	Tri par tas en $O(n \log(n))$
 \end{appl}
 
-\subsubsection{En pratique}
+\subsection{En pratique}
 
 \begin{idee} 
 	Pour implémenter de tels arbres, on peut les implémenter comme des structures récursives, en gardant le chemin jusqu'à la dernière feuille sous forme de listes de droite/gauche
@@ -203,7 +203,7 @@ Une liste doublement chaînée peut, au pris d'une lourdeur relative dans l'impl
 	Faire cette implémentation en C
 \end{exercise}
 
-\subsection{Applications aux graphes}
+\section{Applications aux graphes}
 
 \begin{algorithm}[H]
 	\caption{Parcours de graphe}
@@ -231,11 +231,11 @@ Si $a\_faire$ est une pile, on fait un parcours en profondeur et si $a\_faire$ e
 	On obtient alors les plus courts chemins.
 \end{algo}
 
-\subsection{Applications systèmes}
+\section{Applications systèmes}
 
 Ces structures sont utilisés dans de nombreuses applications à bas niveau.
 
-\subsubsection{Pile d'appel}
+\subsection{Pile d'appel}
 
 Quand on exécute un programme avec des appels successifs à des fonctions, de nouvelles variables sont crées, des emplacements pour les arguments, etc..., mais à la fin de la fonction, on doit restaurer l'environnement précédent.
 
@@ -247,7 +247,7 @@ Quand on exécute un programme avec des appels successifs à des fonctions, de n
 	Suivant la place (notamment si on ne prend pas tous les exemples), on peut rajouter un schéma
 \end{com}
 
-\subsubsection{Ordonnancement}
+\subsection{Ordonnancement}
 
     Pour gérer le parrallélisme, un ordonnanceur doit décider, quel processus doit être executé.
 
@@ -258,7 +258,7 @@ Pour cela on peut par exemple : \begin{itemize}
 	\item Mettre les processus dans une file, en prendre le premier élément, l'exécuté pendant un certain temps, puis le remettre en queue de file. C'est l'algorithme du tourniquet, qui garantie que tous les processus s'exécuterons un jour.
 \end{itemize}
 
-\subsubsection{Tampon}
+\subsection{Tampon}
 	
 	Dès que l'on a deux programmes dont la sortie de l'un est branché sur l'entrée de l'autre, et qui ne travaille pas à la même vitesse, on doit mettre un tampon entre les deux. On utilise alors une file PAPS pour stocker les données en attendant que le deuxième programme les récupère.
 	

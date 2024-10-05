@@ -8,7 +8,7 @@ Programmer, c'est mettre en relation un cahier des charges et des instructions c
 Suivant le contexte il en existe plusieurs que nous verrons ici.
 
 
-\subsection{La programmation impérative}
+\section{La programmation impérative}
 
 C'est la plus classique.
 
@@ -43,7 +43,7 @@ while (x != y):
 	Impératif est pris ici dans son sens courant (en informatique). Une autre définition d'impératif est qu'on dit exactement ce que la machine doit faire (ex : l'assembleur), ce qui s'opose alors au déclaratif (comme SQL). Mais cette notion est à degré (dans tous langage il y a une marge plus ou moins grande pour la machine) et n'est pas nécessairement celle à laquelle on pense quand on pense à de la programmation impérative (même si les deux sont très liées).
 \end{rem}
 
-\subsection{Programmation fonctionnelle}
+\section{Programmation fonctionnelle}
 
 \begin{definition}
 	La \textbf{programmation fonctionnelle} consiste à composer le programme de fonctions
@@ -87,9 +87,9 @@ Informellement, programmer en fonctionnel, c'est considérer les fonctions comme
 	La puissance du fonctionnel vient de la récursivité
 \end{rem}
 
-\subsection{Programmation orientée objet}
+\section{Programmation orientée objet}
 
-\subsubsection{Obtenir de la modularité}
+\subsection{Obtenir de la modularité}
 
 \begin{definition}
 	Une \textbf{classe} est un ensemble de types de données appelés \textbf{attributs} et de \textbf{fonction} appelées méthodes. \newline
@@ -128,7 +128,7 @@ a.afficher()
 	méthodes tq a.sort()). Cette classe implémente des tableaux de taille fixe et de nombreuses méthodes dessus. On peut les utiliser en ne comprenant rien à comment elles fonctionnent, seulement ce qu'elles font, mais on peut aussi les réimplenter sans rien changer à l'utilisation de ces tableaux par des millions de personnes.
 \end{example}
 
-\subsubsection{Pour résoudre un problème}
+\subsection{Pour résoudre un problème}
 
 Une autre utilité de la programmation orienté objet, et de représenter un problème avec ses différents objets que l'on fera intéragir entre eux.
 
@@ -146,9 +146,9 @@ class Arbre:
 	\end{lstlisting}
 \end{example}
 
-\subsection{Dans la vraie vie ?}
+\section{Dans la vraie vie ?}
 
-\subsubsection{Le multiparadigme}
+\subsection{Le multiparadigme}
 
 	Dans la vraie vie, la plupart des langages de programmation implémente plusieurs paradigmes. En effet, python, comme C ou Ocaml, permettent de faire des boucles while, de faire des tableaux, de faire des structures et des fonctions récurisves, et même les fonctions d'ordre supérieur dans une certaine mesure.\\
 	
@@ -156,7 +156,7 @@ class Arbre:
 	
 	Des langages comme C, C++, Fortran, python, Java sont des langages impératifs, quand Haskell, ML, OcamL sont fonctionnels. De plus, python, C++ sont orientés objets.
 
-\subsubsection{Comparaison des paradigmes}
+\subsection{Comparaison des paradigmes}
 	\begin{itemize}[label=$\star$]
 		\item Pour des structures récursives comme des arbres (ou des graphes peu denses), le paradigme fonctionnel est approprié
 		\item Le paradigme fonctionnel offre également élégance et lisibilité au code, avec moins d'instructions «superflues»
@@ -173,6 +173,6 @@ class Arbre:
 		\end{exercise}
 	\end{itemize}
 
-\subsubsection{Et SQL ?}
+\subsection{Et SQL ?}
 
 	Il existe néanmoins bien d'autres paradigmes, comme par exemple le paradigme logique, où seul le résultat est présenté par le code, et non la manière de l'obtenir. C'est par exemple le cas du SQL pour les bases de données, où l'exécution n'est pas dicté par la requête, seul son sens l'est, laissant le SGBD se charger du déroulement.

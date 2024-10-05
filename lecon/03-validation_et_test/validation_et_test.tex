@@ -1,8 +1,8 @@
 \dev{Emile Martinez, Malory Marin}{}{}{}
 
-\subsection{Introduction}
+\section{Introduction}
 
-\subsubsection{Qu'est-ce qu'un test}
+\subsection{Qu'est-ce qu'un test}
 
 Tester est un anglicisme pour le mot français essayer (ou éprouver). Me soumettant à la folie anglomane ambiante je garderai ce mot, soucieux de ma cohérence avec le monde extérieur.
 
@@ -14,7 +14,7 @@ Tester est un anglicisme pour le mot français essayer (ou éprouver). Me soumet
 	On ne cherche pas ici à prouver directement que le programme est correct, mais à prouver qu'on n'arrive pas à se rendre compte qu'il est incorrect.
 \end{rem}
 
-\subsubsection{Données de tests}
+\subsection{Données de tests}
 
 \begin{definition}
 	\textbf{Une donnée de test} est un couple (valeur d'entrée, valeur de sortie), où à l'évidence, le deuxième élément représente la valeur de sortie quand la fonction est appelée sur le premier élément.
@@ -32,7 +32,7 @@ Tester est un anglicisme pour le mot français essayer (ou éprouver). Me soumet
 	Un jeu de tests pour une fonction calculant le pgcd peut être \\$\left\{ \big((1,2), 1\big), \big((-3, 6), 3\big), \big((0, 0), 0\big), \big((2, 2.45), \text{Erreur de type}\big) \right\}$
 \end{example}
 
-\subsubsection{Types de tests}
+\subsection{Types de tests}
 
 Il existe deux types de tests : 
 \begin{itemize}
@@ -40,9 +40,9 @@ Il existe deux types de tests :
 	\item Les tests en boites blanches : On connait le code et on génère un jeu de test en fonction. 
 \end{itemize}
 
-\subsection{Tests en boîtes noires}
+\section{Tests en boîtes noires}
 
-\subsubsection{Caractéristiques}
+\subsection{Caractéristiques}
 
 Pour un test en boîtes noires, comme on ne connait pas le code, il faut tester beaucoup de données. Idéalement, toutes, mais cela se trouve souvent impossible.
 
@@ -52,7 +52,7 @@ Pour un test en boîtes noires, comme on ne connait pas le code, il faut tester 
 
 Viennent alors deux problèmes : Générer suffisament de données d'entrées et effectuer le test suiffisament rapidement.
 
-\subsubsection{Générer des données d'entrée}
+\subsection{Générer des données d'entrée}
 
 Dans de nombreux cas, ne pouvant pas essayer toutes les données d'entrées, on va devoir faire des choix.
 
@@ -87,7 +87,7 @@ Une fois cela fait, il est très commun que les erreurs puissent venir des cas l
 	Pour l'exemple précédent, on testerai les cas d'égalité : $0 <= a = b$, $a = 0 = b$, $a  = 0 <= b$ etc... (en effet par exemple, le cas 0, 0 est différent des autres, la valeur pouvant être $+\infty$ ou $0$ suivant les définitions).
 \end{example}
 
-\subsubsection{Utiliser les caleurs de sorties efficacement}
+\subsection{Utiliser les caleurs de sorties efficacement}
 
 Néanmoins, maintenant que l'on a les valeurs d'entrées, il faut pour avoir notre jeu de tests avoir également les valeurs de sorties.
 
@@ -116,9 +116,9 @@ Néanmoins, maintenant que l'on a les valeurs d'entrées, il faut pour avoir not
 	\end{enumerate}
 \end{example}
 
-\subsection{Tests en boite blanche}
+\section{Tests en boite blanche}
 
-\subsubsection{Graphe de flot de contrôle}
+\subsection{Graphe de flot de contrôle}
 
 Pour un test en boîte blanches, on connaît le code, et on va vouloir générer des données d'entrées en fonction de ce code là.\\
 
@@ -163,7 +163,7 @@ Pour cela, on extrait du code le graphe de flot de contrôle.
 	\end{minipage}
 \end{example}
 
-\subsubsection{Utilisation du graphe}
+\subsection{Utilisation du graphe}
 
 On essaye alors de générer un jeu de données qui parcourt une bonne partie du graphe.
 
@@ -195,7 +195,7 @@ Par exemple, un jeu couvrant : \begin{itemize}
 
 \noindent \textbf{Developpement \ref{D?}} Intérets et insuffisances de ces critères
 
-\subsubsection{Test exhaustif de condition}
+\subsection{Test exhaustif de condition}
 
 \begin{idee}
 	Une autre approche consiste à avoir un jeu qui satisfait ou invalide toutes les conditions de toutes les manières possibles.
@@ -218,7 +218,7 @@ int max(int a, int b){
 	\end{minipage}
 \end{example}
 
-\subsection{Pratiques pour éviter d'avoir à déboguer}
+\section{Pratiques pour éviter d'avoir à déboguer}
 
 
 Dans la pratique, de bonne pratique de code sont très efficace pour éviter de passer trop de temps à debugguer son code.
