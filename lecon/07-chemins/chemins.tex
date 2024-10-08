@@ -1,0 +1,284 @@
+\dev{Emile Martinez}{}
+
+\section{Definition}
+
+\begin{com}
+	Les applications sont éparpillées tout le long de la leçon, et relativement peu développer, donc il peut-être rentable des les souligner pendant la défense de plan.
+\end{com}
+
+\begin{definition}[chemin]
+	Dans un graphe orienté $G$ (resp. non orienté) on appelle chemin de longueur $\lambda$ une suite de $(\lambda + 1)$ sommets $(s_0, \, s_1, \,\dots, \, s_\lambda)$
+\end{definition}
+
+\begin{rem}
+	Par convention, on dit qu’il y a un chemin de longueur 0 de tout sommet vers lui-même.
+\end{rem}
+
+\begin{rem}
+	Dans un graphe non-orienté, les chemins sont aussi appelés chaînes.
+\end{rem}
+
+\begin{appl}
+	Dans un graphe de flot de contrôle, le critère tous les chemins consiste à trouver des tests qui font tous les chemins possibles du graphe
+\end{appl}
+
+\begin{com}
+	Une première application, dont on ne parle pas beaucoup plus parce que ca a pas grand chose a voir. Donc les chemins servent là, mais la théorie derrière n'est pas intéressante par la théorie des graphes. Illustre simplement la diversité de l'utilisation des graphes.
+\end{com}
+
+\begin{com}
+	On peut mentionner que ca fait déjà une première application
+\end{com}
+
+\begin{definition}[chemin élémentaire]
+	Un chemin est dit élémentaire s’il ne contient pas plusieurs fois le même sommet.
+\end{definition}
+
+\begin{com}
+	Par manque de place, cette définition peut être enlevé
+\end{com}
+
+\begin{definition}[circuit/cycle]
+	Dans un graphe orienté (resp. non orienté), un chemin $(s_0, \, \dots, \, s_\lambda)$ dont les $\lambda$ arcs (resp. arêtes) sont distincts deux à deux et tels que $s_0 = s_\lambda$ , est un circuit (resp. un cycle).
+\end{definition}
+
+\begin{example}
+	On dit qu'un circuit est hamiltonien si il passe par tous les sommets une et une seule fois. Décider de l'existence d'un tel circuit dans un graphe est NP-complet (i.e. dur)
+\end{example}
+
+\begin{exercise}
+	On dit qu’un graphe non orienté est Eulérien s’il existe un cycle passant par chaque arête exactement une fois. Montrer qu’un graphe est eulérien si et seulement si tous ses sommets sont de degré pair.
+\end{exercise}
+
+\begin{com}
+	Ces deux choses là peuvent être présenter comme des formes d'applications, du moins d'application des définitions (il semble important que la NP-complétude de quelque chose soit mentionné dans cette leçon)
+\end{com}
+
+\begin{definition}[accessibilité]
+	Étant donné un graphe $G$ (orienté ou non) et deux sommets $s$ et $t$, on dit que $t$ est accessible depuis $s$ s’il existe un chemin allant de $s$ à $t$ dans $G$.
+\end{definition}
+
+\section{Accessibilité}
+
+\subsection{Tri topologique}
+
+\begin{definition}[tri topologique]
+	Étant donné un graphe orienté $G = (S,A)$, on dit que $\sigma : S \to \llbracket 1,  |S| \rrbracket$ est un tri topologique si $(s,t) \in A \implies \sigma(s) < \sigma(t)$
+\end{definition}
+
+\begin{corollary}
+	Soit $\sigma$ un tri topologique sur $G$. Pour $s, t \in S$, si il existe un chemin de $s$ à $t$, alors $\sigma(s) \leq \sigma(t)$
+\end{corollary}
+
+\begin{proposition}
+	$G$ est acyclique si et seulement si $G$ admet un tri topologique.
+\end{proposition}
+
+\begin{proof}[pour le sens direct]
+	On montre par l'absurde par récurrence qu'un graphe acyclique a un sommet source.\\
+	On montre par récurrence la proposition sur $|S|$
+\end{proof}
+
+\begin{algo}Construction d'un tri topologique
+	\begin{itemize}[label=$\bullet$]
+		\item Créer une pile vide
+		\item Faire un parcours en largeur postfixe de G en appliquant la fonction empile
+		\item Renvoyer la pile
+	\end{itemize}
+\end{algo}
+
+\begin{appl}
+	Ordonnancement de tâches
+\end{appl}
+
+\begin{definition}
+	Soit $T=\{ t_1, \, \dots, \, t_n \}$ un ensemble de tâches d'un ordinateur et $C = T^2$ un ensemble de contraintes $((t_i, t_j) \in C$ veut dire que $t_i$ doit être fait avant $t_j$). Un ordonnancement de ces tâches est un ordre d'éxécution de ces tâches.
+\end{definition}
+
+\begin{proposition}
+	On peut trouver un ordonnancement en temps linéaire
+\end{proposition}
+
+\begin{proof}
+	On prend le graphe $(T, C)$ est on fait un tri topologique.
+\end{proof}
+
+\subsection{Connexité}
+
+\begin{proposition}
+	La relation «il existe un chemin de $s$ à $t$ et de $t$ à $s$» est une relation d'équivalence.
+\end{proposition}
+
+\begin{exercise}
+	Montrer que le graphe quotienté par cette relation d'équivalence est acyclique
+\end{exercise}
+
+\begin{com}
+	Ici on introduit le DAG des classes des composantes (fortement) connexes. On peut néanmoins dire que suivant le niveau de la classe, il est très probable que le terme quotienté ne soit pas maitrisé. Donc la on le met par concision, au cas où il aurait déjà était vu en maths (hors programme en maths), mais en vrai on pourrait périphraser et faire des définitions. De plus la c'est un plan, donc on dit ce qu'on ferait dans l'exercice, pas tout l'énoncé rigoureux.
+\end{com}
+
+\begin{definition}
+	Dans un graphe non orienté (resp. orienté), les classes d'équivalence de cette relation sont appelés composantes connexes (resp. fortement connexes).\\
+	Si il n'y a qu'une seul classe, le graphe est dit connexe (resp. fortement connexe)
+\end{definition}
+
+
+\begin{com}
+	On prend ca comme déf et non pas la propriété suivantes en ayant défini connexe comme un chemin de tous le monde à tout le monde, pour avoir une définition plus explicites et naturelles que de passer par la maximalité. Néanmoins, cela nécessite l'abstraction de la classe d'équivalence (vue en maths). Si la classe est faible, on peut faire tout ca plus avec les mains.
+\end{com}
+
+\begin{exercise}
+	Dans un graphe connexe, deux chemins élémentaires maximaux ont un nœud en commun.
+\end{exercise}
+
+\begin{proposition}
+	Une composante connexe (resp. fortement connexe) est un sous-graphe connexe (resp. fortement connexe) maximal.
+\end{proposition}
+
+\begin{algo} \enspace\\
+	\begin{algorithm}[H]
+		\Tq{un sommet n'est pas visité}{
+		    Créer une nouvelle composante connexe\\
+			Parcourir le graphe des sommets non visités depuis un sommet v non visité en ajoutant a la composante tous les sommets que l'on croise
+		}
+		\caption{Calcul des composantes connexes (cas non orienté)}
+	\end{algorithm}
+\end{algo}
+
+Pour les composantes fortement connexes, il faudra plus qu'un simple parcours.
+
+\begin{algo}\enspace \\
+	\begin{algorithm}[H]
+		\caption{Algorithme de Kosaraju}
+		Appliquer l'algorithme de construction d'un tri topologique (meme si le graphe a des cycles)\\
+		Prendre $G^T$ le graphe transposé de $G$ (i.e., $(u,v)$ devient $(v,u)$)
+		\Pour{i allant de 1 à n}{
+			Si $\sigma(i)$ n'a pas déjà été visité\\
+			Créer une nouvelle composante fortement connexe\\
+			Visiter $G^T$ depuis $\sigma(i)$ en ajoutant les sommets visités non encore attribués\\
+		}
+	\end{algorithm}
+\end{algo}
+
+\begin{proposition}
+	Cet algorithme construit les composantes fortement connexes en temps linéaire
+\end{proposition}
+
+\begin{definition}
+	Le problème 2-SAT est le problème de savoir si étant donné $n$ variables $x_1, \,\dots ,\, x_n$ et $p$ clauses $C_1, \,\dots ,\, C_p$ de taille 2 sur $x_1,\, \dots, \, x_n$, $\varphi = \bigwedge\limits_{i=1}^p C_i$ est satisfiable
+\end{definition}
+
+\textbf{Developpement :} Résolution en temps linéaire de 2-SAT.
+
+\section{Plus court chemin}
+
+\begin{definition}[graphe pondéré]
+	Un graphe pondéré est un graphe $G = (S, A)$ muni d’une fonction de poids $w : A \to Z$.\\
+	Le poids d’un chemin est alors défini comme la somme des poids des arêtes qui le compose.
+\end{definition}
+
+\begin{rem}
+	On peut étendre $w$ à $S^2$ en posant $w(u, v) = +\infty$ lorsque $(u, v) \notin A$.
+\end{rem}
+
+\begin{definition}
+	Dans un graphe $G$, un plus court chemin (pcc) de $u$ à $v$ ($u,v\in S$) est un chemin de poids minimal de $u$ à $v$
+\end{definition}
+
+\begin{rem}
+	Si les poids sont unitaires, on peut trouver le pcc entre deux sommets $u$ et $v$ en faisant un parcours en largeur depuis $u$.
+\end{rem}
+
+\begin{com}
+	On considère les parcours déjà vu (servant dans bien d'autres contextes que les chemins dans les graphes). Ici on fait simplement le lien, et on illustre la notion. On pourrait également le faire sur un exemple au tableau, et essayer de le faire devnier aux élèves (lien entre différentes parties du cours)
+\end{com}
+
+\subsection{D'un sommet à tous les autres}
+
+Lorsque la fonction de poids est à valeur dans $\N$, on peut utiliser l'algorithme de Dijkstra.
+
+\begin{algo}
+	\begin{algorithm}
+		\caption{dijkstra(G, S)}
+		$distance \gets $ tableau de taille $|S|$ initialisé à $+\infty$\\
+		$distance[s] \gets 0$\\	
+		$F \gets FilePriorite()$\\
+		$Inserer(F, s, 0)$\\
+		\Tq{$\neg estVide(F )$}{
+			$u, du \gets ExtraireMin(F)$\\
+			\Pour{$v \in N(u)$}{
+				$d \gets du + w(u, v)$\\
+				
+				\Si{$d < distance[v]$}{
+					\eSi{$distance[v] = +\infty$}{
+						$Inserer(F ,v,d)$
+					}{
+						$DiminuerPriorite(F ,v,d)$\\
+						$distance[v] \gets d$
+					}
+				}
+			}
+		}
+		\Retour $distance$
+	\end{algorithm}
+\end{algo}
+
+\begin{proposition}
+	L’algorithme de Dijkstra réalise au plus $|S|$ appels à $Inserer$ et $ExtraireMin$, et $|A|$ appels à $DiminuerPriorite$.\\
+	Donc avec un tas min, on obtient $O(|A| \times \log |S|)$
+\end{proposition}
+
+\begin{rem}
+	Si la structure d'entrée est une matrice d'adjacence, on peut faire l'algorithme en $O(n^2)$ sans structure particulière pour $F$.
+\end{rem}
+
+\begin{rem}
+	Lorsque la fonction de poids est à valeur dans $\mathbb Z$ et que le graphe ne contient aucun circuit absorbant, on peut utiliser l'algorithme de Bellman-Ford.
+\end{rem}
+
+\begin{appl}
+	Détection des cycles absorbants.
+\end{appl}
+
+\begin{rem}
+	Si l'on souhaite seulement le plus court chemin entre deux points, on peut utiliser l'algorithme A* (Dijkstra + heuristique du chemin restant).
+\end{rem}
+
+\subsection{De tous les sommets à tous les sommets}
+
+Lorsque le graphe ne contient aucun cycle absorbant, l'algorithme de Floyd Warshall calcule les plus courts chemins entre toute paire de sommets de $S=\{1, \, \dots , \,n\}$ par programmation dynamique. \begin{itemize}[label=$\star$]
+	\item \textbf{Sous-problèmes :} $d^{(k)(i,j)}$ la distance du pcc de $i$ à $j$ avec seulement $\llbracket 1, k \rrbracket$ comme sommets intermédiaires
+	\item \textbf{Relation de récurrence}
+	$$ \begin{array}{l}
+		d^{(0)}(i,j) = w(i,j)\\
+		d^{(k+1)}(i,j) = \min\left(d^{(k)}(i,j), \enspace d^{(k)}(i,k) + d^{(k)}(k, j)\right)
+	\end{array} $$
+	\item \textbf{Résolution :} On résout sur $S^2$ à $k$ croissant
+\end{itemize}
+
+\begin{proposition}
+	Floyd Warshall est en $O(n^3)$
+\end{proposition}
+
+\begin{rem}
+	Si les poids sont positifs, appliquer dijkstra à chaque sommet nous donne $O(n \times |A| \times \log n)$
+\end{rem}
+
+\begin{rem}
+	Cette algorithme utilise une matrice d'adjacence (algorithme centralisé)
+\end{rem}
+
+\begin{algo}
+	Si on a des listes d'adjacence (algorithme décentralisé/distribué), on peut utiliser l'algorithme de Bellman Ford
+\end{algo}
+
+\begin{appl}
+	Routage des paquets d'un réseau par le protocole IP avec l'algorithme de Bellman Ford.
+\end{appl}
+
+\noindent \textbf{Developpement :} Presentation et terminaison de l'algorithme de Bellamn Ford.
+
+
+\begin{com}
+	On a fait une leçon sur les graphes, sans aucun dessin de graphes. En vrai, il pourrait y en avoir sur des exemples, et puis les schémas ne sont pas absolument necessaires pour illustrer la plupart des concepts, dont surtout la formalisation est imporante (la def d'un chemin est explicite).
+\end{com}
