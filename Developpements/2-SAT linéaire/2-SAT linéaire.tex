@@ -1,0 +1,88 @@
+\dev{Marin Malory}{\cite{Lesesvre}}
+
+\textit{Ce développement propose de montrer que le problème 2-$\mathbf{SAT}$ est décidable en temps linéaire. Pour cela, on montre que résoudre ce problème revient à déterminer les composantes fortement connexes d'un certain graphe. 
+Ainsi, ce développement s'intègre dans la leçon $\ref{L26}$ comme illustration non évidente d'un problème $\mathbf{P}$. De plus, il s'insère naturellement dans la leçon \ref{L28} pour illustrer un problème de satisfiabilité. Enfin, ce développement illustre une application non tivial des algorithmes permettant de déterminer les composantes fortement connexes d'un graphe, tels que Tarjan ou Kosaraju, et s'intègre alors parfaitement dans la leçon \ref{L7}.}
+
+\begin{definition}[2-$\mathbf{SAT}$]~
+
+\noindent \textbf{Données :} 
+\begin{itemize}
+\item un ensemble de variables propositionnelles $X = \{x_1,...,x_n\}$
+\item une formule $F$ sous forme normale conjonctive où chaque clause est composée de $2$ littéraux (un littéral étant une variable ou sa négation).
+\end{itemize}
+\noindent\textbf{Problème :} existe-t-il une valuation $ d : \{x_1,...,x_n\} \rightarrow \{0,1\}$ telle que $d(F)=1$ ?
+\end{definition}
+
+On se propose de montrer le théorème suivant :
+
+\begin{theorem}\label{2SAT1}
+2-$\mathbf{SAT}$ est décidable en temps linéaire.
+\end{theorem}
+
+\paragraph{Construction du graphe.} Soit $X= \{x_1,...,x_n\}$ et $F=C_1 \wedge C_2 \wedge ... \wedge C_m$ une instance de 2-$\mathbf{SAT}$. On construit le graphe orienté $G=(V,E)$ avec :
+\begin{itemize}
+\item $S = \{x_1,\overline{x_1},...,x_n,\overline{x_n} \}$ ;
+\item pour $1\leq i \leq m$, en notant $C_i = u \vee v$, on a $(\overline{u},v) \in E$ et $(\overline{v},u) \in E$.
+\end{itemize}
+
+\begin{rem}On remarque que la taille du graphe est linéaire en la taille de la formule.
+\end{rem}
+
+
+\paragraph{Caractérisation de la satisfiabilité.} On peut alors montrer le résultat suivant :
+
+\begin{theorem}\label{2SAT2}
+$F$ est satisfiable si, et seulement si aucune composante fortement connexe de $G$ ne contient à la fois une variable $x$ et son complément $\overline{x}$.
+\end{theorem}
+
+\begin{lemma}\label{2SAT3}
+Soit $d$ une valuation. On a $d(F)=0$ si, et seulement s'il existe un chemin $l_1...l_k$ dans $G$ avec $d(l_1)=1$ mais $d(l_k)=0$.
+\end{lemma}
+
+\begin{proof}
+Si $d(F)=0$, alors il existe une clause $C=u \vee v$ telle que $d(C)=0$. On prend alors le chemin $\overline{u}v$, et on a $d(\overline{u})=1$ et $d(v)=0$.
+
+Réciproquement, on suppose $d( F)=1$. Montrons tout d'abord que si $uv\in E$ et $d(u)=1$, alors $d(v)=1$. En effet, si $uv\in E$, alors on a dans $F$ la clause $\overline{u}\vee v$ ou la clause $v \vee \overline{u}$ (donc la même clause).  On a directement $d(v)=1$.
+
+Ainsi, s'il existait un chemin $l_1...l_k$ dans $G$ avec $d(l_1)=1$, alors on a immédiatement $d(l_2)=...=d(l_k)=1$.
+\end{proof}
+
+
+\begin{proof}[ du sens direct du théorème \ref{2SAT2}]
+Par contraposée, on suppose qu'il existe $x$ et $\overline{x}$ dans la même composante fortement connexe. Soit $d$ une valuation, montrons $d(F)=0$. Il y a deux cas :
+\begin{itemize}
+\item si $d(x)=1$, alors puisqu'il existe un chemin $x\rightsquigarrow \overline{x}$ et $d(\overline{x})=0$, on conclut par le lemme \ref{2SAT3} que $d(F)=0$ ;
+\item si $d(x)=0$, alors on a $d(\overline{x})=1$ et il existe un chemin $\overline{x} \rightsquigarrow x$ dans $G$. On conclut de la même manière.
+\end{itemize}
+Ainsi, $F$ n'est pas satisfiable.
+\end{proof}
+
+
+\begin{proof}[du sens indirect du théorème \ref{2SAT2}]
+
+On suppose maintenant que pour tout $x\in X$, on a $x$ et $\overline{x}$ dans des composantes fortement connexes différentes. On utilisera le lemme suivant.
+
+\begin{lemma}
+Pour toute composante fortement connexe $C$ de $G$, il existe une composante fortement connexe $\overline{C}$ tel que $u\in C \Leftrightarrow \overline{u}\in C$.
+\end{lemma}
+
+\begin{proof}
+Soit $u\in C$, on pose $\overline{C}$ la composante de $\overline{u}$. On montre alors que $v\in C \Leftrightarrow  \overline{c}\in \overline{C}$.
+
+On a $v\in C$ si, et seulement si $u \rightsquigarrow v$ et $v\rightsquigarrow u$. Or, s'il existe un chemin $u_1...u_k$ dans $G$, on a par définition de $G$ l'existence du chemin $\overline{u_k} ...\overline{u_1}$. Ainsi, on a 
+$u \rightsquigarrow v$ si, et seulement si $\overline{v} \rightsquigarrow \overline{u}$. On peut conclure facilement.
+\end{proof}
+
+On peut maintenant construire la valuation. On considère le graphe des composantes fortement connexes de $G$. Il s'agit d'un DAG et on peut alors prendre un tri-topologique de ce graphe $C_1....C_n$. On construit la valuation $d$ de la manière suivante : pour $i=1...n$, si $C_i$ n'a toujours pas été traitée, alors on pose $d(C_i)=1$ et $d(\overline{C_i})=0$.
+
+La fonction $d$ est bien définie par hypothèse. Par l'absurde, si $d(F)=0$, alors il existe un chemin $l_1....l_k$ dans $G$ avec $d(l_1)=1$ mais $d(l_k)=0$. En particulier, il existe une arête $ll'$ sur le chemin avec $d(l)=1$ et $d(l')=0$. On a $l$ et $l'$ dans deux CFC différentes $C$ et $C'$. Puisque $d(C)=1$, $\overline{C}$ est après dans le tri topologique ($\overline{C} <C$). Puisque $d (C')=0$, $\overline{C'}$ a été traité avant et donc $C'< \overline{C'}$. Enfin, puisqu'on a une arête entre $C$ et $C'$, on a $C<C'$, et donc :
+$$
+\overline{C} < C < C' < \overline{C'}
+$$
+Or, puisque $ll'\in E$, on a $\overline{l'}\overline{l}\in E$, et donc $\overline{C'}< \overline{C}$, c'est absurde.
+
+Finalement, $F$ est satisfiable.
+\end{proof}
+
+
+Le théorème \ref{2SAT1} est alors un corollaire du théorème \ref{2SAT2} puisqu'il suffit de calculer les composantes fortement connexes en temps linéaire (via Tarjan ou Kosaraju), et de vérifier linéairement si une variable et sa négation sont dans la même CFC.

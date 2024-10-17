@@ -1,0 +1,56 @@
+\dev{Marin Malory}{\cite{Mitzenmacher}}
+
+\textit{Ce développement présente un exemple d'utilisation d'aléatoire afin de vérifier si un produit de matrice est correct de manière efficace. Il s'intègre ainsi dans la leçon \ref{L3} et de part sa nature probabiliste, il illustre la leçon \ref{L11}. }
+
+
+\paragraph{Introduction.} On considère ici un exemple où utiliser de l'aléatoire permet de vérifier une égalité plus rapidement que les algorithmes déterministes. L'idée est de vérifier si un algorithme réalise bien le produit de matrice, sans pour autant utiliser un algorithme déterministe réalisant ce calcul.
+
+On se concentrera ici sur des matrices d'entiers modulo 2, avec $A$ et $B$ deux matrices, et $C$ la matrice à tester.
+
+\begin{theorem}\label{ThmVerif}
+Soient $A,B,C\in \{0,1\}^{n\times n}$. Si $AB\neq C$, et si $r$ est choisit uniformément dans $\{0,1\}^n$, alors 
+$$
+\mathbb{P}(ABr =Cr) \leq \frac{1}{2}
+$$
+\end{theorem}
+
+Pour montrer ce théorème, on utilise le lemme suivant.
+
+\begin{lemma}
+Choisir $r=(r_1, r_2,...,r_n) \in \{0,1\}^n$ aléatoirement et uniformément est équivalent à choisir chaque $r_i$ uniformément et indépendamment dans $\{0,1\}$.
+\end{lemma}
+
+\begin{proof}
+Si chaque $r_i$ est tiré uniformément et indépendamment, chacun des $2^n$ vecteurs de $\{0,1\}^n$ a une probabilité $2^{-n}$ d'être tiré.
+\end{proof}
+
+\begin{proof}[du théorème \ref{ThmVerif}]
+ L'événement considéré est \og $ABr=Cr$ \fg.  Soit $D=AB-C\neq 0$. Ainsi, $ABr=Cr$ implique $Dr=0$. Puisque $D\neq 0$, il existe au moins un coefficient non nul : on prend $d_{11}\neq 0$ sans perdre de généralité.
+ 
+Puisque $Dr=0$, on a :
+$$
+\sum_{j=1}^n d_{1j}r_j=0
+$$
+et de manière équivalente  :
+\begin{equation}
+r_1 = - \frac{\sum_{j=2}^n d_{1j}r_j}{d_{11}}
+\end{equation}
+
+Maintenant, on utilise le lemme précédent. Au lieu de considérer qu'on tire uniformément $r$ dans $\{0,1\}^n$, on suppose que l'on tire chaque $r_i$ indépendamment et uniformément dans $\{0,1\}$, de $r_n$ jusqu'à $r_1$. En particulier, on peut supposer que l'on choisit $(r_2,...,r_n)$ uniformément dans $\{0,1\}^{n-1}$ et $r_1$ uniformément dans $\{0,1\}$. Ces deux tirages sont réalisés de manière indépendante.
+
+D'après la formule des probabilités totales :
+
+\begin{align*}
+\mathbb{P}(ABr=Cr)
+&= \sum_{(x_2,...,x_n) \in \{0,1\}^{n-1}} \mathbb{P}(ABr=Cr \cap (r_2,...,r_n) = (x_2,...,x_n)) \\
+&\leq \sum_{(x_2,...,x_n) \in \{0,1\}^{n-1}} \mathbb{P}\left(r_1 = - \frac{\sum_{j=2}^n d_{1j}r_j}{d_{11}}
+\cap (r_2,...,r_n) = (x_2,...,x_n)\right) \\
+&= \sum_{(x_2,...,x_n) \in \{0,1\}^{n-1}} \mathbb{P}\left(r_1 = - \frac{\sum_{j=2}^n d_{1j}r_j}{d_{11}}\right) .
+\mathbb{P}\left( (r_2,...,r_n) = (x_2,...,x_n)\right) \\
+&= \sum_{(x_2,...,x_n) \in \{0,1\}^{n-1}} \frac{1}{2} .
+\mathbb{P}\left( (r_2,...,r_n) = (x_2,...,x_n)\right) \\
+&=\frac{1}{2}
+\end{align*}
+\end{proof}
+
+Pour améliorer la probabilité d'erreur du théorème précédent, il suffit de faire tourner plusieurs tests. Si l'algorithme trouve un $r$ tel que $ABr\neq Cr$, alors l'algorithme retourne correctement $AB\neq C$. Si on trouve $ABr=Cr$ pour $k$ tests, alors on retourne $AB=C$, ce qui est vrai avec une probabilité $\geq 1-2^{-k}$. La complexité de ce test est alors en $\mathcal{O}(kn^2)$.

@@ -1,0 +1,235 @@
+\dev{Emile Martinez}{mon cul}
+
+\textit{Ce développement présente comment faire du C sans fonction avec du Ocaml sans boucle, et réciproquement. Il peut donc servir à illustrer les paradigmes de programmation ou encore l'universalité de la notion de calculabilité}\\
+
+Fonctionnel : OcamL sans boucle while
+
+Impératif : C sans fonction
+
+\begin{com}
+	Remarque à moduler suivant le contexte de ce développement
+\end{com}
+
+
+$\star$ Impératif vers fonctionnel
+
+$$ \underset{\text{transforme un état de la mémoire en un autre}}{\underset{\uparrow}{\text{programme C}}} \leadsto \text{fonction} : \text{Etat de la mémoire} \to \text{Etat de la mémoire} $$
+
+\paragraph{Exemple}
+$\begin{array}{l}
+	x = 1\\
+	y = x + 1\\
+	x = x*y \end{array}$
+$\leadsto$ 
+$\left( fun(x,y) \to (x*y, y)\right) \quad \circ \quad \left( fun(x,y) \to (x, x+1)\right)
+	\quad \circ \quad \left( fun(x,y) \to (1, y)\right)$\\
+
+Tout se traduit naturellement. (Les tableaux vers des listes, les opérations arithmétiques tel quel, etc...). Il ne reste alors que les boucles while.\\
+
+\begin{minipage}{0.12\linewidth}
+\begin{lstlisting}[style=CStyle]
+while(C){
+	S;
+}
+\end{lstlisting}
+\end{minipage} \quad
+On suppose que C ne modifie pas l'état de la mémoire.
+\\
+On procède alors par induction et que l'on a donc $ \begin{array}{l}
+\text{C} \leadsto f_{\text C} : \text{Etat de la mémoire} \to bool\\
+\text{S} \leadsto f_{\text S} : \text{Etat de la mémoire} \to \text{Etat de la mémoire}
+\end{array}$
+\\
+Alors \begin{minipage}{0.12\linewidth}
+	\begin{lstlisting}[style=CStyle]
+	while(C){
+	S;
+	}
+	\end{lstlisting}
+\end{minipage} $\quad \leadsto \quad$ \begin{minipage}{0.7 \linewidth}
+\begin{lstlisting}
+let rec while_S_C args =
+    if <@$f_C$@> args then while_S_C (<@$f_S$@> args)
+                      else args
+\end{lstlisting}
+\end{minipage}\\\\
+
+$\star$ Fonctionnel vers Impératif
+\begin{enumerate}
+	\item De OCamL vers C avec fonction
+	\item De C avec fonction vers C sans fonction
+\end{enumerate}
+
+\paragraph{1.} Comme on a le droit aux fonctions, c'est naturel, sauf :
+\begin{itemize}[label = $\bullet$]
+	\item le polymoprhisme : On suppose les fonctions non polymorphes
+	\item l'ordre supérieur : c'est du sucre syntaxique.\\\\
+	Exemple : \enspace
+	\begin{minipage}{0.35\linewidth}
+		\begin{lstlisting}
+(fun f x y -> 
+	if f x y 
+	    then x 
+	    else y
+) (fun x y -> x < y)
+		\end{lstlisting}
+	\end{minipage}\enspace devient \enspace \begin{minipage}{0.3\linewidth}
+	\begin{lstlisting}
+fun x y -> 
+    if x < y then x 
+             else y
+	\end{lstlisting}
+\end{minipage}
+	\item la curryifcation : on décurryfie
+\end{itemize}
+
+\paragraph{2.} \enspace
+\begin{com}
+	Dans cette partie là, on peut soit présenter la pile d'appels en parlant de saut, et en présentant comment elle fonctionne sans écrire le code. (Il faut alors adapter les annonces au dessus en fonction). Sinon on fait une version plus explicite (qui suit), mais qui n'est pas la vrai manière.
+\end{com}
+
+Pour simplifier, on suppose sans perte de généralité que tous les appels de fonctions sont de la forme
+\begin{lstlisting}[style=CStyle]
+variable = f(liste variables sans appels de fonctions)
+\end{lstlisting}
+
+
+
+Idée de la transformation : \begin{enumerate}
+	\item avoir une pile stockant dans l'ordre, les lignes de code devant être exécutées et la valeur des variables à ce moment là
+	\item tant que la pile est non vide, prendre le sommet, et executer la ligne indiqué avec l'environnement associé.
+	\item quand on exécute une ligne, calculer le nouvel environnement qu'elle produit, et ajouter sur la pile, les lignes qui doivent être alors exécutés, avec ce nouvel environnement.
+	\item on empile deux choses : \begin{enumerate}
+		\item le fait qu'il faudra reprendre le code là où on l'avait laissé
+		\item la première ligne de la fonction avec comme environnement, ses paramêtres avec des valeurs.
+		\end{enumerate}
+	\item Une valeur spéciale pour gérer les valeurs de retour
+\end{enumerate} \enspace\\
+
+\begin{com}
+	Ici je mets ce qu'ont doit dire ou écrire en parallèle de l'écriture de la liste au dessus.
+\end{com}
+\begin{enumerate}
+	\item \quad \begin{minipage}{0.25 \linewidth}
+		\begin{lstlisting}[style=CStyle]
+<@\setcounter{lstnumber}{32}@>
+<@ $\hdots$ @>
+x = 1 + y;
+<@ $\hdots$ @>
+\end{lstlisting} \end{minipage} \enspace deviendra \qquad \begin{minipage}{0.50 \linewidth}
+		\begin{lstlisting}[style=CStyle]
+while(! est_vide(pile)){
+    ligne, env = depiler(pile)<@\setcounter{lstnumber}{110}@>
+    <@$\hdots$@>
+    if (ligne == 34){
+        env[x] = 1 + env[y];
+        empiler(pile, 35, env);
+    }
+    <@$\hdots$@><@\setcounter{lstnumber}{300}@>
+}
+\end{lstlisting}
+	\end{minipage}
+	
+	\item On écrit ce que l'on vient d'expliquer.
+	\item
+	\item Pour un appel de fonctions, on a envie de dire qu'on va devoir executer deux lignes : celle de la fonction, puis après le reste du programme\\
+	\begin{minipage}{0.2\linewidth}
+\begin{lstlisting}[style=CStyle]
+<@ $\hdots$ @><@\setcounter{lstnumber}{10}@>
+void f(){
+    <@ $\hdots$ @><@\setcounter{lstnumber}{20}@>
+}
+<@ $\hdots$ @><@\setcounter{lstnumber}{52}@>
+f();
+<@ $\hdots$ @>
+\end{lstlisting}
+	\end{minipage}\enspace deviendrait \qquad \begin{minipage}{0.50\linewidth}
+\begin{lstlisting}[style=CStyle]
+while (! est_vide(pile)){
+    ligne, env = depiler(pile)<@\setcounter{lstnumber}{60}@>
+    <@$\hdots$@>
+    if (ligne == 11){
+        // Executer le code de f
+    }<@\setcounter{lstnumber}{106}@>
+    <@$\hdots$@>
+    if (ligne == 53){
+        empiler(pile, env, 54);
+        empiler(pile, env, 12);
+    }
+    <@ $\hdots$ @><@\setcounter{lstnumber}{286}@>
+}
+\end{lstlisting}
+\end{minipage}
+\end{enumerate}
+
+
+Les points 2 et 3 sont l'algorithme de transformation.
+
+On associera à chaque variables un numéro. Un environnement devient alors seulement un tableau. On mettra également une valeur pour la valeur de retour d'une fonction.
+
+Quand on fait un retour de fonction, on doit s'occuper de communiquer la valeur de retour à la variables d'après
+
+\begin{com}
+	Ce qui suit peut éventuellement être taper à l'ordi et projeter
+\end{com}
+
+\begin{minipage}{0.3\linewidth}
+\begin{lstlisting}[style=CStyle]
+int f(int x){
+    if(x==0)
+        return 1;
+    else{
+        int z = f(x-1);
+        return x*z;}
+}
+int y = f(4);
+\end{lstlisting}
+\end{minipage}
+\enspace Tableau des variables (j'ai oublié le terme) : \begin{tabular}{|c|c|}
+	\hline ret & 0 \\ \hline
+	x & 1 \\ \hline
+	y & 2 \\ \hline
+	z & 3 \\ \hline
+\end{tabular}
+
+\begin{lstlisting}[style=CStyle]
+pile pile = pile_vide;
+int env[5];
+empiler(pile, env, 8);
+while ! est_vide(pile):
+    env, ligne = depile(pile)
+    if (ligne == 2){
+        if(env[1] == 0)
+            empiler(pile, env, 3);
+        else
+            empiler(pile, env, 5);
+    }
+    if(ligne == 3){
+        env2, ligne2 = depiler(pile);
+        env2[0] = 1;
+        empiler(pile, env2, ligne2);
+    }
+    if(ligne == 5){
+        empiler(pile, env, 5bis);
+        env[1] = env[1] - 1;
+        empiler(pile, env, 2);
+    }
+    if(ligne == 5bis){
+        env[3] = env[0];
+        empiler(pile, env, 6);
+    }
+    if(ligne == 6){
+        env2, ligne2 = depiler(pile);
+        env2[0] = env[1]*env[3];
+        empiler(pile, env2, ligne2);
+    }
+    if(ligne == 8){
+        empiler(pile, env, 8bis);
+        env[1] = 4;
+        empiler(pile, env, 2);
+    }
+    if(ligne==8bis){
+        env[2] = env[0]
+        empiler(pile, env, 9);
+    }
+\end{lstlisting}

@@ -1,0 +1,133 @@
+\dev{Emile Martinez}{}
+
+\textit{A présenter éventuellement dans les leçons de réseaux, en commençant par l'introduire comme un algo de routage (justifiant d'autant plus les remarques à la fin)}
+
+\begin{algorithm}[H]
+	\Entree{G = (S, V, w) un graphe pondéré non orienté avec V le tableau des listes d'adjacence}
+	
+	$proch\_saut \gets$ tableau indéxé par $S\times S$\\
+	\# $proch\_saut[u,v]$ contiendra le premier noeud où aller pour aller de u à v\\
+	$D \gets$ tableau indexé par $S\times S$\\
+	\Pour{$u,v \in S$}{
+		$proch\_saut[u][v] \gets None$\\
+		$D[u][v] \gets +\infty$\\ 
+	}
+	\Pour{$u \in S$}{
+		$D[u][u] \gets 0$\\
+	}
+	\enspace\\
+	\Repeter{stabilisation}{
+		\Pour{$u \in S$}{
+			\Pour{$v \in V[u]$}{
+				\Pour{$s \in S$}{
+					\Si{$D[v][s] + w(u,v) < D[u][s]$}{
+						$proch\_saut[u, s] \gets v$\\
+						$D[u][s] \gets D[v][s] + w(u,v)$
+					}
+				}
+			}
+		}
+	}
+	
+	
+	\caption{Bellman Ford}
+\end{algorithm}
+
+\begin{example} \enspace\\
+	\begin{tikzpicture}[-, node distance=2cm]
+		\node[state] (q0) {A};
+		\node[state, below left of = q0] (q1) {B};
+		\node[state, below right of = q0] (q2) {C};
+		
+		\draw (q0) edge[above] node{1} (q1) ;
+		\draw (q1) edge[above] node{2} (q2) ;
+		\draw (q0) edge[above] node{6} (q2) ;
+	\end{tikzpicture}
+
+	$$ D : \: \begin{array}{|c|c|c|c|}
+		\hline
+		& \text{A} & \text B & \text C \\ \hline
+		\text A & 0 & +\infty & +\infty \\ \hline
+		\text B & +\infty & 0 & +\infty \\ \hline
+		\text C & +\infty & +\infty & 0 \\ \hline
+	\end{array}
+	\longrightarrow
+	\begin{array}{|c|c|c|c|}
+		\hline
+		& \text{A} & \text B & \text C \\ \hline
+		\text A & 0 & 1 & 6 \\ \hline
+		\text B & 1 & 0 & 2 \\ \hline
+		\text C & 6 & 2 & 0 \\ \hline
+	\end{array}
+	\longrightarrow
+	\begin{array}{|c|c|c|c|}
+		\hline
+		& \text{A} & \text B & \text C \\ \hline
+		\text A & 0 & 1 & 3 \\ \hline
+		\text B & 1 & 0 & 2 \\ \hline
+		\text C & 3 & 2 & 0 \\ \hline
+	\end{array}
+	$$
+
+\end{example}
+
+\paragraph{Question} Est-ce que notre algorithme termine ?
+
+\paragraph{Première réponse} Oui. A chaque passage, si on a pas stabilisation, alors une case de $D$ diminue. Les cases de $D$ ne pouvant que diminuer, et ne contenant que des entiers, $\sum\limits_{(u,v)\in S} D[u][v]$ est donc un variant de boucle.
+
+\begin{com}
+	Ici, on raye au lieu de réécrire à chaque fois, et on explique oralement comment on obtient chaque case (pas toute mais voila) en faisant référence à l'algo.
+\end{com}
+
+\paragraph{Deuxième Réponse} Super ! Mais combien d'itérations fait-on ? Pour cela, montrons un résultat intermédiaires :
+
+\begin{lemma}
+	En notant $D^i$ le tableau après la $i$-ième itération de la boucle, on a $\mathcal P(i)$ : « $D^i(u,s)$ est le plus court chemin (pcc) de $u$ à $s$ avec au plus $i$ sauts »
+\end{lemma}
+
+\begin{proof}
+	\begin{itemize}[label=$\star$]
+		\item $\mathcal P (0)$ est vrai car le seul endroit où on peut aller en 0 sauts, c'est sur soi-même, qui est à distance 0.
+		\item Soit $i \in \N$ tel que $\mathcal P(i) $.\\
+		Alors, $D^{i+1}[u][s] = \min \left( D^i[u][s], \, \min\limits_{v \in V(u)} D^i(v, s) + w(u,v)\right)$\\
+		Or, le pcc de $u$ à $s$ de au plus $i+1$ sauts est :\begin{itemize}
+			\item soit de au plus $i$ sauts
+			\item soit commence par aller vers un voisin $v$ de $u$ puis est un pcc de $v$ à $s$ de au plus $i$ sauts.
+		\end{itemize}
+		Or, tous ces chemins sont valides, et par $\mathcal P(i)$, on prend bien le minimum de tout ça. D'où, $\mathcal P(i+1)$
+	\end{itemize}
+	Ainsi, par principe de récurrence, $\forall i \in \N, \mathcal P (i)$
+	
+\end{proof}
+
+De plus, un pcc ne passe pas deux fois par le même sommet (car on suppose $w \geq 0$) donc un pcc est de longueur au plus $|S|$. Ainsi, $\mathcal P(|S|)$ et $\mathcal P(|S|+1)$ impliquent que la $|S|$-ième et la $|S|+1$-ième itérations sont les mêmes. On a donc au plus $|S|$ itérations (et en plus notre algo est correcte !)
+
+\begin{com}
+	Ce n'est pas le vrai résultat que l'on calcule car on met a jour $D^i$ au fure et à mesure. (la on a fait la preuve comme si dans l'algo, on faisait au début de la boucle $D'\gets D$, puis qu'on modifiait dans $D'$ et enfin on finit la boucle principale par $D \gets D'$)
+\end{com}
+
+\paragraph{Complexité} Ainsi cet algorithme est en $O(|S| \times \sum\limits_{u\in S} |V(S)| \times |S|)  =  O(|S|^2 \times |A|)$
+
+\begin{com}
+	Suivant le temps, on peut soit détailler un peu plus le calculs, soit même dire que c'est du $O(|S|^4)$ puis ensuite devenir raisonnable et faire remarquer qu'en fait c'est potentiellement moins. Et si on fait ca dire que c'est important, parce que souvent la plupart des éléments ne sont pas connectés.
+\end{com}
+
+\begin{com}
+	Dire à l'oral que en fait on connaît mieux
+\end{com}
+
+\paragraph{Alors pourquoi l'utiliser ?} A cela plusieurs raisons :
+\begin{itemize}
+	\item On peut facilement le paralléliser : chaque nœud $u$ peut calculer son propre $D[u]$
+	\item On peut même le distribuer, car \emph{là montrer sur l'algo} on n'a besoin que de $D[v]$ pour ses voisins $v$. Il suffit alors d'échanger avec ses voisins les vecteurs de distance (d'où le nom de routage par vecteur de distance)
+	\item On ne dévoile pas trop la topologie du réseau : On ne connait que les distances des voisins à tous les noeuds, mais pas comment y accéder $\to$ on ne connait pas quels routeurs sont où dans les autres réseaux.
+\end{itemize}
+
+\paragraph{Inconvénients}\begin{itemize}
+	\item La convergence est plus lente que avec Djikstra
+	\item En cas de panne d'un lien ou d'un noeud, on peut se retrouver avec des boucles et une convergence encore plus lente
+\end{itemize}
+
+\begin{rem}
+	En théorie des graphes, cet algo peut aussi être utilisé pour détecter des cycles de poids négatifs (en ne prenant pas $w\geq 0$), en regardant si au bout de $|S$ itérations on est pas encore à stabilité.
+\end{rem}

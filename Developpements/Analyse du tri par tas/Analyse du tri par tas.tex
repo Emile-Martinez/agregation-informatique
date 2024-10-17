@@ -1,0 +1,118 @@
+
+\dev{Marin Malory}{\cite{Cormen}}
+
+\textit{Ce développement présente un algorithme permettant de construire un tas en temps linéaire, ainsi que le tri par tas. Un tas permet notamment d'implémenter une file de priorité, illustrant ainsi les leçons \ref{L4} et \ref{L5}. De plus, ce développement illustre l'utilisation des arbres pour réaliser des structures de données arborescentes et s'insère donc naturellement dans la leçon \ref{L10}.}
+
+
+\paragraph{Tas-max.} La structure de tas max est une structure de données qu'on peut représenter par un arbre binaire complet gauche, où chaque étiquette d'un nœud est plus grande que celle de ses descendants. Un tas peut être implanter par un tableau à $n$ éléments numérotés de $1$ à $n$, où le fils gauche (resp. droit) d'un élément $i \in \{0,...,n-1\}$ est $2i$  (resp. $2i+1$).
+
+\paragraph{Tri par tas.}
+
+L'idée du tri par tas est assez élémentaire une fois qu'on a la structure de donnée : étant donné les $n$ éléments à trier, on construit un tas les contenant puis on extrait $n$ fois le minimum du tas.\newline
+
+
+Étant donné un tableau $A$ (représentant un arbre binaire) et un indice $i$, on note $T_i$ l'arbre correspondant enraciné au noeud $i$. L'algorithme suivant, {\tt Entasser-Max}, reçoit un tableau $A$ et un indice $i$ tel que les arbres enracinés en $2i$ et $2i+1$ soient des tas, et modifie $A$ afin que $T_i$ soit un tas.
+
+\begin{algorithm}
+$g \leftarrow 2i$ ;\\
+$d \leftarrow 2i+1$ ;\\
+
+$\max \leftarrow \text{argmin}_{j \in \{i,g,d \}} A[j]$ ;\\
+\Si{$\max \neq i$}{
+	$A[i] \leftrightarrow A[\max]$ ;\\
+	Entasser-Max($A$, $\max$) ;\\
+}
+\caption{Entasser-Max($A$,$i$)}
+\end{algorithm}
+
+\begin{center}
+\textit{Illustrer le fonctionnement de la procédure {\tt Entasser-Max} sur un exemple.}\newline
+\end{center}
+
+On déduit de cet algorithme une procédure permettant de transformer un tableau en tas-max en temps linéaire. Enfin, avec ce tas, on en déduit une procédure permettant de réaliser un tri en place.
+
+\begin{algorithm}
+\Pour{$i=\lfloor n/2 \rfloor,...,1$}{
+	Entasser-Max($A$,$i$) ;\\
+}
+\caption{Construire($A$)}
+\end{algorithm}
+
+\begin{algorithm}
+Construire($A$) ;\\
+\Pour{$i=A.\text{taille}-1,...,1$}{
+	$A[1]\leftrightarrow A[i]$ ;\\
+	$A.\text{taille} \leftarrow A.\text{taille} -1$ ;\\
+	Entasser-Max($A$,$1$) ;\\
+}
+\caption{Tri-Par-Tas($A$)}
+\end{algorithm}
+
+\begin{center}
+\textit{Illustrer le fonctionnement de la procédure {\tt Tri-Par-Tas} sur un exemple.}
+\end{center}
+
+\paragraph{Analyse.} Le seul point complexe est la correction de la procédure {\tt Entasser-Max}. Les autres corrections en découle presque directement.
+
+\begin{lemma}\label{lemme 1}
+Soit $1\leq i \leq n$, si $T_{2i}$ et $T_{2i+1}$ sont des tas , alors après {\tt Entasser-Max($A$,$i$)}, $T_i$ est un tas. La procédure s'exécute en temps $\mathcal{O}(h(i))$, où $h(i)$ est la hauteur de $T_i$.
+\end{lemma}
+
+\begin{proof}
+On note $C_h$ la complexité dans le pire des cas de l'algorithme Tasser pour un nœud $i$ dont l'arbre enraciné en $i$ est de hauteur $h$. On a alors dans le pire cas $C_h = \mathcal{O}(1)+C_{h-1}$ et donc $C_h=\mathcal{O}(h)$.
+
+Prouvons maintenant la correction. On montre par induction structurelle sur les arbres binaires que l'arbre obtenu vérifie la propriété du tas-max. 
+
+Si $T_i$ est une feuille, alors {\tt Entasser-Max($A$,$i$)} ne modifie pas $T_i$ qui est déjà un tas. Sinon, on fait une disjonction de cas selon la valeur de \texttt{plus\_grand}:
+\begin{itemize}
+\item  si \texttt{max}=$i$, alors l'arbre enraciné en $i$ est un tas ;
+\item si  \texttt{max}=$g$, alors on a si $d<n$ $A[g]\geq A[i]$ et $A[g] \geq A[d]$. On échange alors dans $A$ les nœuds $i$ et $g$ et la propriété du tas-max est vérifiée localement. Puisque  $T_g$ était bien un tas par hypothèse, ses enfants le sont aussi et donc ont peut appliquer l'hypothèse d'induction sur $g$ et après {\tt Entasser-Max($A$,$g$)}, $T_g$ est aussi un tas.
+\item si  \texttt{max}=$d$, on raisonne de la même manière.
+\end{itemize}
+\end{proof}
+
+\begin{lemma}\label{lemme 2}
+La procédure {\tt Construire($A$)} transforme $A$ en un tas en temps $\mathcal{O}(n)$.
+\end{lemma}
+
+\begin{proof}~
+
+\textbf{Complexité :} On note $C(n)$ la complexité dans le pire des cas de l'appel {\tt Construire($A$)} où $n = A.\text{taille}$. Uun tas à $n$ éléments a une taille bornée par $\lfloor\log_2 n\rfloor$ et le nombre de nœud ayant la hauteur $h$ est au plus $\lceil n/2^{h+1} \rceil$. Puisque notre fonction appelle la fonction \texttt{Tasser} pour tout nœud ayant une hauteur strictement positive, on a :
+$$
+C(n) = \sum_{h=1}^{\lfloor \log_2 n \rfloor} \left\lceil \frac{n}{2^{h+1}} \right\rceil \mathcal{O}(h) = \mathcal{O} \left(\sum_{h=1}^{\lfloor \log_2 n \rfloor} \frac{n}{2^{h}} h \right)
+$$
+Or, on peut calculer la deuxième somme en dérivant la série géométrique de raison $x$ et en appliquant la formule en $1/2$. On obtient alors 
+$$
+\sum_{h\geq 0} \frac{h}{2^h} = \frac{1/2}{(1-1/2)^2}=2
+$$
+et ainsi $C(n) = \mathcal{O}(n)$.
+
+
+\textbf{Correction :} Le fait que l'arbre obtenue soit complet gauche est direct via la représentation par tableau. Il reste à montrer qu'il vérifie la propriété du tas-max. On utilise l’invariant de boucle suivant : \og Au début de chaque itération de la boucle, $T_{i + 1}$, $T_{i + 2}$, ... , $T_n$ sont des tas \fg.
+\begin{itemize}
+\item \textbf{Initialisation :} Avant la première itération, $i=\lfloor n/2 \rfloor$ et pour $j > \lfloor n/2 \rfloor$, alors $T_j$ contient une unique feuille, et vérifie donc la propriété du tas-max trivialement.
+\item \textbf{Hérédité :} Pour voir que chaque itération conserve l’invariant, on observe que les enfants du nœud $i$ ont des indices supérieurs à $i$. D’après l’invariant, ce sont donc tous les deux des racines d'un arbre vérifiant la propriété du tas-max. D'après le lemme \ref{lemme 1}, après \texttt{Entasser-Max($A$,$i$)}, $T_i$. Ainsi, tous les arbres enracinés en $i$, $i+1$,etc sont des tas.
+\end{itemize}
+À la fin, on a $i=0$ et donc l'arbre enraciné en $1$ est un tas. Ainsi, $A$ est un tas.
+
+\end{proof}
+
+
+\begin{theorem}
+La procédure \texttt{TriParTas}($A$) trie en place un tableau $T$ à $n$ éléments en temps $\mathcal{O}(n\log n)$.
+\end{theorem}
+
+\begin{proof}~
+
+\textbf{Complexité :} D'après le lemme \ref{lemme 2}, l'appel \texttt{Construire($T$,$n$)} transforme $T$ en un tas en temps $\mathcal{O}(\log n)$ sans prendre de place supplémentaire. De plus, l'algorithme fait $n-1$ appels échanges et appels à la fonction \texttt{Tasser} qui s'exécute dans le pire des cas en $\mathcal{O}(\log n)$. Donc l'algorithme s'exécute en $\mathcal{O}(n+n \log n) = \mathcal{O}(n\log n)$.
+
+
+\textbf{Correction :} On pose l'invariant suivant : \og à chaque itération, le sous-tableau $A[i+1...n]$ contient les $n-i-1$ plus grands éléments de T triées, et $A[1...i]$ est un tas max \fg{}.
+\begin{itemize}
+\item Avant de rentrer dans la boucle, on a $i=n$ et donc $A[n+1,n]$ est vide et $A[1...n]$ est effectivement un tas d'après le lemme \ref{lemme 2}. 
+\item On suppose que pour $i>0$, on a $A[i+1...n]$ trié et qui contient les plus grands éléments et $A[1...i]$ est un tas. On a alors $A[1]$ le plus grand élément de $A[1...i]$, et donc après échange, $A[i...n]$ est encore trié et contient les $n-i$ plus grands éléments de $A$. Ensuite, d'après le lemme \ref{lemme 1}, après l'appel \texttt{Entasser-Max}($A$,$0$), on a $A[1...i-1]$ qui est un tas.
+\end{itemize} 
+
+À la fin de la boucle, on a alors $i=0$ et donc $A[1...n]$ qui est trié.
+\end{proof}
+

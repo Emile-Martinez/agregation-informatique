@@ -1,0 +1,145 @@
+\dev{Marin Malory}{\cite{Lesesvre}}
+
+\textit{Ce développement propose de montrer l'équivalence entre la définition descriptive et axiomatique de l'ensemble $\mathbf{premier}$ en analyse syntaxique. Cette nouvelle définition permet notamment de calculer cet ensemble par saturation. Ainsi, ce développement s'insère dans la leçon \ref{L25}.}
+
+\paragraph{Définition de premier.} On rappelle ici la définition descriptive de l'ensemble $\mathbf{premier}$. On note $\epsilon_0$ un symbole frais qui peut être interprété comme \og première lettre de $\epsilon$ \fg{}. 
+
+\begin{definition}
+Soit $G$ une grammaire, et $w \in (V \cup \Sigma)^*$, on définit :
+$$
+\mathbf{premier}(w) = \left\lbrace 
+\begin{array}{ll}
+\mathbf{premier}'(w) &\text{si} ~ w \not\Rightarrow^* \epsilon \\
+\mathbf{premier}'(w) \cup \{\epsilon_0\} &\text{si} ~ w \Rightarrow^* \epsilon \\
+\end{array}\right.
+$$
+où :
+$$
+\mathbf{premier}'(w) = \{a\in \Sigma | w \Rightarrow^* aw', w'\in (V \cup \Sigma)^*\}
+$$
+\end{definition}
+
+
+\paragraph{Définition axiomatique.}
+On considère une vision ensembliste des fonctions. On veut montrer que la fonction $\mathbf{premier}$ est la plus petite partie $P$ de $(V\cup \Sigma)^* \times (\Sigma\cup\{\epsilon_0\})$ telle que 
+\begin{enumerate}
+\item $a\in P(a)$ ;
+\item $\epsilon_0 \in P(\epsilon)$ ;
+\item si $N \rightarrow w_1...w_n$, alors $P(w_1....w_n) \subset P(N)$ ;
+\item si $N\rightarrow \epsilon$, alors $\epsilon_0\in P(N)$ ;
+\item $(P(w_1) \backslash \{\epsilon_0 \}) \subset P(w_1....w_n)$ ;
+\item si $\epsilon_0 \in P(w_1)$, alors $P(w_2...w_n) \subset P(w_1....w_n)$ 
+\end{enumerate}
+
+
+\begin{lemma}\label{lemmePremier1}
+La fonction $\mathbf{premier}$ vérifie les axiomes 1 à 6.
+\end{lemma}
+
+\begin{proof}~
+
+\begin{enumerate}
+\item Pour $a\in \Sigma$, on a $a\Rightarrow^* a$ et donc $a\in \mathbf{premier}(a)$.
+\item De même, $\epsilon \Rightarrow^* \epsilon$, et donc $\epsilon_0 \in \mathbf{premier}(\epsilon)$ ;
+\item Si $N\rightarrow w_1...w_n$. Soit $a\in \mathbf{premier}(w_1...w_n)$. 
+
+Si $a=\epsilon_0$, alors $w_1...w_n \Rightarrow^* \epsilon$, et donc par transitivité $N\Rightarrow^* \epsilon$. Ainsi, $\epsilon_0\in \mathbf{premier}(N)$. 
+
+Si $a\neq \epsilon_0$, on a $w_1...w_n \Rightarrow aw'$, et donc encore par transitivité, $N\Rightarrow^* aw'$, et finalement $a\in \mathbf{premier}(N)$.
+
+\item Si $N\Rightarrow \epsilon$, alors $N\Rightarrow^* \epsilon$ et donc $\epsilon_0 \in \mathbf{premier}(N)$.
+
+\item Soit $w_1...w_n\in ( \Sigma \cup V)^*$. Soit $a\in \mathbf{premier}(w_1) \backslash\{\epsilon_0\}$. Ainsi, $a\in \mathbf{premier}'(w_1)$, et donc $w_1\Rightarrow^*aw_1'$. En appliquant les mêmes règles au mot $w_1....w_n$, on a $w_1....w_n \Rightarrow^* aw_1'w_2...w_n$, et donc $a\in \mathbf{premier}(w_1...w_n)$.
+
+\item Soit $w_1...w_n\in ( \Sigma \cup V)^*$, avec $\epsilon_0\in \mathbf{premier}(w_1)$. Alors, on a $w_1\Rightarrow^*\epsilon$. En appliquant les même règle, on a $w_1...w_n \Rightarrow^* \epsilon w_2...w_n = w_2...w_n$. On en déduit directement $\mathbf{premier}(w_2...w_n) \subset \mathbf{premier}(w_1...w_n)$.
+
+\end{enumerate}
+\end{proof}
+
+
+\begin{lemma}\label{lemmePremier2}
+Soit $P$ la plus petite partie vérifiant les axiomes 1 à 6. Montrer que pour tout $n\in \mathbb{N}$, pour tout $a\in \Sigma$, pour tout $w,w' \in (\Sigma \cup V)^*$, on a 
+\begin{itemize}
+\item si $w \Rightarrow^n aw'$, alors $a\in P(w)$ ;
+\item si $w \Rightarrow^n \epsilon$, alors $\epsilon_0 \in P(w)$.
+\end{itemize}
+\end{lemma}
+
+
+En admettant ce lemme pour l'instant, on peut montrer le résultat voulu.
+\begin{theorem}
+$\mathbf{premier}$ est la plus petite partie $P$ vérifiant les propriétés 1 à 6.
+\end{theorem}
+
+\begin{proof}
+Soit $P$ la plus petite partie vérifiant les axiomes 1 à 6. Puisque $\mathbf{premier}$ vérifie ces axiomes d'après le lemme \ref{lemmePremier1}, on a $P\subset \mathbf{premier}$. Le lemme \ref{lemmePremier2} nous permet de montrer l'autre inclusion. En effet, si $a\in \mathbf{premier}(w)$, il existe $w'\in (\Sigma \cup V)^*$ tel que $w\Rightarrow^*aw'$ (avec possiblement $a=\epsilon_0$ et donc $w'=\epsilon$). Par le lemme \ref{lemmePremier2}, on a directement $a\in P(w)$, et donc pour tout $w$, on a $\mathbf{premier}(w) \subset P(w)$.
+
+Finalement, $\mathbf{premier}=P$.
+\end{proof}
+
+
+
+\paragraph{Algorithme.} Cette définition axiomatique nous donne un moyen de calculer $\mathbf{premier}$ par saturation via l'algorithme \ref{algoPremier}.\newline
+
+\begin{algorithm}[!h]
+\Pour{$a\in \Sigma$}{
+	$\mathbf{premier}(a) \leftarrow \{a\}$ ;
+}
+$\mathbf{premier}(\epsilon) \leftarrow \{\epsilon_0\}$ ; \\
+\Pour{$N\rightarrow \epsilon \in R$}{
+	$\mathbf{premier}(N) \leftarrow \{\epsilon_0\}$ ;
+
+}
+\Tq{$\mathbf{premier}$ est modifié}{
+	\Pour{$N\rightarrow w_1...w_n \in R$}{
+	$\mathbf{premier}(N) \leftarrow \mathbf{premier}(N) \cup \mathbf{premier}(w_1...w_n)$ ; \\
+	\eSi{$\epsilon_0\notin \mathbf{premier}(w_1)$}{
+		$\mathbf{premier}(w_1...w_n)\leftarrow \mathbf{premier}(w_1...w_n) \cup (\mathbf{premier}(w_1) \backslash \{\epsilon_0 \})$ ;\\
+	}{
+	$\mathbf{premier}(w_1...w_n)\leftarrow \mathbf{premier}(w_1...w_n) \cup \mathbf{premier}(w_2...w_n)$ ;\\
+	}
+}
+}
+\caption{Calcul\_Premier($w$)}\label{algoPremier}
+\end{algorithm}
+
+\begin{proof}[du lemme \ref{lemmePremier2}]
+On montre le résultat par récurrence forte sur $n$. 
+
+Pour $n=0$, soit $a\in \Sigma$, $w,w' \in (\Sigma \cup V)^*$.
+
+\begin{itemize} 
+\item Si $w=aw'$, alors on a $a\in P(a)$ d'après 1, et en particulier $a\in P(a)\backslash \{\epsilon_0\}$. D'après 5, on a $a\in P(aw')$, et donc $a\in P(w)$.
+\item Si $w=\epsilon$, alors par 2, on a directement $\epsilon_0\in P(w)$.
+\end{itemize}
+
+
+On suppose la propriété vraie pour tout $k< n$ pour un certain $n>0$. soit $a\in \Sigma$, $w,w' \in (\Sigma \cup V)^*$. On note $w=w_1...w_m$.
+
+\begin{itemize}
+\item Si $w\Rightarrow^n aw'$. On veut montrer que $a\in P(w)$. On distingue deux cas 
+\begin{itemize}
+\item Si $w_1\in \Sigma$, alors $w_1=a$. Ainsi par 1 et 5, on a directement $a\in P(w)$.
+\item Si $w_1\notin \Sigma$, ie $w_1=N\in V$. On distingue deux cas :
+\begin{itemize}
+\item S'il existe $j<n$ tel que 
+$$
+Nw_2...w_m \Rightarrow^j w_2...w_m \Rightarrow^{n-j} aw'
+$$
+On a alors $\epsilon_0 \in P(N)$ par HR au rang $j$, et $a\in P(w_2...w_m)$ par HR au rang $n-j$. De plus, par l'axiome 6, on a $P(w_2...w_m) \subset P(w_1...w_m)$ et donc $a\in P(w)$.
+\item Sinon, la première règle appliquée à $N$ est de la forme $N\Rightarrow x_1...x_k$. De plus, puisque $x_1...x_k \not \Rightarrow^* \epsilon$, on prend $i$ l'indice minimal tel que $x_i \Rightarrow^* a$. Il existe alors $j<n$ tel que 
+$$
+Nw_2...w_n \Rightarrow^j x_i...x_k w_2...w_m \Rightarrow aw'
+$$
+
+Par application successive de 6, on a 
+$$
+P(x_i...x_k) \subset P(x_1...x_k)
+$$
+Or par HR, on a $a\in P(x_i)\subset P(x_i...x_k)$ par 5. En combinant, on a $a\in P(x_1...x_k)$, puis $a\in P(N)$ par 3, et finalement par 5, on a $a\in P(Nw_2...w_m)$, c'est-à-dire $a\in P(w)$.
+\end{itemize}
+\end{itemize}
+\item Si $w\Rightarrow^n\epsilon$, on recommence avec $w$ qui commence par un non terminal.
+\end{itemize}
+\end{proof}
+

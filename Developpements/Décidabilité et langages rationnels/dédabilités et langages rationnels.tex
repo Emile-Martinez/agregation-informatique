@@ -1,0 +1,133 @@
+
+\dev{Marin Malory}{\cite{Sipser}}
+
+\textit{
+Ce développement propose d'étudier des résultats de décidabilité et d’indicibilité autour des langages rationnels, permettant d'illustrer de manière intéressante la hiérarchie de Chomsky. Il s'insère naturellement dans la leçon \ref{L27} ainsi que dans la leçon \ref{L29} si les concepts de décidabilité sont abordés.}
+
+\paragraph{Introduction.} On considère trois problèmes autours des langages rationnels. Deux d'entre eux sont décidables, et l'autre est indécidable.
+
+\paragraph{Automate et langage vide.}
+$$
+E_{AFD} = \{\langle A \rangle | A \text{ est un AFD et } L(A)=\emptyset \} 
+$$
+
+\begin{theorem}
+$E_{AFD}$ est décidable.
+\end{theorem}
+
+\begin{proof}
+Un automate fini déterministe accepte au moins un mot si, et seulement si, il peut atteindre un état final depuis l'état initial en suivant la fonction de transition.\newline
+
+\fbox{\begin{minipage}{0.9\linewidth}
+\noindent $\mathbf{T=}$ \og Sur l'entrée $\langle A\rangle$ :
+\begin{enumerate}
+\item Marquer l'état initial de $A$.
+\item Répéter tant qu'un nouvel état est marqué :
+\item ~~ Marquer chaque état qui a une transition depuis n'importe quel état marqué.
+\item Si aucun état final n'est marqué, \textbf{accepter}, sinon \textbf{rejeter}. \fg
+\end{enumerate}
+\end{minipage}}
+
+\end{proof}
+
+
+\paragraph{Égalité de langages rationnels.} On considère le problème suivant :
+$$
+EQ_{AFD} =\{\langle A,B \rangle | \text{$A$ et $B$ sont des AFDs et } L(A)=L(B) \} 
+$$
+
+\begin{theorem}
+$EQ_{AFD}$ est décidable.
+\end{theorem}
+
+\begin{proof}
+On va montrer ce théorème à l'aide du précédent. On construit un nouvel automate $C$ à partir de $A$ et $B$ qui accepte seulement les mots qui sont soit dans $L(A)$, soit dans $L(B)$, mais pas les deux.
+
+Le langage de $C$ est défini par :
+$$
+L(C)=(L(A) \cap \overline{L(B)}) \cup ( \overline{L(A)} \cap L(B))
+$$
+\begin{rem}
+On dit que $L(C)$ est la \textbf{différence symétrique} de $L(A)$ et $L(B)$.
+\end{rem}
+
+Montrons que $L(A)=L(B)$ si, et seulement si, $L(C)=\emptyset$.
+Si $L(A)=L(B)=X$, alors $L(C)=(X\cap \overline{X})\cup ( \overline{X} \cap X) = \emptyset \cup \emptyset = \emptyset$. Réciproquement, si $L(C)=\emptyset$, on a $L(A) \cap \overline{L(B)}=\emptyset$ et  $( \overline{L(A)} \cap L(B))=\emptyset$. Soit $x\in L(A)$, alors par l'absurde, si $x\notin L(B)$, alors $x\in \overline{L(B)}$ et donc $x\in L(A) \cap \overline{L(B)}$, ce qui est absurde. Ainsi, on a $L(A)\subset L(B)$ et de la même manière $L(B)\subset L(A)$ ce qui conclut la preuve. 
+
+On peut alors construire $C$ via $A$ et $B$ en utilisant les résultats de clôtures sur les langages rationnels. En effet, ces constructions sont des algorithmes pouvant être implantées via des machines de Turing. On en déduit la machine $F$ qui décide $EQ_{AFD}$ :\newline
+
+\fbox{\begin{minipage}{0.9\linewidth}
+\noindent $\mathbf{F=}$ \og Sur l'entrée $\langle A,B\rangle$ :
+\begin{enumerate}
+\item Construire $C$ comme décrit ci-dessus.
+\item Simuler $T$ sur l'entrée $\langle C \rangle$.
+\item Si $T$ accepte, \textbf{accepter}. Si $T$ rejette, \textbf{rejeter}. \fg
+\end{enumerate}
+\end{minipage}}
+
+\end{proof}
+
+
+\paragraph{Un problème indécidable.} On considère le problème suivant :
+$$
+\mathbf{R_{TM}}=\{\langle M \rangle | \text{$M$ est une MT et } L(M) \text{ est rationnel}\}
+$$
+
+\begin{theorem}
+$\mathbf{R_{TM}}$ est indécidable.
+\end{theorem}
+
+\begin{proof}
+On procède par réduction depuis le problème de l'acceptation $\mathbf{A_{TM}}$. On suppose que $\mathbf{R_{TM}}$ est décidable par une machine de Turing $\mathbf{R}$ et on l'utilise pour construire une machine de Turing $\mathbf{S}$ qui décide $\mathbf{A_{TM}}$.\newline
+
+\noindent\textbf{Idée.} $\mathbf{S}$ reçoit en entrée $\langle M,w\rangle$ où $M$ est une machine de Turing et $w$ un mot, et va modifier $M$ en une nouvelle machine $M_2$ dont le langage est rationnel si, et seulement si $M$ accepte $w$.
+Pour cela, $M_2$ va reconnaître automatique tous les mots de $\{0^n1^n | n\geq 0\}$, mais si en plus $M$ accepte $w$, alors $M_2$ accepte tous les autres mots.\newline
+
+\noindent \textbf{Construction de $\mathbf{S}$.} \newline
+
+\fbox{\begin{minipage}{0.9\linewidth}
+\noindent $\mathbf{S=}$ \og Sur l'entrée $\langle M,w\rangle$ :
+\begin{enumerate}
+\item Construire  MT $M_2$ suivante :
+
+~~\fbox{\begin{minipage}{0.8\linewidth}
+$\mathbf{M_2=}$ \og Sur l'entrée $x$ :
+\begin{enumerate}
+\item Si $x$ est de la forme $0^n1^n$, \textbf{accepter}.
+\item Sinon, simuler $M$ sur l'entrée $w$ et \textbf{accepter} si $M$ accepte $w$.\fg
+\end{enumerate}
+\end{minipage}}
+\item Simuler $\mathbf{R}$ sur l'entrée $\langle M_2 \rangle$.
+\item Si $\mathbf{R}$ accepte, \textbf{accepter} ; si $\mathbf{R}$ rejette, \textbf{rejeter}.\fg
+\end{enumerate}
+\end{minipage}}\newline
+
+Montrons que $\mathbf{S}$ décide $\mathbf{A_{TM}}$. Soit $M$ une machine de Turing et $w$ un mot.
+
+Si $M$ accepte $w$, alors on remarque que $L(M_2)= \Sigma^*$, car $M_2$ accepte sur toute entrée $x$. Ainsi, $L(M_2)$ est rationnel, $\mathbf{R}$ accepte sur l'entrée $\langle M_2 \rangle$ et finalement $\mathbf{S}$ accepte.
+
+Si $M$ n'accepte pas $w$, on remarque que $L(M_2)= \{0^n1^n | n\geq 0\}$ qui n'est pas rationnel. Ainsi $\mathbf{R}$ rejette sur l'entrée $\langle M_2 \rangle$ et donc $\mathbf{S}$ rejette.
+
+Finalement, $\mathbf{S}$ décide $\mathbf{A_{TM}}$, et ainsi $\mathbf{R_{TM}}$ est indécidable.
+\end{proof}
+
+\begin{rem}
+Ce résultat nous montre qu'il n'est pas possible de décider si, lors de notre choix d'une machine de Turing comme modèle de calcul, on aurait pu simplement choisir un automate.
+\end{rem}
+
+\begin{rem}
+Ce résultat est en fait un corollaire du théorème de Rice.
+\end{rem}
+
+\begin{rem}
+Le fait que $\{0^n1^n[n\geq 0\}$ n'est pas rationnel découle du lemme de l'étoile, dont on rappelle l'énoncé ci-dessous.
+\end{rem}
+
+\begin{lemma}[de l'étoile]
+Soit $L$ un langage rationnel. Il existe un entier $p$ tel que pour tout mot $w$ de $L$ tel que $|w|\geq p$ possède une factorisation $w=xyz$ vérifiant :
+\begin{enumerate}
+\item pour tout $i\geq 0, xy^iz\in L$ ;
+\item $|y|>0$ ;
+\item $|xy|\leq p$.
+\end{enumerate}
+\end{lemma}

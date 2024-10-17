@@ -1,0 +1,143 @@
+\dev{Emile Martinez}{}
+
+\textit{Ce développement présente le fait qu'une construction inductive est valide. Il consiste à démontrer qu'on peut définir seulement le nom des fonctions et qu'on arrivera à en faire quelque chose. Puis l'équivalence des définitions par le haut et par le bas. On se place dans un contexte où on dit que les constructeur sont de $X^{\alpha(i)}$ dans $X$, injectif et d'image disjointes. Si on le met dans le leçon principe d'induction, on niveau MPII, il faut dire que c'est à la fin du cours, on fait ça pour ceux qui veulent suivre en distribuant un poly et en faisant ça au tableau. Avec notamment le fait que c'est la meme chose que ce qu'on écrit, et que ce qu'affiche OcamL (d'où le fait de le faire après OcamL)}
+
+\begin{definition}Quelques défintions pour commencer\\
+	$\Sigma =  $ $[$'a' - 'z'$]$ \qquad $\Gamma = \Sigma \cup \{$'[', ']', '\#' $\}$\\
+	$\Sigma^* = \bigcup\limits_{n \in \N} \Sigma^n$ \qquad $\Gamma^* = \bigcup\limits_{n \in \N} \Gamma^n$ \\
+	On définit également $\cdot :\begin{array}{cll}
+	\Gamma^* \times \Gamma^* & \to & \Gamma^*\\
+	(u,v) & \mapsto & (u_1, \, \dots, \, u_{|u|}, \, v_1, \, \dots, \, v_{|v|})
+	\end{array}$
+\end{definition}
+
+\begin{rem}
+	$\cdot(\Sigma^n \times \Sigma^m) = \Sigma^{n+m}$
+\end{rem}
+
+\begin{com}
+	Dire que 'a', 'b', ..., '[' c'est vraiment simplement des symboles mathématiques différents les uns des autres. Que la puissance $n$ c'est les suites finies, donc on prend l'ensemble des suites finies. La définition de la concaténation on peut la rajouter dans les def après le paragraphe suivant
+\end{com}
+
+\paragraph{De quoi on part} Au début, on a seulement les noms des élements de la signature $\left( \mathcal B, \left(f_i\right)_{i \in I} \right) $: 
+$$\mathcal{B} \subset \Sigma^* \qquad \forall i \in I, \, \left\{ \begin{array}{l}
+nom_i \in \Sigma^* \\ nom_i \notin \mathcal{B} \\ nom_i \neq nom_j \text { pour } j \neq i
+\end{array} \right.$$
+
+\paragraph{Construction de nos ensembles}
+
+Pour $X$ on va prendre $\Gamma^*$.\\
+
+$\mathcal B = \mathcal B \subset \Sigma^* \subset \Gamma^*$\\
+
+$f_i : \begin{array}{cll}
+	\Gamma^{\alpha(i)} & \to & \Gamma^*\\
+	(u_1, \, \dots, \, u_{\alpha(i)}) & \mapsto & nom_i \cdot \text [ \cdot u_1 \cdot \# \cdot  ... \cdot \# \cdot u_{\alpha(i)} \cdot \text ]
+\end{array}$\\
+
+\begin{rem}
+\textbf{Qu'est-ce que c'est ce truc ?}
+
+C'est ce que l'on fait quand on écrit l'enchainement des constructeurs et qu'il n'y a pas d'ambiguïté. C'est la même chose que fait OcamL, quand dans l'interpréteur il vous affiche un objet construit par des constructeurs :\\\\
+\begin{minipage}{0.5\linewidth}
+	\begin{lstlisting}
+type bin = E | B of bin*int*bin;;
+ajout (ajout (ajout E 1) 2) 3;;
+\end{lstlisting}
+\end{minipage} \enspace $\to$ \enspace \begin{minipage}{0.4\linewidth}
+\begin{lstlisting}
+- : bin = B (B (E, 1, E),
+2, B (E, 3, E))
+\end{lstlisting}
+\end{minipage}\\que nous on note $B[B[E\#1\#E]\#2\#B[E\#3\#E]]$
+\end{rem}
+$\bullet$ $$\begin{array}{cl}
+ f_i(u_1, \dots, u_{\alpha(i)}) = f_j(v_1, \dots, v_{\alpha(j)})  \\
+ \Downarrow \\
+  nom_i \cdot \text [ \cdot u_1 \cdot \# \cdot  ... \cdot \# \cdot u_{\alpha(i)} \cdot \text ] = nom_j \cdot \text [ \cdot u_1 \cdot \# \cdot  ... \cdot \# \cdot u_{\alpha(j)} \cdot \text ] \\
+  \Downarrow *\\
+  nom_i = nom_j \\ \Downarrow \\ i = j
+\end{array}$$
+
+$* [  \, \notin nom_i \text{ et }  [ \, \notin nom_j \text{ donc le premier [ est celui après } nom$
+
+Donc pour $i \neq j$, $Im(f_i) \cap Im(f_j) = \emptyset$\\
+
+$\bullet$
+$$
+\forall b \in \mathcal B, \forall i, \, \forall u_1, \, \dots, u_{\alpha(i)} \in \Gamma^*, \left\{ \begin{array}{l}
+	[ \in f_i(u_1, \, u_{\alpha(i)}) \\ [ \notin b
+\end{array}\right. \implies b \neq f_i(u_1,\, \dots, \, u_{\alpha_i})
+$$
+
+$\bullet$ Reste l'injectivité des $f_i$. Mais en fait elles ne sont pas injectives.
+
+\begin{com}
+	Là on peut dire que en fait il faudrait modifier légèrement X, mais la construction des $f_i$ est la même, et c'est simplement technique. On peut également mentionner à l'attention du jury que ca ferait un super sujet pour plus tard en MPI.
+\end{com}
+
+\paragraph{Définition de l'ensemble inductif} Maintenant qu'on a l'existence de nos constructeurs, il faut savoir si notre définition des ensembles inductifs est correctes.
+
+\begin{com}
+	Dans la leçon, on aurait la définition de $T_0 = \mathcal B$ et $T_{k+1} = T_k \cup \bigcup\limits_{i \in I} f_i\left(T_k^{\alpha(i)}\right)$
+\end{com}
+
+Notons $P_S$ la propriété défini sur $\mathcal P(X)$ $P_S(A) : \mathcal B \subset A \text{ et } \forall i \in I, \, f_i\left( A^{\alpha(i)} \right) \subset A$
+
+\begin{com}
+	$P_S$ veut dire contient $\mathcal B$ et stable par tous les $f_i$
+\end{com}
+
+Prenons comme définition de l'ensemble inductif $E$ défini par la signature $(\mathcal B, (f_i)_{i \in I})$, le plus petit ensemble contenant $\mathcal B$ et stable par tous les $f_i$.
+
+\begin{itemize}[label=$\star$]
+	\item Premièrement, cet ensemble existe-t-il ?
+
+	Oui. J'annonce même que c'est $\bigcap\limits_{\substack{A \in \mathcal P(X) \\ P_S(A)}} A$.
+	
+	En effet,\begin{itemize}[label=$\bullet$]
+		\item $\left(\forall A \in \mathcal P(X), P_S(A) \implies \mathcal B \subset A \right) \implies \mathcal B \subset \bigcap\limits_{\substack{A \in \mathcal P(X) \\ P_S(A)}} A$
+		
+		\item Soit $i\in I$, soit $x_1, \, \dots, \, x_{\alpha(i)} \in \bigcap\limits_{\substack{A \in \mathcal P(X) \\ P_S(A)}} A$.\\
+		Alors $\forall A \in \mathcal P(X), P_S(A) \implies \left\{ \begin{array}{l}
+		P_S(A) \\ x_1, \dots, x_{\alpha(i)} \in A 
+		\end{array}\right.\implies f_i\left(x_1, \dots, x_{\alpha(i)}\right) \in A$\\
+		Donc $\bigcap\limits_{\substack{A \in \mathcal P(X) \\ P_S(A)}} A$ est stable par tous les $f_i$
+		
+		\item Soit $A \in \mathcal P(x)$ tel que $P_S(A)$. Alors, $\bigcap\limits_{\substack{A \in \mathcal P(X) \\ P_S(A)}} A \subset A$.
+		
+	\end{itemize}
+	Ainsi, $\bigcap\limits_{\substack{A \in \mathcal P(X) \\ P_S(A)}} A$ est bien le plus petit ensemble vérifiant $P_S$.
+	\begin{com}
+		Si on manque de temps pendant le développement, on peut ne pas faire cette preuve.
+	\end{com}
+
+	Reste maintenant à montrer que $E = \bigcup\limits_{k \geq 0} T_k$
+	
+	\item $\boxed{\subset}$ 
+		\begin{itemize}[label=$\bullet$]
+			\item $\mathcal B = T_o \subset \bigcup\limits_{k \geq 0} T_k$
+			\item Soit $i \in I$ et $x_1, \, \dots, \, x_{\alpha(i)} \in \bigcup\limits_{k \geq 0} T_k$\\
+			Alors par définition, $\forall j \in \llbracket 1, \alpha(i) \rrbracket , \, \exists k_j \in \N : \: x_j \in T_{k_j}$\\
+			Posons $K = \max\limits_j k_j$\\
+			Alors, comme $T_k \subset T_{k'}$ pour $k \leq k'$ (par une récurrence immédiate par définition des $T_k$), $\forall j \in \llbracket 1, \alpha(i) \rrbracket, \, x_j \in T_K $. Donc par définition de $T_{K+1}$, $f_i(x_1, \, \dots, \, x_{\alpha(i)}) \in T_{K+1} \subset  \bigcup\limits_{k \geq 0} T_k$
+			Ainsi, $\bigcup\limits_{k \geq 0} T_k$ est stable par tous les $f_i$
+		\end{itemize}
+
+	D'où $P_S\left( \bigcup\limits_{k \geq 0} T_k\right)$, donc par définition de $E$, $E \subset \bigcup\limits_{k \geq 0} T_k$
+	
+	
+	\item $\boxed{\supset}$ Soit $\mathcal P$ la propriété défini pour $k \in \N$ par $\mathcal P(k): \: « T_k \subset E »$
+	\begin{itemize}[label=$\bullet$]
+		\item Par définition de $E$, $T_0 = \mathcal B \subset E$ d'où $\mathcal P(0)$.
+		\item Soit $k \in \N$ tel que $\mathcal P(k)$. Soit $y \in T_{k+1}$. Alors par définition de $T_{k+1}$ on a deux possibilités :
+		\begin{itemize}
+			\item Si $y \in T_k$ alors par $\mathcal P(k)$, $y \in E$
+			\item Si $\exists i \in I :\: \exists x_1, \, \dots, \, x_{\alpha(i)} \in T_k : \: y = f_i\left(x_1, \,\dots, \, x_{\alpha(i)}\right) $\\
+			Donc par $\mathcal P (k)$, $\forall j \in \llbracket 1, \alpha(i) \rrbracket,\, x_i \in E$. Or $E$ est stable par tous les $f_i$ donc $y = f_i\left(x_1, \,\dots, \, x_{\alpha(i)}\right) \in E$.
+		\end{itemize}
+		D'où $\forall y \in T_{k+1}, \, y\in E$, soit $\mathcal P(k+1)$.
+	\end{itemize}
+	Ainsi par principe de récurrence, $\forall k \in \N, T_k \subset E$, donc $ \bigcup\limits_{k \geq 0} T_k \subset E$.
+\end{itemize}
+

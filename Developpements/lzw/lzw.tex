@@ -1,0 +1,166 @@
+\dev{Emile Martinez}{Balabonski MP2I (notamment les quantifications à la fin)}
+
+\paragraph{Idée} Compresser les répétitions de sous-chaines.\\
+$\to$ Cette algorithme est online
+
+\begin{com}
+	Mentionner la différence avec Huffman qui est pas online et qui fonctionne pas sur les sous-chaines mais directement sur les caractères. Et que si on faisait huffman sur les mots, on aurait un très gros truc a rajouter au début, et en plus le caractère ' ' serait arbitraire.
+\end{com}
+
+\begin{enumerate}
+	\item On associe un entier à chaque lettre de notre alphabet \quad $\to$ dictionnaire
+	\item On parcourt le mot pas encore dans le dictionnaire : \begin{itemize}
+		\item On met dans le dictionnaire le plus grand préfixe possible
+		\item On ajoute au dictionnaire une nouvelle clé : préfixe + lettre suivante (nouveau numéro)
+	\end{itemize}
+\end{enumerate}
+
+%\paragraph{Exemple} "entendent", $\Sigma = \{\underset{0}{E}, \underset{1}{N}, \underset{2}{T}, \underset{3}{D}\}$
+%
+%\begin{tabular}{r|c|c}
+%	 entrée \quad \quad & résultat & dictionnaire \\
+%	ENTENDENT & 0 & EN $\to$ 4 \\
+%	NTENDENT & 1 & NT $\to$ 5 \\
+%	TENDENT & 2 & TE $\to$ 6 \\
+%	ENDENT & 4 & END $\to$ 7 \\
+%	DENT & 3 & DE $\to$ 8 \\
+%	ENT & 4 & ENT $\to$ 9 \\
+%	T & 2 &
+%\end{tabular}\\
+%
+%Décompression :\\
+%\begin{tabular}{c|c|c}
+%	entrée & résutlat & dictionnaire \\
+%	0 & E & EN $\to$ 4 \\
+%	1 & N & NT $\to$ 5 \\
+%	2 & T & TE $\to$ 6 \\
+%	4 & & \\
+%	3 & & \\
+%	4 & & \\
+%	2 & & \\
+%\end{tabular}\\
+%
+%\paragraph{Problème :} $\Sigma = \{\underset{0}{L}, \underset{1}{A}, \underset{2}{E}, \underset{3}{R}\}$ LALALALALERE$\to$0,1,4,6,5,2,3,2
+%
+%\begin{tabular}{c|c|c}
+%	0 & L & \\
+%	1 & A & LA $\to$ 4 \\
+%	4 & LA & AL $\to$ 5 \\
+%	6 & LAL & LAL $\to$ 6 \\
+%\end{tabular}
+%
+
+
+\paragraph{Exemple} "ALLALALA", $\Sigma = \{\underset{0}{\texttt A}, \underset{1}{\texttt B}\}$\\
+\begin{tabular}{r|c|l}
+	\texttt{ALLALALA} & Sortie & Dictionnaire \\
+	&& \texttt A $\to$ 0\\
+	&& \texttt L $\to$ 1\\
+	\texttt{\emph{A}L\enspace\enspace\enspace\enspace\enspace\enspace} &0& \texttt{AL} $\to$ 2\\
+	\texttt{\emph{L}L\enspace\enspace\enspace\enspace\enspace} &1& \texttt{LL} $\to$ 3\\
+	\texttt{\emph{L}A\enspace\enspace\enspace\enspace} &1& \texttt{LA} $\to$ 4\\
+	\texttt{\emph{AL}A\enspace\enspace} &2& \texttt{ALA} $\to$ 5\\
+	\texttt{\emph{ALA}} &5&\\
+\end{tabular}
+
+
+\begin{com}
+	Essayons de faire un algorithme de décompression
+\end{com}
+
+\begin{tabular}{c|c|l}
+	Entrée & Sortie & Dictionnaire \\
+	& & \texttt 0 $\to$ A \qquad \texttt 1 $\to$ L\\
+	0 & \texttt A & \\
+	1 & \texttt L & 2 $\to$ \texttt{AL}\\
+	1 & \texttt L & 3 $\to$ \texttt{LL}\\
+	2 & \texttt L & 4 $\to$ \texttt{LA}\\
+\end{tabular}
+
+
+\begin{com}
+	Ca a l'air de fonctionner. Essayons d'écrire un code pour cela.\\
+	(Quand on le fait, laisser de la place au milieu pour pouvoir faire les modifications a venir dessus)
+\end{com}
+
+\begin{algorithm}[H]
+	$d \gets$ dictionnaire initial\\
+	$vieux\_i \gets None$\\
+	$indice \gets |d|$\\
+	\Tq{il y a une entrée}{
+		$i \gets input()$\\
+		$print(d[i])$\\
+		\Si{$vieux\_i \neq None$}{
+			$d[indice] \gets d[vieux\_i] + d[i][0]$\\
+		}
+		$vieux\_i \gets i$\\
+		$indice ++$\\
+	}
+\end{algorithm}
+
+\begin{com}
+	Reprenons l'execution sur l'exemple
+\end{com}
+
+\paragraph{Problème} On a pas 5 dans le dictionnaire. On a réutiliser tout de suite le facteur que l'on a ajouter. \textcolor{red}{Il faut traiter à part ce cas là.}
+
+\begin{com}
+	Bien expliquer sur la compression, que c'est parce que on a rajouter 5 puis utiliser 5. Que on a le problème parce que on ajoute dans le dico avec un de décalage à la decompression. Que par conséquent le problème vient du fait que on reconnu le motif que l'on vient d'ajouter, donc on connait la lettre suivante, c'est celle du mot d'avant.
+\end{com}
+
+\begin{algorithm}[H]
+	$d \gets$ dictionnaire initial\\
+	$vieux\_i \gets None$\\
+	$indice \gets |d|$\\
+	\Tq{il y a une entrée}{
+		$i \gets input()$\\
+		\eSi{\color{red} $i \in d$}{
+			$print(d[i])$\\
+			\Si{$vieux\_i \neq None$}{
+				$d[indice] \gets d[vieux\_i] + d[i][0]$\\
+			}
+		}{
+			\color{red}
+			$d[indice] \gets d[vieux\_i] + d[vieux\_i][0]$\\
+			$print(d[indice])$\\
+		}
+		$vieux\_i \gets i$\\
+		$indice ++$\\
+	}
+\end{algorithm}
+
+
+
+
+\paragraph{Implementation}\begin{itemize}
+	\item Représentation des entiers \begin{itemize}[label=$\to$]
+		\item Nombre limité de bits (ex. 12) mais dico limité.\\
+		$\to$ On arrête de le compléter \\
+		$\to$ On vide et on recommence
+		\item On augmente la taille des représentations au cours de l'algo\\
+	\end{itemize}
+	\item Choix de l'alphabet \begin{itemize}
+		\item $\{0,1\}$
+		\item les 256 char possibles
+	\end{itemize}
+\end{itemize}
+
+
+\begin{com}
+	Sur les tour du monde en 80 jours, avec l'alphabet $\{0, 1\}$, 29\%, avec l'alphabet de tous les char 57\%, en fixant la taille du dictionnaire à 16 (moins, on détecte moins de répétition, plus on a trop de bits pour trop peu de facteurs). Avec Huffman, on faisait 44\%.
+\end{com}
+
+\paragraph{Question} Gagne-t-on toujours ?\\
+Compression : $LZW \Sigma^* \to \Sigma^*$. A-t-on alors, $\forall w \in \Sigma^*, \, |LZW(w)| \leq |w|$.\\
+$fLZW$ est injectif donc non (en effet, $\left|LZW\left(\Sigma^n\right)\right| = \left|\Sigma^n\right|> \left| \Sigma^{n-1}\right| $).\\
+
+Donc LZW, des fois, on y perd. \texttt{0011} on aura perdu, car on devra stocker nos facteurs sur 2 bits, mais en ne codant que des lettres (7 bits en tout au lieu de 4).
+
+\paragraph{Remarque} On peut choisir de ne perdre au plus que 1 bit.\raisebox{-0.5\height}{
+$\begin{array}{rccl}
+	f:&\Sigma^* & \to & \Sigma^*\\
+	& w & \mapsto & \left\{ \begin{array}{ll}
+		\texttt 0.\text{LZW}(w) & \text{si } |\text{LZW}(w)| < |w|\\
+		\texttt 1.w & \text{sinon}
+	\end{array} \right.
+\end{array}$}

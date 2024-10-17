@@ -1,0 +1,72 @@
+\dev{Marin Malory}{\cite{Mitzenmacher}}
+
+\textit{Ce développement présente une introduction à la méthode probabiliste. Cette méthode permet très souvent de donner des algorithmes d'approximations probabilistes et s'insère donc dans la leçon \ref{L11}. Si les algorithmes d'approximations sont mentionnés dans la leçon \ref{L26}, ce développement permet d'illustrer une manière d'obtenir des certificats d'existence de solution à des problèmes d'optimisation.}
+
+
+\paragraph{Méthode probabiliste.} La méthode probabiliste est un moyen de montrer l'existence d'objets par un simple résonnement de dénombrement. Si la probabilité d'obtenir un objet ayant certaine propriété est strictement positive, alors un tel objet existe. Par exemple, si la probabilité de tirer au sort un ticket gagnant est non nulle, alors il y a au moins un ticket gagnant.
+
+Cette méthode est non-constructiviste en générale, on montre juste l'existence sans vraiment donner l'objet. Mais le plus souvent, une preuve utilisant la méthode probabiliste est équivalente à un algorithme probabiliste permettant de construire cet objet.
+
+
+\paragraph{Argument d'espérance.}
+
+On utilisera le lemme suivant :
+\begin{lemma}
+On considère un univers $\Omega$ et $X$ une variable aléatoire sur $\Omega$. Si $\mathbb{E}(X) =\mu$, alors $P(X\geq \mu) \geq 0$ et $P(X\leq \mu)>0$.
+\end{lemma}
+
+Ainsi, il existe au moins une réalisation de $X$ supérieure ou égal à $\mu$, et au moins une réalisation de $X$ inférieure ou égal à $\mu$.
+
+\paragraph{Application : MAX-SAT.}
+
+\begin{theorem}
+Étant donné un ensemble de $m$ clauses, on note $k_i$ le nombre de littéraux dans la $i$ème clause pour $1\leq i \leq m$. Soit $k = \min_{1\leq i \leq m} k_i$. Il existe une distribution de valeurs de vérités qui satisfait au moins 
+$$
+\sum_{i=1}^m (1-2^{-k_i}) \geq m(1-2^{-k})
+$$
+clauses.
+\end{theorem}
+
+\begin{proof}
+Pour chaque variable, on tire au sort sa valeur de vérité. En notant $X_i$ pour $1\leq i \leq m$ la variable aléatoire qui vaut $1$ la $i$ème clause est satisfaite et $0$ sinon, on a $P(X_i =0) = 2^{-k_i}$ par indépendance des choix. En notant $N$ le nombre de clause satisfaite, on a $N= \sum_{i=1}^n X_i$ et par linéarité de l'espérance :
+$$
+\mathbb{E}(N) = \sum_{i=1}^n \mathbb{E}(X_i) = \sum_{i=1}^m (1-2^{-k_i})
+$$
+Par le lemme ci-dessus, on peut conclure.
+\end{proof}
+
+Ainsi, la preuve ci-dessus peut être transformer en un algorithme qui assigne à chaque variable une valeur de vérité au hasard. Son temps d'exécution est un $\mathcal{O}(m)$, et il renvoie une distribution qui satisfait en espérance $m(1-2^{-k})$ clauses. Cet algorithme est donc une $1-2^{-k}$-approximation randomisé. 
+
+\paragraph{Application : Ensemble indépendant.}
+
+\begin{theorem}
+Soit $G=(S,A)$ un graphe connexe à $n$ sommets et $m \geq n/2$ arêtes. Alors $G$ contient un ensemble indépendant ayant au moins $n^2/4m$ sommets. 
+\end{theorem}
+
+\begin{proof}
+Soit $d=2m/n \geq 1$ le degré moyen d'un sommet dans $G$. On considère l'algorithme probabiliste suivant :
+
+\begin{algorithm}
+Supprimer chaque sommet de $G$ (avec ses arêtes adjacentes) de manière indépendante avec une probabilité $1-1/d$ ;\\
+Pour chaque arête restante, la supprimer avec un des sommets adjacent pris au hasard.
+\caption{EnsembleIndépendantRandomisé($G$)}
+\end{algorithm}
+
+L'algorithme renvoie un ensemble indépendant puisque chaque arête a été supprimée.\newline
+
+\noindent \textbf{Remarque :} l'algorithme se passe en deux phases, une phase d’échantillonnage, et une phase de modification. On parle de méthode \textit{Sample and Modify}.\newline
+
+Soit $X$ le nombre de sommets qui survivent à la première étape de l'algorithme. $X$ suit une loi binomiale de paramètre $n$ et $1/d$. Ainsi, $\mathbb{E}(X)=n/d$.
+
+Soit $Y$ le nombre d'arêtes qui survivent à la seconde étape. Chaque arête survit si, et seulement si ses deux sommets adjacents survivent, donc $Y$ est la somme de $m$ variables de Bernoulli de paramètre $(1/d)^2$. Ainsi,
+$$
+\mathbb{E}(Y) = m \left( \frac{1}{d}\right) = \frac{nd}{2d^2} = \frac{n}{2d}
+$$
+La seconde étape retire toutes les arêtes restantes et donc au plus $Y$ sommets. Ainsi, lorsque l'algorithme termine, le nombre de sommets restants est $X-Y$, et 
+$$
+\mathbb{E}(X-Y) = \frac{n}{d} - \frac{n}{2d} = \frac{n}{2d}
+$$
+Ce qui conclut notre preuve.
+\end{proof}
+
+L'algorithme ci-dessus nous donne donc une $\max(n/4m, 4m/n)$ approximation randomisée, ainsi qu'une borne inférieure sur le cardinal du plus grand ensemble indépendant, noté $\alpha$.

@@ -1,0 +1,212 @@
+\dev{Emile Martinez}{}
+
+\textit{Ce développement a pour but de présenter des exercices avancés de SQL, en présentant différentes manières de faire la division et le max. On peut le présenter comme la correction d'exo dont on aurait dit aux élèves : «pour la prochaine fois, cherchai différentes manières de répondre à ces questions», et qui en vrai, partirait donc de ce qu'ont proposé les élèves}
+
+\section*{Trouver le(s) produit(s) le(s) plus cher(s)}
+
+\paragraph{$\star$}La première manière de faire consiste à trouver le max puis a regarder quels sont les produits qui ont ce prix là.
+\\
+\\
+\begin{minipage}{0.4\linewidth}
+	
+\begin{lstlisting}
+SELECT MAX(prix)
+FROM produit	
+\end{lstlisting}
+
+$\to$ \begin{tabular}{|c|} \hline 10 \\ \hline \end{tabular}
+
+\begin{lstlisting}
+SELECT nom
+FROM produit
+WHERE prix = 10
+\end{lstlisting}
+
+\end{minipage} \enspace $\underset{\text{Ce n'est pas très portable}}\longrightarrow$ \enspace
+\begin{minipage}{0.4\linewidth}
+	
+\begin{lstlisting}
+SELECT nom
+FROM produit,
+     (SELECT max(prix) as m
+      FROM produit)
+WHERE m = prix
+\end{lstlisting}
+
+\end{minipage}
+
+
+\begin{com}
+	Sur un dessin montrer comment on rajoute m à la fin de chaque ligne.
+\end{com}
+
+\begin{rem}
+	Peut-on faire sans agrégation ?
+\end{rem}
+
+\paragraph{$\star$} On peut également ruser avec la clause LIMIT :
+
+\begin{lstlisting}
+SELECT nom
+FROM produit
+ORDER BY prix DESC
+LIMIT 1
+\end{lstlisting} 
+
+\begin{rem}
+	On n'obtient pas tous les produits les plus chers, seulement un.
+\end{rem}
+
+\paragraph{$\star$} On peut néanmoins réussir sans agrégation et proprement.\\
+
+Pour cela on commence par chercher tous les éléments qui ne sont pas maximum.
+\\
+\\
+\begin{minipage}{0.40\linewidth}
+\begin{lstlisting}
+SELECT DISTINCT p1.num_produit
+FROM produit AS p1,
+     produit AS p2
+WHERE p1.prix < p2.prix
+\end{lstlisting}
+\end{minipage} \quad \begin{minipage}{0.15\linewidth}
+\begin{center}
+\begin{tabular}{|c|c|}
+	\hline
+	\qquad \qquad \qquad & 3 \\
+	\hline & 2 \\
+	\hline & 4 \\ \hline
+\end{tabular}\\ \enspace
+\\
+produit
+\end{center}
+\end{minipage}
+\begin{minipage}{0.30 \linewidth}
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|}
+			\hline \rowcolor{gray} \qquad \qquad & 3 & \qquad \qquad & 3 \\ \hline
+			\rowcolor{gray} & 3 &  & 2\\ \hline
+			& 3 & & 4\\ \hline
+			\rowcolor{gray}& 4 & & 3\\ \hline
+			\rowcolor{gray}& 4 & & 2\\ \hline
+			\rowcolor{gray}& 4 & & 4\\ \hline
+			& 2 & & 3 \\ \hline
+			\rowcolor{gray} & 2 & & 2\\ \hline
+			& 2 & & 4\\ \hline
+		\end{tabular}
+	\end{center}
+\end{minipage} $\to$ \begin{minipage}{0.15\linewidth}
+Il ne ne reste bien que les éléments plus petits que quelqu'un d'autre
+\end{minipage}\\
+\\
+Il ne suffit alors que d'enlever à tous les produits, ce qui ne sont pas maximaux
+\begin{lstlisting}
+SELECT nom
+FROM produit AS p JOIN 
+     (SELECT num_produit AS n1
+      FROM produit
+      
+      EXCEPT
+      
+      SELECT DISTINCT p1.num_produit
+      FROM produit AS p1,
+      produit AS p2
+      WHERE p1.prix < p2.prix
+      )
+     ON p.num_produit = n1
+\end{lstlisting}
+
+\begin{com}
+	On peut éventuellement construire cette requête par étape, en partant de la précédente, et en ajoutant à chaque fois des choses (d'abord le fait de récupérer tous les numéros, puis de les utiliser, quite à mettre des accolades sur chaque portion pour expliquer comment cela fonctionne)
+\end{com}
+
+\begin{com}
+	On peut dire qu'on aurait pu se passer du JOIN, en mettant dans le truc que on excepte le num\_produit et le nom, puis en ne selectoinnant que le nom
+\end{com}
+
+\begin{rem}
+	Cela peut évidemment se généraliser à toutes tables avec un attribut comparable, pouvant donc remplacer le MAX agrégatif.
+\end{rem}
+
+
+\section*{Trouver les clients qui ont commandé tous les produits}
+
+\paragraph{$\star$} La solution avec agrégation
+\\
+\\
+\begin{minipage}{0.4\linewidth}
+
+	\begin{lstlisting}
+SELECT num_client, COUNT(*)
+FROM commande
+GROUP BY num_client
+	\end{lstlisting}
+	
+	$\to$ donne le nombre de commandes de chaque client ayant une commande
+
+	$\to$ donc son nombre de produits commandés (car (num\_prod, num\_client) est une clé)\\
+	
+	Supposons qu'il y ait 20 produits.
+	\begin{lstlisting}
+SELECT num_client
+FROM commandes
+GROUP BY num_client
+HAVING COUNT(*) = 20
+	\end{lstlisting}
+	
+\end{minipage} \qquad $\longrightarrow$ \qquad
+\begin{minipage}{0.47\linewidth}
+	
+	\begin{lstlisting}
+SELECT num_client
+FROM commandes
+GROUP BY num_client
+HAVING COUNT(*) IN (SELECT COUNT(*)
+                    FROM produits)
+	\end{lstlisting}
+	
+\end{minipage}
+
+\begin{com}
+	Suivant comment on annonce ce développement et le temps qu'il prend, on peut rajouter à côté du premier bloc une explication de pourquoi ca marche, en dessinat le fait que on fait des paquets par num\_client et que on compte le nombre de lignes pour chaque
+\end{com}
+
+\paragraph{$\star$} On peut aussi le faire sans utiliser d'agrégation\\
+\\
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}
+SELECT num_client
+FROM commande
+
+EXCEPT
+
+SELECT num_client
+FROM (
+      SELECT num_produit, num_client
+      FROM produit, client
+      
+      EXCEPT
+      
+      SELECT num_produit, num_client
+      FROM commande
+     )
+\end{lstlisting}
+\end{minipage}\begin{minipage}{0.5\linewidth}
+$\left. \begin{array}{c}
+\\\\\\\\\\\\\\
+\left. \begin{array}{c}
+\\ \\ \\ \\ \\ \\
+\end{array} \right\} \begin{array}{l}
+\\\text{tous les couples}\\ \text{produit client} \\ \text{n'étant pas une} \\ \text{commande} \\ \\
+\end{array}
+\\\\ \\
+\end{array} \begin{array}{c}
+\\ \\ \\ \\ \left. \begin{array}{c}
+\\ \\ \\ \\ \\ \\ \\ \\ \\ \\ \\
+\end{array} \right\}\begin{array}{l}
+\\ \\\text{tous les}\\\text{clients ne} \\\text{commandant} \\\text{pas au moins} \\ \text{un produit} \\ \\ \\ \\ \\
+\end{array}
+\end{array}\right\}\begin{array}{l}
+\\\text{Tous les}\\\text{clients}\\\text{ayant}\\\text{commandé}\\\text{tous les}\\\text{produits}\\
+\end{array}$
+\end{minipage}

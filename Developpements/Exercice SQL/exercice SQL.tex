@@ -1,0 +1,121 @@
+\dev{Emile Sorci, Marin Malory}{\cite{Silberschatz}}
+
+\textit{ Ce développement est la présentation et la correction d'un exercice avancé de SQL. Il permet notamment de présenter la clause {\tt WITH ... AS ...} qui simplifie certaines requêtes. Il s'intègre parfaitement dans les leçons \ref{L23} et \ref{L18}.}
+
+
+
+\begin{exercise}
+
+On considère une base de donnée sur des entreprises, ainsi qu'une série de requêtes sur cette base. 
+
+La base de données contient les tables suivantes :
+\begin{itemize}
+\item {\tt Employes(id, nom, rue, ville)}
+\item {\tt Travail(id, nom\_compagnie, salaire)}
+\item {\tt Compagnie(nom\_compagnie, ville)}
+\end{itemize}
+Donner une expression SQL pour chacune des requêtes suivantes :
+\begin{enumerate}
+\item Trouver l'identifiant, le nom de la ville de résidence de chaque employé travaillant pour \og Banque Centrale\fg{}.
+\item Trouver l'identifiant, le nom et la ville de résidence de chaque employé travaillant pour \og Banque Centrale \fg{} et gagnant plus de 10 000 €.
+\item Trouver l'identifiant de chaque employé qui gagne plus que n'importe quel employé de la \og Banque Locale \fg{}.
+\item On suppose que des compagnies peuvent se situer dans plusieurs villes. Trouver le nom de chacune des compagnies qui ne sont situées que dans des villes où la \og Banque Locale \fg{} est implantée.
+\end{enumerate}
+
+Pour les questions suivantes, on utilisera la clause {\tt WITH}, qui s'utilise de la manière suivante {\tt WITH nom\_table(att\_1,...,att\_n) AS (sous-requête) requête} et qui permet de renommer la table obtenue via la sous-requête.
+
+\begin{enumerate}[resume]
+\item Trouver le nom de la (ou les) compagnie(s) qui a(ont) le plus d'employés.
+\item Trouver le nom de chaque compagnie où, en moyenne, un employé gagne plus qu'un salarié de \og Banque Centrale \fg{}.
+\end{enumerate}
+\end{exercise}
+
+\paragraph{Solution.}~
+
+\begin{enumerate}
+\item 
+
+\begin{lstlisting}
+SELECT e.id, e.ville
+FROM Employes as e 
+JOIN Travail as t on e.id=t.id 
+WHERE t.nom_compagnie = "Banque Centrale"
+\end{lstlisting}
+
+\item 
+
+\begin{lstlisting}
+SELECT e.id, e.ville
+FROM Employes as e 
+JOIN Travail as t on e.id=t.id 
+WHERE t.nom_compagnie = "Banque Centrale" AND t.salaire >= 10000
+\end{lstlisting}
+
+\item 
+
+\begin{lstlisting}
+SELECT e.id
+FROM Employes AS e 
+JOIN Travail AS t on e.id=t.id 
+WHERE t.salaire >= (
+	SELECT MAX(salaire) 
+	FROM Travail 
+	WHERE nom_compagnie = "Banque Locale"
+)
+\end{lstlisting}
+
+\item 
+
+\begin{lstlisting}
+SELECT nom_compagnie
+FROM Compagnie
+
+EXCEPT
+
+SELECT c.nom_compagnie
+FROM Compagnie AS c
+LEFT JOIN (
+    SELECT DISTINCT ville
+    FROM Compagnie
+    WHERE nom_compagnie = "Banque locale"
+     ) AS v
+ON c.ville = v.ville
+WHERE v.ville IS NULL;
+\end{lstlisting}
+
+\item 
+
+\begin{lstlisting}
+WITH NbEmployes(nom_compagnie,n) AS (
+  SELECT nom_compagnie, COUNT(id) AS n
+  FROM Travail
+  GROUP BY nom_compagnie
+)
+
+SELECT t.nom_compagnie
+FROM NbEmployes AS t
+WHERE t.n >= (
+  SELECT MAX(n)
+  FROM NbEmployes
+)
+\end{lstlisting}
+
+\item 
+
+\begin{lstlisting}
+WITH travail_salaire(nom_compagnie, salaire_moyen) AS (
+  SELECT nom_compagnie, AVG(salaire)
+  FROM Travail
+  GROUP BY nom_compagnie
+)
+
+SELECT t.nom_compagnie
+FROM travail_salaire AS t
+WHERE t.salaire_moyen > (
+  SELECT salaire_moyen
+  FROM travail_salaire
+  WHERE nom_compagnie = "Kinder"
+) 
+\end{lstlisting}
+
+\end{enumerate}

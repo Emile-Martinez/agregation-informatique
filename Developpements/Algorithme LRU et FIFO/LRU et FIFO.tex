@@ -1,0 +1,119 @@
+\dev{Marin Malory}{\cite{Motwani}}
+
+\textit{
+Ce développement étudie deux algorithmes de remplacement de pages : LRU et FIFO. En particulier, on s'intéresse au moyen de mesurer la performance de tels algorithmes onlines. Le problème original justifie ce développement pour les leçons \ref{L15} et \ref{L16}. De plus, si la présentation est plus orientée sur FIFO, il s'insère dans la leçon \ref{L5}. Ces deux algorithmes utilisant la stratégie gloutonne, ce développement illustre la leçon \ref{L12}. Enfin, le problème de pagination peut être vu comme un problème de gestion de ressources, et s'insère ainsi dans la leçon \ref{L13}.
+}
+
+\paragraph{Problème de pagination online.} On considère une mémoire à deux niveaux : un \textbf{cache} (ou mémoire rapide) de taille $k$, et une \textbf{mémoire principale} (ou mémoire lente) pouvant potentiellement garder une infinité d'éléments en mémoire (on peut aussi fixer sa taille très grande devant $k$).\newline
+
+Un \textbf{algorithme de pagination} décide quel élément garder en mémoire cache à tout instant. On a une séquence de requêtes $\rho = (\rho_1,...,\rho_N)$, chacun spécifiant un élément mémoire ;
+\begin{itemize}
+\item si l'élément $\rho_i$ est dans le cache, on a un \textit{cache hit} ;
+\item si l'élément $\rho_i$ n'est pas dans le cache, on a un \textit{cache miss}.
+\end{itemize}
+
+\begin{center}
+\fbox{On veut créer un algorithme online qui minimise le nombre de cache miss.}
+\end{center}
+
+\begin{rem}
+Un algorithme online n'a pas accès aux requêtes futures, c'est la différence avec un algorithme offline qui connaît à l'avance toutes les requêtes.
+\end{rem}
+
+On considère trois algorithmes déterministes classiques utilisés en architecture et systèmes d'exploitations :
+\begin{itemize}
+\item LRU (Least Recently Used) : on enlève du cache l'élément dont l'utilisation la plus récente est arrivée le plus tôt
+\item FIFO (First In First Out) : on enlève le premier arrivé dans le cache.
+\item LFU (Least Frequently Used) : on enlève celui utilisé le moins souvent
+\end{itemize}
+
+On va se concentrer sur les deux premiers. 
+
+\paragraph{Un peu de vocabulaire.} Étant donné un algorithme de pagination $A$, et une séquence de requêtes $\rho = (\rho_1,...,\rho_N)$, on note $f_A(\rho)$ le nombre de cache miss de $A$ sur la séquence $\rho$.
+
+On note de plus $f_O(\rho)$ le nombre de cache miss de l'algorithme offline optimal MIN.
+
+\begin{rem}
+L'algorithme MIN a connaissance de la totalité de $\rho$, il supprime du cache l'élément qui apparaît le plus longtemps après dans $\rho$. La preuve d'optimalité est non trivial.
+\end{rem}
+
+\begin{rem}
+Sans perdre de généralité, on considère que le cache est toujours vide au départ (les $k$ premières requêtes entraînent toujours un cache miss).
+\end{rem}
+
+\paragraph{Comment mesurer la performance d'un tel algorithme.} Une première idée consiste à faire comme pour la complexité : étudier le pire cas. Étant donné un algorithme $A$, on définie la performance dans le pire cas $PC(A)$ comme :
+$$
+PC(A) = \max_{\rho \in R_N} f_A(\rho)
+$$
+Cette mesure n'est pas très utile, comme le montre le théorème suivant.
+\begin{theorem} On considère qu'il n'y a que $k+1$ éléments mémoires et on considère des séquences de requêtes de taille $N$. Pour tout algorithme déterministe de pagination $A$,on a $PC(A)=N$.
+\end{theorem}
+\begin{proof} Soit $\rho=(\rho_1,...,\rho_{k})$ une séquence de départ avec les $\rho_i$ distincts deux à deux. La mémoire cache est alors remplie. On demande le $k+1$-ème élément mémoire $\rho_{k+1}$, et $A$ supprime un élément que l'on nomme $\rho_{k+2}$. On demande ensuite $\rho_{k+2}$ qui n'est plus dans le cache, et on recommence jusqu'à $\rho_N$. La séquence se construit alors par induction sur $N$.
+\end{proof}
+
+\paragraph{Compétitivité.} On va chercher un autre moyen de mesurer la performance des algorithmes, en le comparant à l'optimal offline MIN.
+
+\begin{definition}[Compétitivité]
+Un algorithme de pagination déterministe $A$ est $C$-compétitif s'il existe $b$ indépendant de $N$ tel que pour toute séquence de requêtes $\rho$, 
+$$
+f_A(\rho) -Cf_0(\rho) \leq b
+$$
+On note $C_A$ la borne inférieure des $C$ tel que $A$ est $C$-compétitif.
+\end{definition}
+
+On va alors pouvoir distinguer nos algorithmes.
+
+\begin{theorem}\label{LRUth1}
+LRU et FIFO sont $k$-compétitifs.
+\end{theorem}
+
+\begin{theorem}\label{LRUth2}
+LFU n'a pas de coefficient de compétitivité borné.
+\end{theorem}
+
+\begin{theorem}[Optimalité]
+Pour tout algorithme déterministe de pagination $A$, $C_A\geq k$.
+\end{theorem}
+
+\begin{proof}[du théorème \ref{LRUth1}]
+Soit $\rho=(\rho_1,....,\rho_N)$. On partitionne $\rho$ en phases de la manière suivante : $P_0$ est la phase vide, et pour $i>0$, $P_i$ est la séquence maximale suivant $P_{i-1}$ contenant au plus $k$ requêtes distinctes.
+
+\begin{example} Pour $k=2$ et $\rho=(1,1,2,3,3,4,5)$, on a $P_0=\emptyset$, $P_1=(1,1,2)$, $P_2=(3,3,4)$ et $P_3=(5)$.
+\end{example}
+
+On numérote les phases pour $0\leq i \leq m$, et on montre que pour tout $i$, $f_A(P_i) \leq k$ pour $A\in \{LRU,FIFO\}$.
+
+Par l'absurde, si $f_{A}(P_i)>k$, alors il existe un élément mémoire $\alpha$  qui provoque un cache miss par deux fois dans la phase $P_i$. On montre que cela est impossible via les algorithmes LRU et FIFO. Entre les deux moments où $\alpha$ provoque un cache miss, les requêtes concernent au plus les $k-1$ autres éléments mémoires de la phase $P_i$. 
+\begin{itemize}
+\item Cas LRU : au moment de l'éviction de $\alpha$ (entre les deux caches miss), $\alpha$ avait la dernière utilisation la plus tôt. Ainsi, les $k-1$ autres éléments du caches ont eu une requête entre le premier cache miss de $\alpha$ et son éviction. Puisque lors de son éviction, la requête concernait un élément non présent en cache, on obtient $k+1$ éléments mémoires distincts demandés durant $P_i$.
+\item Cas FIFO : même raisonnement. En effet, lors de l'éviction de $\alpha$, les $k-1$ autres éléments sont en haut de la file, $\alpha$ en bas et on insère un $k+1$-ème élément dans la file, ce qui est absurde.
+\end{itemize}
+
+Ainsi, on a 
+$$
+f_A(\rho) = \sum_{i=1}^m f_A(P_i) \leq mk
+$$
+
+Maintenant, montrons que $f_o(\rho) \geq m-1$. Soit $0<i<m$, on pose $q$ la première requête de $P_i$, et $q'$ la première requête de $P_{i+1}$. On considère la séquence qui démarre juste après $q$ et termine juste après $q'$. On montre que MIN fait au moins une erreur sur cette séquence. En effet, $q$ est chargé en mémoire cache au début, et cette séquence contient au moins $k$ éléments distincts ($q'$ et $P_i$ sans $q$). Ainsi, au moins un de ces éléments ne sera pas dans le cache. Ainsi, on obtient au moins $(m-1)$ cache miss.\newline
+
+Finalement, 
+$$
+f_A(\rho) -k f_o(\rho) \leq mk - k(m-1) =k
+$$
+Ce qui conclut la preuve.
+\end{proof}
+
+\begin{center}
+\textit{ Pour rendre la preuve plus claire, il sera judicieux de faire un schéma temporel des différentes requêtes. De plus, il s'avère que la preuve est beaucoup plus claire pour FIFO que LRU.}
+\end{center}
+
+\begin{exercise}[Démonstration du théorème \ref{LRUth2}]~
+
+\noindent Montrer le théorème \ref{LRUth2} en posant pour $l\geq 0$ :
+$$
+\rho = \rho_1^l \rho_2^l ... \rho_{k-1}^l (\rho_k \rho_{k+1})^{l-1}
+$$
+\end{exercise}
+
+
+\paragraph{Pratique vs Théorie.} En pratique, on sait bien que LRU marche mieux que FIFO, alors que théoriquement leurs performances sont similaires. Ce modèle de performance est donc critiquable. Pour distinguer théoriquement FIFO et LRU, il faut alors notamment limiter la capacité de l'adversaire, et prendre en compte les principes de localités.

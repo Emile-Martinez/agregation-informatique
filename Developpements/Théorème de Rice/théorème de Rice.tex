@@ -1,0 +1,74 @@
+
+\dev{Marin Malory}{\cite{Carton}}
+
+\textit{Ce développement présente le théorème de Rice avec quelques applications simples du théorème. Puisque ce résultat permet de montrer l'indécidabilité de certains langages, il s'insère naturellement dans la leçon \ref{L27}. De manière indirecte, ce théorème donne un résultat d'indécidabilité sur la correction des programmes et peut donc illustrer la leçon \ref{L1}.}
+
+\begin{theorem}[Théorème de Rice]~
+
+Soit $P$ une propriété non triviale sur les langages récursivement énumérables. Le problème de savoir si le langage $L(M)$ d'une machine de Turing $M$ vérifie $P$ est indécidable.
+\end{theorem}
+
+De manière plus formelle, on a $P\subset \{ L(M) | M \text{ est une machine de Turing}\}$, et on définit $L_P$ le langage des machines de Turing vérifiant $P$ : $L_P \subset \{<M> | L(M) \in P\}$. $P$ est non triviale s'il existe $M_1$ et $M_2$ avec $<M_1>\in L_P$ et $<M_2 \notin L_P$.
+
+\begin{example}
+On peut prendre $P$ la propriété : \og le langage est non vide \fg{}, et alors $L_P =\{<M> | L(M)\neq \emptyset \}$.
+\end{example}
+
+\begin{proof}
+On veut montrer que $L_P$ est indécidable. On donne une réduction de $L_\in$ à $L_p$.
+
+Quitte à remplacer $P$ par sa négation, on suppose que le langage vide ne vérifie pas $P$. Puisque $P$ n'est pas triviale, il existe une machine $M_0$ telle que $<M_0>\in L_P$.
+
+
+Pour toute paire $(M,w)$ où $M$ est une machine de Turing et $w$ un mot, on définit la machine de Turing suivante :\newline
+
+
+\fbox{\begin{minipage}{0.9\linewidth}
+\noindent $\mathbf{M_w=}$ \og Sur l'entrée $u$ :
+\begin{enumerate}
+\item Si $M$ accepte $w$, simuler $M_0$ sur $u$ et \textbf{retourner le résultat}.
+\item Sinon, \textbf{rejeter}.\fg
+\end{enumerate}
+\end{minipage}}\newline
+
+On veut montrer :
+$$
+w\in L(M) \Leftrightarrow <M_w>\in L_P
+$$
+
+Si $M$ accepte $w$, alors $L(M_w)=L(M_0)$ et donc $<M_w> \in L_P$. Réciproquement, si $M$ n'accepte pas $w$. Il y a deux cas : 
+\begin{itemize}
+\item Si $M$ ne s'arrête pas sur $w$, alors $M$ ne s'arrête jamais et donc $L(M)=\emptyset$
+\item Si $M$ rejette $w$, $M_w$ rejette tous les mots $u$, d'où $L(M_w)=\emptyset$
+\end{itemize}
+Ainsi, $<M_w> \notin L_P$ puisque $\emptyset \notin L_P$.
+
+
+
+Or, la fonction $f$ qui à $<M,w>$ associe $<M_w>$ est calculable, et donc $L_\in$ se réduit à $L_P$. Ainsi, $L_P$ est indécidable.
+\end{proof}
+
+\begin{corollary}
+Le langage $L_\emptyset$ est indécidable.
+\end{corollary}
+
+\paragraph{Condition d'utilisation.} On considère un problème légèrement différent du problème précédent :
+$$
+L_{\neq} =\{<M,M> | L(M) \neq L(M')\}
+$$
+Attention, le théorème de Rice n'est pas directement applicable ici car la propriété ne porte pas sur les langages récursivement énumérables (ici sur deux langages récursivement énumérables).
+
+On montre la proposition suivante par réduction de $L_{\emptyset}$ à $L_{\neq}$.
+
+\begin{proposition}
+$L_{\neq}$ est indécidable.
+\end{proposition}
+
+\begin{proof}
+On fixe une machine $M_{\emptyset}$ qui ignore son entrée et rejette directement. On a alors $L(M_\emptyset)=\emptyset$. On pose $g$ la fonction qui à $<M>$ associe $<M,M_\emptyset>$ (qui est calculable), et on a 
+$$
+L(M) \neq \emptyset \Leftrightarrow L(M) \neq L(M_\emptyset)
+$$
+Ainsi, $g$ est une réduction de $L_{\emptyset}$ à $L_{\neq}$, donc $L_{\neq}$ est indécidable.
+\end{proof}
+

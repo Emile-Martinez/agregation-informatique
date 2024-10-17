@@ -1,0 +1,116 @@
+\dev{Marin Malory}{\cite{Lesesvre}}
+
+\textit{Ce développement présente un algorithme permettant de résoudre le problème de recherche de motif dans un texte. Pour cela, on construit un automate minimal en pré-traitement, permettant ensuite de résoudre le problème linéairement en la taille du texte. Ainsi, il s'intègre aussi bien dans la leçon \ref{L9} que dans la leçon \ref{L29}. Enfin, il peut illustrer la leçon \ref{L2} si la programmation orienté automate est abordée.}
+
+
+\paragraph{Introduction.}
+
+Le problème de recherche d'un motif $M$ dans un texte $T$ consiste à déterminer si $M$ apparaît comme facteur (sous-mot) de $T$. On pose $T=t_1...t_n$ et $M=m_1...m_k$, et pour $1\leq i \leq k$, on pose $M_i=m_1...m_i$ le préfixe de $M$ de longueur $i$. On pose aussi par convention $M_0= \epsilon$.\newline
+
+Si $u,v\in \Sigma^*$, on note $u \sqsubset v$ si $u$ est suffixe de $v$. On note aussi 
+$$
+\sigma(u) = \max\{ i : M_i \sqsubset u\}
+$$
+c'est-à-dire la taille du plus grand préfixe de $M$ qui est également suffixe de $u$. 
+
+
+L'objectif est alors de construire un algorithme résolvant le problème en $\mathcal{O}(n)$ avec un pré-traitement polynomial en $k$.
+
+
+\paragraph{Construction d'un automate.} Soit $A=(Q,\Sigma, I,F,\delta)$ l'automate déterministe complet défini par :
+\begin{itemize}
+\item $Q=\{0,...,k\}$ ;
+\item $I=\{0\}$ ;
+\item $F=\{k\}$;
+\item pour tout $q\in Q$ et $a\in \Sigma$, $\delta(q,a) = \sigma(M_qa)$.
+\end{itemize}
+
+On va alors montrer que le langage reconnu par notre automate est $\Sigma^*M$, ce qui nous permettra de l'utiliser afin de résoudre le problème initial. On montrera ensuite que cet automate est minimal, et qu'il n'y a donc pas besoin de le minimiser avant de traiter le texte.
+
+\begin{proposition}\label{prop1Motif}
+Pour tout mot $u\in \Sigma^*$, on a $\delta^*(0,u) =\sigma(u)$. Ainsi, $L(A)=\Sigma^*M$.
+\end{proposition}
+
+\paragraph{Un premier lemme.} Ce premier lemme, manipulant préfixe et suffixe, nous sera utile pour montrer la proposition précédente.
+
+
+
+\begin{lemma}
+Soient $u,v \in \Sigma^*$ et $a\in \Sigma$.
+\begin{enumerate}
+\item Si $u\sqsubset v$, alors $\sigma(u) \leq \sigma(v)$.
+\item $\sigma(ua) \leq \sigma(u)+1$.
+\item $\sigma(ua) =\sigma(M_{\sigma(u)}a)$
+\end{enumerate}
+\end{lemma}
+
+\textit{La démonstration de ce lemme est difficile à faire en direct au tableau. Il sera judicieux de justifier la démonstration avec des dessins, quitte à le faire manière un peu moins formel pour gagner en clarté.}
+
+\begin{rem}
+Si $M_i \sqsubset u$ ($0\leq i \leq k$), alors $i\leq \sigma(u)$. De plus, on a $\sigma(M_i)=i$.
+\end{rem}
+\begin{proof}~
+
+\begin{enumerate}
+\item Si $u\sqsubset v$, alors tout suffixe de $u$ est suffixe de $v$. Ainsi, on a $\{i : M_i \sqsubset u\} \subset \{i : M_i \sqsubset v\}$, et donc $\sigma(u) \leq \sigma(v)$.
+
+\item Si $\sigma(ua)=0$, alors puisque $\sigma(u)\geq 0$, l'inégalité est vérifiée. Sinon, on a $\sigma(ua)-1\geq 0$. On remarque alors que $M_{\sigma(ua)-1} \sqsubset u$, et ainsi, $\sigma(ua)-1 \leq \sigma(u)$.
+
+\item On montre le résultat par double inégalité. 
+
+\begin{itemize}
+\item Par définition $M_{\sigma(u)} \sqsubset u$ et donc $M_{\sigma(u)}a \sqsubset ua$ et donc d'après le point 1, $\sigma(M_{\sigma(u)a}) \leq \sigma(ua)$.
+
+\item Pour l'autre inégalité, on observe que $M_{\sigma(u)}a$ et $M_{\sigma(ua)}$ sont deux suffixes de $ua$. Ainsi, le plus court des deux mots est suffixe de l'autre. D'après le point 2, on a $
+|M_{\sigma(ua)} | = \sigma(ua) \leq \sigma(u)+1 =|M_{\sigma(u)}a|$.
+Ainsi, $M_{\sigma(ua)} \sqsubset M_{\sigma(u)}a$, d'où $\sigma(ua) = \sigma(M_{\sigma(ua)}) \leq \sigma(M_{\sigma(u)}a)$ d'après le point 1. 
+\end{itemize}
+\end{enumerate}
+\end{proof}
+
+Nous pouvons maintenant revenir au langage reconnu par l'automate défini ci-dessus.
+
+\begin{proof}
+On procède par récurrence sur la longueur $l$ de $u$.
+\begin{itemize}[label =$\bullet$]
+\item Si $l=0$, alors $u=\epsilon$ et $\delta^*(0,\epsilon) =0 = \sigma(\epsilon)$.
+\item Supposons que $l>0$ et que pour tout mot $v\in \Sigma^{l-1}$ vérifie $\delta^*(0,v) = \sigma(v)$. Soit $u\in \Sigma^l$, qu'on écrit $v=ua$ avec $|u|=l-1$ et $a\in \Sigma$. En appliquant l'hypothèse de récurrence :
+$$
+\delta^*(0,u) =\delta(\delta^*(0,v),a) = \delta(\sigma(v),a) = \sigma \left( M_{\sigma(v)}a\right) = \sigma(va) = \sigma(u)
+$$
+\end{itemize}
+Cela conclut la récurrence.
+
+Enfin, par définition de $\sigma$, $\sigma(u)=k$ si et seulement si $M \sqsubset u$. Ainsi, 
+$$
+u\in L(A) \Leftrightarrow \delta^*(0,u)=k \Leftrightarrow \sigma(u)=k \Leftrightarrow M \sqsubset u \Leftrightarrow u \in \Sigma^*M
+$$
+et donc $L(A)=\Sigma^*M$.
+\end{proof}
+
+Enfin, montrons que cet automate est minimal au sens de Nérode.
+
+\begin{lemma}
+Pour $i,j\in Q$ tels que $i>j$, le mot $m_{i+1}...m_k$ est accepté par $A$ à partir de $i$ mais pas de $j$. Ainsi, $A$ est minimal.
+\end{lemma}
+
+\begin{proof}
+On note $N_i=m_{i+1}...m_k$ le suffixe de $M$ de taille $k-i$. Par construction, on a $\delta^*(0,M_i)=i$, d'où 
+$$
+\delta^*(i,N_i) = \delta^*(0,M_iN_i) = \delta^*(0,M)=k
+$$
+Ainsi, $N_i$ est accepté à partir de $i$ dans $A$.
+
+Pour $j<i$, alors $|M_jN_i|=j+k-i<k = |M|$. Ainsi, $M$ n'est pas un suffixe de $M_jN_i$ et donc 
+$$
+\delta^*(j,N_i) = \delta^*(0,M_jN_i) = \sigma(M_jN_i)<k
+$$
+donc $N_i$ n'est pas accepté à partir de $j$ dans $A$.
+
+On en déduit de même que si $i>j$, les états $i$ et $j$ de $A$ ne sont pas équivalents pour l'équivalence de Nérode. Comme $A$ est déterministe et complet, ceci assure que $A$ est minimal.
+\end{proof}
+
+
+\paragraph{Algorithme.}
+
+La construction de $A$ (et plus particulièrement de sa fonction de transition $\delta$) n'utilise que le motif $M$ et non le texte $T$. On peut représenter cette fonction via un tableau bidimensionnelle de taille $(k+1)\times |\Sigma|$. On peut alors remplir cette table avec les différentes valeurs de $\sigma$, ce qui se fait en temps polynomial en $k$. Enfin, on lit le texte $T$ lettre par lettre et si on atteint l'état $k$, on a trouvé une occurrence de du motif $M$. Si on atteint la fin de $T$ sans jamais atteindre $k$, alors $M$ n'apparaît pas dans $T$.

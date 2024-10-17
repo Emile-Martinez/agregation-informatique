@@ -1,0 +1,68 @@
+\dev{Marin Malory}{\cite{Cormen}}
+
+\textit{
+Ce développement propose un algorithme permettant de calculer la profondeur d'un graphe orienté acyclique, et montre sa correction. Cet algorithme trouve son application dans le calcul du délai d'un circuit booléen, celui-ci étant proportionnel à la longueur du chemin critique du circuit. Ainsi, ce développement s'insère dans les leçons   \ref{L7} et \ref{L19}.
+}
+
+\paragraph{Introduction.} La recherche d'un chemin critique dans un circuit booléen revient au calcul de la profondeur d'un DAG (graphe orienté acyclique). Un tel algorithme peut trouver application dans le cadre d'un logiciel de dessin de circuit booléen, permettant ainsi de connaître la longueur du chemin critique et d'identifier de tels chemins.
+
+
+L'idée de l'algorithme proposé ici est de simplifier et modifier un algorithme classique : l'algorithme des plus courts chemins dans un DAG pondéré.
+
+
+\paragraph{Algorithme.} On présente ici un algorithme linéaire qui calcule la profondeur d'un DAG, ainsi que sa correction totale. Il repose notamment sur un tri topologique du graphe.
+
+
+\begin{algorithm}
+\Donnees{graphe orienté acyclique $G=(V,E)$, où $n = |V|$.}
+\Res{profondeur de $G$}
+$(v_i)_{1\leq i \leq n} \leftarrow$ Tri-Topologique($G$) ;\\
+
+\Pour{$i=1...n$}{
+$\text{dist}[v_i] \leftarrow 0$ ;\\
+}
+\Pour{$i=1...n$}{
+	$\text{dist}[v_i] \leftarrow \max_{uv_i \in E} (\text{dist}[u]+1)$ ;\\
+}
+\Retour{$\max_{1\leq i \leq n} \text{dist}[v_i]$} ;\\
+\caption{CheminCritique($G$)}\label{CheminCritique}
+\end{algorithm}
+
+
+\begin{proposition}
+L'algorithme \ref{CheminCritique} s'exécute en temps linéaire en la taille du graphe.
+\end{proposition}
+
+\begin{proof}
+Étant donné un DAG $G=(V,E)$, son tri topologique se réalise en temps $\mathcal{O}(|V|+|E|)$, donc linéaire en la taille du graphe. La première boucle s'exécute en $|V|$ opérations élémentaires. Ensuite, en notant pour $d(u)$ le degré entrant d'un sommet $u\in V$, l'exécution de la seconde boucle réalise 
+$$
+\sum_{i=1}^n (d(v_i)-1)+1 = |E|
+$$
+opérations élémentaires, en comptant à chaque itération le calcul du maximum et l'affectation. Enfin, on calcule le résultat final en $|V|-1$ comparaisons.
+
+Finalement, l'algorithme s'exécute en temps linéaire.
+\end{proof}
+
+
+La terminaison de l'algorithme est directe. On montre ici sa correction.
+
+\begin{proposition}
+L'algorithme \ref{CheminCritique} est correct.
+\end{proposition}
+
+\begin{proof}
+On montre l'invariant de boucle suivant (pour la seconde boucle): 
+\og À la fin de chaque itération, $\text{dist}[v_j]$ ($1\leq j \leq i$) contient la longueur du plus long chemin terminant en $v_j$. 
+
+\begin{description}
+\item[Initialisation] À la première itération, on a $\text{dist}[v_1] = \max \emptyset = 0$. En effet, puisque $G$ est un DAG, $v_1$ est une source et n'a pas d'antécédent dans le graphe.
+\item[Conservation] On suppose l'invariant vrai à l'itération $i-1$, montrons qu'il l'est à l'itération $i$. Pour $1\leq j \leq i-1$, par hypothèse, $\text{dist}[v_j]$ est déjà la longueur du plus chemin terminant en $v_j$. Montrons qu'un plus long chemin terminant en $v_i$ est de longueur $\text{dist}[v_i]=\max_{uv_i \in E} (\text{dist}[u]+1)$.
+
+Soit $\mu$ un plus long chemin terminant en $v_i$. Par tri topologique de $G$, on peut écrire $\mu = v_{i_1}...v_{i_k}$ avec $k \leq i$ la longueur du chemin et $v_{i_k} = v_i$. On remarque alors que $\mu' = v_{i_1}...v_{i_{k-1}}$ est un plus long chemin terminant en $v_{i_{k-1}}$ par maximalité de $\mu$. Par hypothèse, on a alors $k-1 = \text{dist}[v_{i_{k-1}}]$. Ainsi, $\max_{uv_i \in E} (\text{dist}[u]+1) \geq  \text{dist}[v_{i_{k-1}}] +1 = k$. Par l'absurde, si $\text{dist}[v_i] > k$, il existe un arc $uv_i \in E$ tel que $\text{dist}[u] \geq k$. Par l'invariant, il existe un plus long chemin terminant en $u$ de longueur $\geq k$, et on peut donc construire un chemin terminant en $v_i$ de longueur $>k$, ce qui contredit la maximalité de $\mu$.
+\end{description} 
+
+Ainsi, en sortie de boucle, $\text{dist}[u]$ contient la longueur des plus longs chemins terminant en $u\in V$. Finalement, $\max_{u\in V} \text{dist}[u]$ est bien la profondeur du DAG.
+\end{proof}
+
+
+\paragraph{Conclusion.} Cet algorithme nous permet de calculer la profondeur du graphe. À partir du tableau obtenu, on peut aussi retourner l'ensemble des chemins critiques. Pour cela, il suffit pour chaque sommet qui maximise $\text{dist}[u]$, de remonter dans le DAG par les ancêtres $v$ de $u$ tels que $\text{dist}[v] = \text{dist}[u]-1$ et ainsi de suite. Dans le cadre d'un logiciel, cette modification permettrait à l’utilisateur de colorier les chemins critiques sur son circuit.

@@ -1,0 +1,114 @@
+\dev{Marin Malory}{\cite{Robert}}
+
+\textit{
+Dans ce développement, on étudie un problème de routage qui s'avère être $\mathbf{NP}$-complet, et on propose d'en étudier un algorithme d'approximation. Dans ce cadre, ce développement rentre dans la leçon \ref{L11}, mais aussi dans la leçon \ref{L26} si celle-ci traite des algorithmes d'approximations. 
+Puisque le problème étudié concerne du routage, il s'intègre notamment dans la leçon \ref{L21} si un point de vue théorique est abordé.\newline
+Enfin, d'une manière plus large, ce problème consiste à trouver des chemins disjoints dans un graphe, donnant une application aux algorithmes de plus courts chemins présentés en leçon \ref{L7}.
+}
+
+\paragraph{Introduction.} Le routage consiste à envoyer un paquet d'une source à une destination dans un réseau. Plus formellement, on représente ce réseau comme un graphe orienté $G=(V,E)$, et on définit un ensemble de requêtes $\mathcal{R}\subset V\times V$ que l'on essaye de satisfaire.
+
+Dans ce problème, tous les paquets d'une même requête passent par le même chemin dans le réseau. De plus, deux chemins de deux requêtes différentes ne peuvent pas partager une arête. Autrement dit, chaque requête réserve un chemin qu'elle seule peut utiliser. On veut alors maximiser le nombre de requêtes satisfaites.
+
+
+\begin{definition}[Maximum Edge-Disjoint Paths ($\mathbf{MEDP}$)]~
+
+\noindent \textbf{Entrée :}
+\begin{itemize}
+\item Graphe $G=(V,E)$
+\item Ensemble de requêtes $\mathcal{R} \in \mathcal{P}(V \times V)$
+\end{itemize}
+\noindent \textbf{Sortie :}
+$$
+\underset{\mbox{$A \subset \mathcal{R}$ est réalisable}}{\max} |A|
+$$
+où $A \subset \mathcal{R}$ est réalisable si pour tout $r_i=(s_i,t_i)\in \mathcal{R}$ il existe un chemin $\pi_i$ de $s_i$ à $t_i$ dans $G$, et tel que pour tout $(R_i,R_j) \in A^2$, si $i\neq j$ alors $\pi_i$ et $\pi_j$ ne partagent aucune arête. 
+
+On notera $A^*$ une solution optimale à ce problème.
+\end{definition}
+
+\begin{theorem}[Admis]
+$\mathbf{MEDP}$ est NP-complet.
+\end{theorem}
+
+
+\paragraph{Algorithme.} On présente ici un algorithme glouton plutôt naïf, nommé \textit{Shorts-Requests-First} ou SRF. L'idée est de router les requêtes courtes d'abord, c'est-à-dire celles dont le plus court chemin est minimal par rapport aux autres requêtes disponible.
+
+
+\begin{algorithm}[!h]
+$A \gets \emptyset$ ;\\
+\Tq{ il existe une requête de $\mathcal{R}$ qui peut être router}{
+		choisir : $r =(s,y) \gets$ une requête de $\mathcal{R}$  qui a le plus petit plus court chemin ; \\
+		accepter : $A \gets A \cup \{R_i\}$ ;\\
+		router : $\pi \gets$ un plus court chemin de $s_i$ à $t_i$ dans $G$  ;\\
+		supprimer : $\mathcal{R} \gets \mathcal{R} \backslash \{r\}$\\
+		élaguer : enlever les arêtes de $\pi_i$ de $G$\\
+	}
+\caption{Short-Requests-First($G$,$\mathcal{R}$)}\label{ApproxRoutage1}
+\end{algorithm}
+
+\textbf{Complexité.} En utilisant l'algorithme de Floyd-Warshall pour la partie \og choisir \fg{}, on peut calculer l'ensemble des plus courts chemins allant d'une source $s$ à une destination $t$ avec une complexité de $\mathcal{O}(|V|^3)$. La complexité totale de l'algorithme est alors un $\mathcal{O}(|\mathcal{R}|.|V|^3)$.
+
+
+\begin{theorem}\label{ApproxRoutage2}
+L'algorithme \ref{ApproxRoutage1} a un ratio d'approximation de $\lceil \sqrt{m} \rceil$ pour le problème $\mathbf{MEDP}$ sur un graphe avec $m$ arêtes, et cette borne est atteinte.
+\end{theorem}
+
+\begin{proof}
+On commence par montrer que la borne est atteinte. Soit $q\geq 2$. 
+
+On construit un graphe $G=(V,E)$, avec $V= \{u_{10}\} \cup \{u_{ij} | 1\leq i,j\leq q\}$. On choisit les arêtes suivantes :
+\begin{itemize}
+\item Un premier chemin $p_0$ qui est une chaîne de $q+1$ sommets :
+$$
+u_{10} \rightarrow u_{11} \rightarrow ... \rightarrow u_{1q}
+$$
+\item Pour $1 \leq i \leq q$, on construit le chemin : 
+$$
+u_{1i} \rightarrow u_{1i} \rightarrow ... \rightarrow u_{qi}
+$$
+\end{itemize}
+
+On remarque alors que $m=|E|=q^2$. L'ensemble des requêtes est défini par :
+$$
+\mathcal{R} = (u_{10},u_{1q}) \cup \{(u_{1(i-1)},u_{1q}) | 1\leq i \leq n\}
+$$
+c'est-à-dire l'ensemble des couples (début,fin) des $q+1$ chemins du graphe $G$.
+Puisque tous les chemins ont la même longueur $q$, l'algorithme SRF va choisir la requête $R_0=(u_{10},u_{1q}) $ en premier. Or chaque requête suivante partage une arête avec le seul chemin possible pour satisfaire cette requête, donc $|A|=1$. Or, la solution optimale consiste à choisir les $q$ autres requêtes, donc $|A^*|=q=\lceil\sqrt{m}\rceil$.\newline
+
+
+\textbf{Cas général :}
+
+Étant donné une instance de $\mathbf{MEDP}$ $(G,\mathcal{R})$ où $G$ a $m$ arrêtes, on note $A^* = \{r_i^*\}$ une solution optimale. On note $p_i^*$ le chemin associé à $r_i^*\in A^*$.
+
+L'idée consiste à procéder par stratégie adverse : on lance l'algorithme et en parallèle, on supprime des requêtes de $A^*$.
+
+
+On lance SRF sur $(G,\mathcal{R})$. À chaque itération, SRF sélectionne une requête $r\in \mathcal{R}$ de chemin $\pi$.
+\begin{itemize}
+\item Si $r\in A^*$, on supprime $r$ de $A^*$.
+\item Pour tout $r^*\in A^*$ telle que $\pi^* \cap \pi \neq \emptyset$, on supprime $r^*$ de $A^*$.
+\end{itemize}
+
+\begin{lemma}\label{lemmeApproxRoutage}
+Pour montrer que $|A^*| \leq \lambda |A|$ pour une certaine constante $\lambda$, il suffit de montrer que lorsque l'algorithme SRF accepte une requête, pas plus de $\lambda$ requêtes sont supprimées de $A^*$.
+\end{lemma}
+\begin{proof}
+L'algorithme accepte $|A|$ requêtes (autant d'itérations), et à la fin, $A^*$ est vide.
+\end{proof}
+
+Si SRF sélectionne $r \in \mathcal{R}$  de chemin $\pi$. Il y a deux cas :
+\begin{enumerate}
+\item Si $\pi_i$ a au plus $\lceil \sqrt{m} ~\rceil-1$ arêtes. Il y a au plus $\lceil \sqrt{m} ~\rceil-1$ requêtes de $A^*$ dont le chemin partage une arête avec $\pi_i$. En ajoutant la possibilité de supprimer $R_i$ lui-même de $A^*$, on supprime au maximum $\lceil \sqrt{m} ~\rceil$ requêtes de $A^*$.
+\item Si $\pi_i$ a au moins $\lceil \sqrt{m} ~\rceil$ arêtes. Alors toutes les requêtes qui sont dans $A^*$ ont un chemin de longueur au moins $\lceil \sqrt{m} \rceil$, parce que sinon elles auraient été choisies par l'algorithme SRF (on choisit le plus petit des plus petits chemins). 
+
+Ainsi, toutes les requêtes restantes de $A^*$ ont un chemin associé de longueur $\lceil \sqrt{m} ~\rceil$ et ont toutes des chemins disjoints deux à deux (y compris $R_i$ si $R_i \in A$). Ainsi, par l'absurde, si ce nombre de requêtes restantes est strictement supérieur à $\lceil \sqrt{m} ~\rceil$, alors on obtient en tout strictement plus de $m$ arêtes dans le graphe, c'est absurde. Il y a donc moins de $\lceil \sqrt{m} ~\rceil$ requêtes dans $A^*$, et donc moins de $\lceil \sqrt{m} ~\rceil$ requêtes qui peuvent être supprimées.
+\end{enumerate}
+Ainsi, d'après le lemme, on a pour toute instance de $\mathbf{MEDP}$ :
+$$
+|A^*| \leq \lceil \sqrt{m} \rceil \times |A|
+$$
+\end{proof}
+
+
+\noindent Le ratio $\lceil \sqrt{m} ~\rceil$ du théorème \ref{ApproxRoutage2} est optimal, on ne peut pas faire mieux à moins que $\mathbf{P}=\mathbf{NP}$.

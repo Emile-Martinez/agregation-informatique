@@ -1,0 +1,115 @@
+\dev{Marin Malory}{\cite{Robert}}
+
+\textit{
+Ce développement étudie le problème du voyageur de commerce qui consiste à trouver un chemin de poids minimal passant par tous les sommets une et une seule fois dans un graphe complet pondéré. Il s'insère alors naturellement dans la leçon \ref{L7}.
+Tout d'abord, on montre la $\mathbf{NP}$-complétude du problème, illustrant la leçon \ref{L26}. Ensuite, on montre un résultat d'inapproximabilité et on présente un algorithme d'approximation dans le cas où la fonction de poids du graphe vérifie l'inégalité triangulaire. Ainsi, ce développement s'intègre dans la leçon \ref{L11}.
+}
+\paragraph{Définition du problème et complexité.}
+
+\begin{definition}[Voyageur de commerce ($\mathbf{TSP}$)]
+Étant donné un graphe complet $G=(V,E)$ et une fonction de coût $w : E \rightarrow \mathbb{N}$ et nu entier $k$, existe-t-il un cycle $C$ passant par chaque sommet une et une seule fois, avec $\sum_{e\in C} w(e) \leq k$ ?
+\end{definition}
+
+
+On se propose de montrer le théorème suivant :
+
+\begin{theorem}
+$\mathbf{TSP}$ est $\mathbf{NP}$-complet.
+\end{theorem}
+
+\begin{proof}
+$\mathbf{TSP}$ est trivialement dans $\mathbf{NP}$, un certificat étant la donnée du cycle. Il suffit alors de vérifier si ce cycle passe bien une et une seule fois par chaque sommet et si la somme des poids est bien inférieure à $k$.\newline
+
+Pour montrer que $\mathbf{TSP}$ est $\mathbf{NP}$-dure, on réduit $\mathbf{HC}$ (circuit hamiltonien) à $\mathbf{TSP}$.
+
+Soit $G=(V,E)$ une instance de $\mathbf{HC}$. On construit alors une instance de $\mathbf{TSP}$ de la manière suivante :
+\begin{itemize}
+\item on pose $G'=(V,E')$ le graphe complet contenant les mêmes sommets que $G$ ;
+\item on pose $w : E \rightarrow \{0,1\}$ où $w(e) = \mathbf{1}\{e\notin E\}$, c'est-à-dire toute les arêtes de $G$ ont un poids de $0$, et $1$ sinon.
+\item on prend $k=0$.
+\end{itemize}
+Cette nouvelle instance de $\mathbf{TSP}$ a bien une taille polynomiale en la taille de l'instance de départ.
+
+Si $G$ admet un cycle hamiltonien $C$. On montre que $C$ est une solution de $\mathbf{TSP}$. En effet, $C$ passe par chaque sommet une et une seule fois, et puisqu'il ne passe que par des arêtes de $E$, on a $\sum_{e\in C} w(e)=0$.
+
+Réciproquement, si $\mathbf{TSP}$ admet une solution $C$ vérifiant $\sum_{e\in C}w(e)=0$, alors pour tout $e\in C$, $w(e)=0$ et donc $e\in E$. Ainsi, $C$ est une solution de $\mathbf{HC}$.
+\end{proof}
+
+\noindent\rule{1\linewidth}{1pt}
+
+\paragraph{Inaproximabilité.} On s'intéresse maintenant au problème d'optimisation associé à $\mathbf{TSP}$. On peut montrer qu'il n'existe aucun algorithme d'approximation, à moins que $\mathbf{P}=\mathbf{NP}$.
+
+
+\begin{theorem}
+Pour tout $\lambda \geq 1$, il n'existe pas de $\lambda$-approximation de $\mathbf{TSP}$, à moins que $\mathbf{P}=\mathbf{NP}$. 
+\end{theorem}
+
+\begin{proof} Soit $\lambda \geq 1$.
+On procède par l'absurde, on suppose qu'il existe une $\lambda$-approximation pour $\mathbf{TSP}$, et on montre que l'on peut résoudre $\mathbf{HC}$ avec cet algorithme.
+
+Soit $G=(V,E)$ une instance de $\mathbf{HC}$. On transforme cette instance en une instance de $\mathbf{TSP}$ :
+\begin{itemize}
+\item $G'=(V,E')$ le graphe complet ayant les mêmes sommets que $G$.
+\item $w : E' \rightarrow \mathbb{N}$ où 
+$$
+w(e) = \left\lbrace 
+\begin{array}{ll}
+1 & \text{si}~ e\in E \\
+\lambda n+1 & \text{sinon}
+\end{array}
+\right.
+$$
+\end{itemize}
+
+On note $C_{opt}$ la solution optimale de $\mathbf{TSP}$ pour ce problème, et on note $c_{opt}$ le poids du cycle associé. De même, on pose $C_{algo}$ la solution retournée par notre algorithme d'approximation, et $c_{algo}$ le poids du cycle. Par hypothèse, on a :
+$$
+c_{algo} \leq \lambda \times c_{opt}
+$$
+On considère deux cas :
+\begin{itemize}
+\item Si $c_{algo} \geq \lambda n+1$, alors on a $c_{opt} >n$. On en déduit que $G$ n'admet pas de cycle hamiltonien, car si c'était le cas, ce cycle ne passerait que par des arêtes de poids $1$ et aurait donc un poids total de $n$.
+\item Si $c_{algo} < \lambda n +1$, alors on remarque que $C_{algo}$ ne passe que par des arêtes de $E$, puisque s'il passait par une seule arête hors de $E$, son poids dépasserait $\lambda n +1$. La solution $c_{algo}$ est donc un cycle hamiltonien de $G$.
+\end{itemize}
+Ainsi, le résultat de notre algorithme nous permet de résoudre le problème $\mathbf{HC}$, ce qui conclut la preuve.
+\end{proof}
+
+
+\paragraph{Cas euclidien.} On termine par une restriction du problème du voyageur de commerce, nous permettant de trouver un algorithme d'approximation. On définit $\mathbf{TSP-EUCLIDIEN}$ le problème $\mathbf{TSP}$ dans lequel la fonction de poids $w$ vérifie l'inégalité triangulaire :
+$$
+\forall v_1,v_2,v_3 \in V, w(v_1,v3) \leq w(v_1,v_2)+w(v_2,v_3)
+$$
+On rappelle que le graphe est complet.
+
+On définit l'algorithme suivant :
+
+\begin{algorithm}
+$T \leftarrow$ arbre couvrant de poids minimum de $G$ ;\\
+$e_1,...,e_n \leftarrow$ Parcours-Profondeur($T$) ;\\
+$C\leftarrow \{(v_i,v_{i+1})\}_{1\leq i <n} \cup \{(v_n,v_1)\}$ ;\\
+\Retour{$C$}
+\caption{Spanning-tsp($G$,$w$)}
+\end{algorithm}
+
+\begin{theorem}
+L'algorithme Spanning-tsp est une $2$-approximation pour le problème
+
+$\mathbf{TSP-EUCLIDIEN}$.
+\end{theorem}
+
+\begin{proof} Soit $G=(V,E)$ et $w$ une instance de $\mathbf{TSP-EUCLIDIEN}$. On note $c_{opt}$ le coût optimal pour le problème. On note $w(T)$ la somme des poids des arêtes de l'arbre couvrant de poids minimal retenu par l'algorithme.
+
+En prenant le cycle optimal, si on enlève une arête, on obtient un arbre. Ainsi, on a $c_{opt} \geq w(T)$.
+
+On considère maintenant la solution $C_{algo}$ de poids $c_{algo}$ retournée par l'algorithme. On note $O$ l'ordre du parcours et ainsi, $C$ est obtenu en gardant seulement la première occurrence de chaque sommet dans $O$.
+
+\noindent \textbf{Remarque 1 :} dans l'ordre $O$, on rencontre exactement 2 fois chaque arête de $T$.
+
+\noindent \textbf{Remarque 2 :} $C_{algo}$ est obtenu en supprimant de $O$ des sommets. Or, en supprimant un sommet de $O$, on n'augmente pas le poids du chemin associé : $(x,y,z) \rightsquigarrow (x,z)$, on a $w(x,y)+w(x,z) \geq w(x,z)$. 
+
+
+Ainsi, en notant $C_O$ le chemin associé à $O$, on a $c_{algo}=w(C_{algo}) \leq w(C_O)$ par la remarque 2. Or $w(C_0) = 2 \times w(T)$ par la remarque 1. Finalement, en combinant les inégalités, 
+$$
+c_{algo} \leq 2c_{opt}
+$$
+ce qui conclut la preuve.
+\end{proof}

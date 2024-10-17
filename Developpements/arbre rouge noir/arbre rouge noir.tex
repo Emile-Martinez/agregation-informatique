@@ -1,0 +1,292 @@
+\dev{Emile Martinez}{Daphné Kany}
+
+\textit{On estime que la définition des ARN est déjà admise}.
+
+\paragraph{Insertion dans un ABR} 
+\begin{enumerate}
+	\item On colorie la racine en noir
+	\item On insert le noeud en tant que feuille comme dans un ABR \\
+	On le colore en rouge
+	\item On rétablit la propriété (ii) par rotations successives en préservant la hauteur noire.
+\end{enumerate}
+
+\begin{definition}Rotation\\ 
+	\begin{tabular}{ccc}
+		\multirow{5}{*}{
+		\begin{tikzpicture}[-, node distance=1cm]
+			\node[state, scale=0.5] (q0) {$k_3$};
+			\node[state, below left of = q0, scale=0.5] (q1) {$k_2$};
+			\node[below left of =q1] (q2) {$t_1$};
+			\node[below right of = q1] (q3) {$t_2$};
+			\node[below right of = q0] (q4) {$t_3$};
+			\draw (q0) edge[] node{} (q1) ;
+			\draw (q1) edge[] node{} (q2) ;
+			\draw (q1) edge[] node{} (q3) ;
+			\draw (q0) edge[] node{} (q4) ;
+		\end{tikzpicture}} &  &
+		\multirow{5}{*}{\begin{tikzpicture}[-, node distance=1cm]
+			\node[state, scale=0.5] (q0) {$k_2$};
+			\node[state, below right of = q0, scale=0.5] (q1) {$k_3$};
+			\node[below left of =q0] (q2) {$t_1$};
+			\node[below left of = q1] (q3) {$t_2$};
+			\node[below right of = q1] (q4) {$t_3$};
+			\draw (q0) edge[] node{} (q1) ;
+			\draw (q0) edge[] node{} (q2) ;
+			\draw (q1) edge[] node{} (q3) ;
+			\draw (q1) edge[] node{} (q4) ;
+		\end{tikzpicture}} \\ & $\overset{\text{rotation droite }(k_3)}{\longrightarrow}$ & \\  & $\underset{\text{rotation gauche } (k_2)}{\longleftarrow} $ &
+	\end{tabular}
+\end{definition}
+\begin{rem}
+	La rotation préserve la structure d'ABR
+\end{rem}
+
+\begin{com}
+	Expliquer la remarque à l'oral sur le dessin de la définition
+\end{com}
+
+\paragraph{Etape 3 de l'insertion}
+4 cas à considérer :
+%\begin{enumerate}
+%	\item \raisebox{-0.5\height}{\begin{tikzpicture}[-, node distance=1cm]
+%		\node[state, black, scale=0.5] (q0) {$k_3$};
+%		\node[state, below left of = q0, red, scale=0.5] (q1) {$k_2$};
+%		\node[state, below left of = q1, red, scale=0.5] (q2) {$x$};
+%		\node[below left of =q2] (q3) {$t_0$};
+%		\node[below right of = q2] (q4) {$t_1$};
+%		\node[below right of = q1] (q5) {$t_2$};
+%		\node[below right of = q0] (q6) {$t_3$};
+%		
+%		
+%		\draw (q0) edge[] node{} (q1) ;
+%		\draw (q1) edge[] node{} (q2) ;
+%		\draw (q2) edge[] node{} (q3) ;
+%		\draw (q2) edge[] node{} (q4) ;
+%		\draw (q1) edge[] node{} (q5) ;
+%		\draw (q0) edge[] node{} (q6) ;
+%	\end{tikzpicture}}
+%
+%	\item \raisebox{-0.5\height}{\begin{tikzpicture}
+%		\node[state, black, scale=0.5] (q0) {$k_3$};
+%		\node[state, below left of = q0, red, scale=0.5] (q1) {$k_2$};
+%		\node[state, below right of = q1, red, scale=0.5] (q2) {$x$};
+%		\node[below left of =q2] (q3) {$t_0$};
+%		\node[below right of = q2] (q4) {$t_1$};
+%		\node[below left of = q1] (q5) {$t_2$};
+%		\node[below right of = q0] (q6) {$t_3$};
+%		
+%		
+%		\draw (q0) edge[] node{} (q1) ;
+%		\draw (q1) edge[] node{} (q2) ;
+%		\draw (q2) edge[] node{} (q3) ;
+%		\draw (q2) edge[] node{} (q4) ;
+%		\draw (q1) edge[] node{} (q5) ;
+%		\draw (q0) edge[] node{} (q6) ;
+%	\end{tikzpicture}}
+%
+%	\item Pareil
+%	\item Pareil\\
+%\end{enumerate}
+
+\begin{enumerate}
+	\item \raisebox{-0.5\height}{\begin{tikzpicture}[-, node distance=1cm]
+		\node[state, black, scale=0.5] (q0) {$k_3$};
+		\node[state, below left of = q0, red, scale=0.5] (q1) {$k_2$};
+		\node[state, below left of = q1, red, scale=0.5] (q2) {$x$};
+		\node[below left of =q2] (q3) {$t_0$};
+		\node[below right of = q2] (q4) {$t_1$};
+		\node[below right of = q1] (q5) {$t_2$};
+		\node[below right of = q0] (q6) {$t_3$};
+		
+		
+		\draw (q0) edge[] node{} (q1) ;
+		\draw (q1) edge[] node{} (q2) ;
+		\draw (q2) edge[] node{} (q3) ;
+		\draw (q2) edge[] node{} (q4) ;
+		\draw (q1) edge[] node{} (q5) ;
+		\draw (q0) edge[] node{} (q6) ;
+	\end{tikzpicture}} $\overset{\text{Rotation droite } (k_3)}{\longrightarrow} $ \raisebox{-0.5\height}{\begin{tikzpicture}[-, node distance=1cm]
+		\node[state, red, scale=0.5] (q0) {$k_2$};
+		\node[state, below right = 0.5 cm and 0.8 cm of q0, black, scale=0.5] (q1) {$k_3$};
+		\node[state, below left = 0.5 cm and 0.8 cm of q0, black, scale=0.5] (q2) {$x$};
+		\node[below left of =q2] (q3) {$t_0$};
+		\node[below right of = q2] (q4) {$t_1$};
+		\node[below left of = q1] (q5) {$t_2$};
+		\node[below right of = q1] (q6) {$t_3$};
+		
+		\draw (q0) edge[] node{} (q1) ;
+		\draw (q0) edge[] node{} (q2) ;
+		\draw (q2) edge[] node{} (q3) ;
+		\draw (q2) edge[] node{} (q4) ;
+		\draw (q1) edge[] node{} (q5) ;
+		\draw (q1) edge[] node{} (q6) ;
+	\end{tikzpicture}}
+	
+	\item \raisebox{-0.5\height}{\begin{tikzpicture}
+		\node[state, black, scale=0.5] (q0) {$k_3$};
+		\node[state, below left of = q0, red, scale=0.5] (q1) {$k_2$};
+		\node[state, below right of = q1, red, scale=0.5] (q2) {$x$};
+		\node[below left of =q2] (q3) {$t_0$};
+		\node[below right of = q2] (q4) {$t_1$};
+		\node[below left of = q1] (q5) {$t_2$};
+		\node[below right of = q0] (q6) {$t_3$};
+		
+		
+		\draw (q0) edge[] node{} (q1) ;
+		\draw (q1) edge[] node{} (q2) ;
+		\draw (q2) edge[] node{} (q3) ;
+		\draw (q2) edge[] node{} (q4) ;
+		\draw (q1) edge[] node{} (q5) ;
+		\draw (q0) edge[] node{} (q6) ;
+	\end{tikzpicture}} $\overset{\text{Rotation gauche }(k_2)}{\longrightarrow}$ \raisebox{-0.5\height}{\begin{tikzpicture}[-, node distance=1cm]
+	\node[state, black, scale=0.5] (q0) {$k_3$};
+	\node[state, below left of = q0, red, scale=0.5] (q1) {$x$};
+	\node[state, below left of = q1, red, scale=0.5] (q2) {$k_2$};
+	\node[below left of =q2] (q3) {$t_2$};
+	\node[below right of = q2] (q4) {$t_0$};
+	\node[below right of = q1] (q5) {$t_1$};
+	\node[below right of = q0] (q6) {$t_3$};
+	
+	
+	\draw (q0) edge[] node{} (q1) ;
+	\draw (q1) edge[] node{} (q2) ;
+	\draw (q2) edge[] node{} (q3) ;
+	\draw (q2) edge[] node{} (q4) ;
+	\draw (q1) edge[] node{} (q5) ;
+	\draw (q0) edge[] node{} (q6) ;
+\end{tikzpicture}} $ \overset{\text{Etape 1}}{\rightarrow}$
+	\item Pareil
+	\item Pareil
+\end{enumerate}
+
+\paragraph{Invariant}\begin{itemize}
+	\item On a toujours au plus, en tout, 2 noeuds rouges consécutifs
+	\item La hauteur noire est préservée
+\end{itemize}
+
+\begin{example}
+	\raisebox{-0.5\height}{\begin{tikzpicture}[-, node distance=1cm]
+		\node[state, black, scale=0.5] (q0) {1};
+		\node[state, black, below left of = q0, scale=0.5] (q1) {0};
+		\node[state, red, below right of = q0, scale=0.5] (q2) {3};
+		\node[state, black, below left of = q2, scale=0.5] (q3) {2};
+		\node[state, black, below right of = q2, scale=0.5] (q4) {4};
+		\node[state, red, below right of = q4, scale=0.5] (q5) {6};
+		\node[state, red, below left of = q5, scale=0.5] (q6) {5};
+		
+		
+		\draw (q0) edge[] node{} (q1) ;
+		\draw (q0) edge[] node{} (q2) ;
+		\draw (q2) edge[] node{} (q3) ;
+		\draw (q2) edge[] node{} (q4) ;
+		\draw (q4) edge[] node{} (q5) ;
+		\draw (q5) edge[] node{} (q6) ;
+		
+	\end{tikzpicture}} $\overset{\text{Rotation\_droite(6)}}{\longrightarrow}$
+	\raisebox{-0.5\height}{\begin{tikzpicture}[-, node distance=1cm]
+		\node[state, black, scale=0.5] (q0) {1};
+		\node[state, black, below left of = q0, scale=0.5] (q1) {0};
+		\node[state, red, below right of = q0, scale=0.5] (q2) {3};
+		\node[state, black, below left of = q2, scale=0.5] (q3) {2};
+		\node[state, black, below right of = q2, scale=0.5] (q4) {4};
+		\node[state, red, below right of = q4, scale=0.5] (q5) {5};
+		\node[state, red, below right of = q5, scale=0.5] (q6) {6};
+		
+		
+		\draw (q0) edge[] node{} (q1) ;
+		\draw (q0) edge[] node{} (q2) ;
+		\draw (q2) edge[] node{} (q3) ;
+		\draw (q2) edge[] node{} (q4) ;
+		\draw (q4) edge[] node{} (q5) ;
+		\draw (q5) edge[] node{} (q6) ;
+		
+	\end{tikzpicture}} \\
+	$\overset{\text{Rotation\_gauche(4)}}{\longrightarrow}$  \raisebox{-0.5\height}{\begin{tikzpicture}[-, node distance=1cm]
+		\node[state, black, scale=0.5] (q0) {1};
+		\node[state, black, below left of = q0, scale=0.5] (q1) {0};
+		\node[state, red, below right of = q0, scale=0.5] (q2) {3};
+		\node[state, black, below left of = q2, scale=0.5] (q3) {2};
+		\node[state, red, below right of = q2, scale=0.5] (q4) {5};
+		\node[state, black, below left of = q4, scale=0.5] (q5) {4};
+		\node[state, black, below right of = q4, scale=0.5] (q6) {6};
+		
+		
+		\draw (q0) edge[] node{} (q1) ;
+		\draw (q0) edge[] node{} (q2) ;
+		\draw (q2) edge[] node{} (q3) ;
+		\draw (q2) edge[] node{} (q4) ;
+		\draw (q4) edge[] node{} (q5) ;
+		\draw (q4) edge[] node{} (q6) ;
+		
+	\end{tikzpicture}}
+	$\overset{\text{Rotation\_gauche(1)}}{\longrightarrow}$
+\raisebox{-0.5\height}{\begin{tikzpicture}[-, node distance=1cm]
+	\node[state, red, scale=0.5] (q0) {3};
+	\node[state, black, below left = 0.5cm and 0.8cm of q0, scale=0.5] (q1) {1};
+	\node[state, black, below right = 0.5cm and 0.8cm of q0, scale=0.5] (q2) {5};
+	\node[state, black, below left of = q1, scale=0.5] (q3) {0};
+	\node[state, black, below right of = q1, scale=0.5] (q4) {2};
+	\node[state, black, below left of = q2, scale=0.5] (q5) {4};
+	\node[state, black, below right of = q2, scale=0.5] (q6) {6};
+	
+	
+	\draw (q0) edge[] node{} (q1) ;
+	\draw (q0) edge[] node{} (q2) ;
+	\draw (q1) edge[] node{} (q3) ;
+	\draw (q1) edge[] node{} (q4) ;
+	\draw (q2) edge[] node{} (q5) ;
+	\draw (q2) edge[] node{} (q6) ;
+	
+\end{tikzpicture}}
+
+\end{example}
+
+\paragraph{Complexité :} \begin{enumerate}
+	\item $O(h)$
+	\item $O(h)$
+	\item $O(1)$
+\end{enumerate}
+
+
+\begin{proposition}
+	Soit $A$ un ARN de hauteur $h$ à $n$ noeuds, alors $h = O(\log n)$
+\end{proposition}
+
+\begin{lemma}
+	Soit $A$ un ARN. Alors :\begin{enumerate}
+		\item $h \leq 2 h_N $ où $h_N$ est la hauteur noire.
+		\item $2^{h_N} \leq n+1$
+	\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+	\begin{enumerate}
+		\item Soit $C$ un chemin de la racine à une feuille de longueur $h$.
+		
+		On note $h_R(C)$ le nombre de noeuds rouges de $C$ et $h_N(C)$ le nombre de noeuds noirs de $C$.
+		
+		$|C| = h = h_R(C) + h_N(C)$.\\ \\
+		D'après (ii) (de la def) : $h_R(C) \leq h_N(C)$
+		D'après (iii) : $h_N(C) = h_N$.\\
+		
+		Donc, $h \leq 2 h_N$.
+		
+		\item Procédons par induction
+		\begin{com}
+			Si on a pas le temps ici on écrit simplement induction.
+		\end{com}
+		\begin{itemize}[label = $\star$]
+			\item Si l'arbre est vide, le résultat est immédiat.
+			\item Soit $\mathcal A$ un ARN dont les deux fils $\mathcal A_g$ et $\mathcal A_d$ vérifient la propriété (ce sont bien des ARN).
+			Alors, \begin{itemize}
+				\item Si la racine de $\mathcal A$ est rouge, $2^{h_N(\mathcal A)} = 2^{h_N(\mathcal A_g)} \leq \left| \mathcal A_g \right| +1 \leq \left| \mathcal A \right| + 1$
+				\item Si la racine de $\mathcal A$ est noire, alors $2^{h_N(\mathcal A)} = 2^{h_N(\mathcal A)-1} + 2^{h_N(\mathcal A)-1} = 2^{h_N(\mathcal A_g)} + 2^{h_N(\mathcal A_d)} \underset{\text{HI}}{\leq} \underset{= \left| \mathcal A \right|}{\underbrace{\left| \mathcal A_g \right| + 1 + \left|\mathcal A_d\right|}} + 1 $
+			\end{itemize}
+		\end{itemize}
+	\end{enumerate}
+\end{proof}
+
+Ainsi, $h_N \leq \log (n+1)$ donc $h \leq 2 \log(n+1)$. Donc h = $O(\log n)$\\
+
+Insertion : $O(\log n)$
+

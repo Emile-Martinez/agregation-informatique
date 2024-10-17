@@ -1,0 +1,113 @@
+\dev{Emile Martinez}{Legendre}
+
+\textit{Ce développement présente vérifiant l'appartenance d'un mot à un langage reconnu par une grammaire. Cet algorithme fonctionnant par retour sur trace (avec plein de subtilités du retour sur trace dedans), il s'insère donc complétement dans les leçons sur l'analyse lexicale et syntaxique, et dans la leçon sur glouton et retour sur trace.}
+
+\paragraph{Notation} Notons $v\rightarrow^*_l u$ pour $v$ se dérive en $u$ en moins de $l$ étapes.
+
+\begin{com}
+	D'abord l'exemple ou d'abord l'algorithme ? Ou dans quelle mesure on arrive à faire les deux en même temps.
+\end{com}
+
+\begin{algorithm}[H]
+	\Donnees{grammaire $G$, $u$ mot d'entrée, $v$ mot en cours\textcolor{red}{, $l$ longueur restante de dérivation autorisée}}
+	\Sortie{VRAI ssi $v\rightarrow^*_{\textcolor{red}{l}} u$}
+	\textcolor{red}{\Si{$l < 0$}{
+		\Retour{FAUX}\\
+	}}
+	\Si{$v$ est vide}{
+		\Retour{$u$ est vide}
+	}
+	$a, v_2 \gets $depiler($v$)\\
+	\eSi(\tcp*[h]{$a$ est un termnial}){$a \in \Sigma$ }{
+		$b, u_2 \gets $depiler($u$) \tcp{Si $u$ est vide, retourner Faux}
+		\eSi{$a\neq b$}{
+			\Retour{FAUX}
+		}{
+			\Retour{retour\_sur\_trace($G$, $u_2$, $v_2$\textcolor{red}{, $l$})}
+		}
+	}(\tcp*[h]{$a$ est un non termnial}){
+		\Pour{chaque règle $a\rightarrow x_1\dots x_n$ de $G$}{
+			$v_3 \gets $empiler($x_1\dots x_n$, $v_2$) \\
+			\Si{Backtrack($G$, $u$, $v_3$\textcolor{red}{, $l-1$})}{
+				\Retour{VRAI}
+			}
+		}
+		\Retour{FAUX}
+	}
+	\caption{retour\_sur\_trace($G$, $u$, $v$\textcolor{red}{, $l$})}
+\end{algorithm} \enspace \\
+
+Il suffit alors d'appeler retour\_sur\_trace($\mathcal G$, $u$, $S$\textcolor{red}{, $l_{max}$})  pour déterminer si $u\in \mathcal{L(G)}$ où $S$ est l'axiome et $l_{max}$ une borne supérieur sur la longueur minimale d'une dérivation de $u$ si elle existe.
+
+\paragraph{Illustration} Soit $\mathcal G$: 
+
+$$ \begin{array}{c}S \to aSb \, | \, aTb \\
+T \to c \, | Tc
+\end{array}
+$$
+
+On alors $\mathcal{L(G)} = \left\{a^nc^mb^n \big/ m,n > 0\right\}$
+
+Comment faire pour reconnaitre savoir si $u = aacbb \in \mathcal{L(G)}$:
+$$ 
+\begin{array}{r|cccc}
+u & v \\ \hline
+aacbb & S &&& \\
+\cancel{a}acbb & & \cancel{a}Sb && \\
+\cancel{a}cbb&&&\cancel aSbb& \\
+\sout c bb&&&& \sout a Sbbb\\
+\sout cbb&&& & \sout aTbbb\\
+\cancel acbb & & & \cancel a Tbb  & \\
+\cancel c\cancel b\cancel b&&&& \cancel c\cancel b \cancel b\\
+\end{array}
+$$
+
+
+\paragraph{Terminaison} A-t-on la terminaison ? Non si on inverse $c$ et $Tc$ dans $\mathcal G$. \textcolor{red}{On ajoute alors une longueur maximale de dérivation.}\\
+
+Maintenant cela termine.
+
+Variant : $|u| + l$
+
+
+\paragraph{Correction} On fait la correction par induction, en supposant la spécification de la fonction correcte sur tous les appels récursifs.
+\begin{itemize}[label=$\star$]
+	\item Pour les deux premires $Si$, on a bien le comportement attendu
+	\item Si $a$ est un terminal, $\forall w \in (\Sigma \cup V)^*, \, v \rightarrow^*_l aw \Leftrightarrow v_2 \rightarrow^*_l w $ d'où le comportement correct.
+	\begin{com}
+		Dire à l'oral que cela veut dire que toutes dérivation est indépendante de $a$, et le mot final commencera donc toujours par $a$.
+	\end{com}
+	\item Sinon, comme on devra transformer $a$ en quelque chose avec une des règles, on a bien \\
+	$v\rightarrow^*_l u \Leftrightarrow \exists  a \to x_1\dots x_n \in G :\: x_1\dots x_n v_2 \rightarrow^*_{l-1} u$
+	\begin{com}
+		Expliquer à l'oral cette formule.
+	\end{com}
+\end{itemize}
+
+\paragraph{Comment trouver $l_{max}$} On peut tout d'abord essayer d'en deviner un en fonction de la grammaire. Par exemple, si chaque application de règle ajoute un non terminal (ou si plus largement, après $n$ applications de règles, tout mot aura au moins $n$ caractères), on peut prendre $|u|$ pour $l_{max}$\\
+
+Sinon on a des résultats généraux mais moins précis sur les grammaires :
+\begin{theorem}
+	Soit $G$ une grammaire et $m\in \Sigma^*$. Les deux assertions suivantes sont équivalentes :
+	\begin{itemize}
+		\item $m\in L(G)$ 
+		\item il existe une dérivation reconnaissant $m$ dont la longueur est inférieure à $a^{|m|\times r}$
+	\end{itemize}
+	où $a$ est le nombre maximum de symbole à droite d'une règle, et $r$ le nombre de non-terminaux.
+\end{theorem}
+
+\begin{com}
+	A part si on est beaucoup trop en avance, donnée l'idée deu théorème ne me parait pas nécessaire.
+\end{com}
+
+\begin{com}
+	Les remarques suivantes ne sont pas nécessaires et sont à mettre en fonction du temps qu'il reste.
+\end{com}
+
+\paragraph{Langage de programmation} Ici, l'implémentation de cet algorithme serait spécifiquement pratique en OcamL, en utilisant pour les piles le type \texttt{symbole list}. L'immuabilité des données nous arrangeant beaucoup. En prenant des \texttt{int} pour non terminaux, $\mathcal G$ deviendrait alors \texttt{symbole list array}. Néanmoins, nous n'avons pas la concaténation en $O(1)$ comme en C.
+
+\paragraph{Complexité} C'est n'importe quoi. On peut faire mieux en : \begin{itemize}
+	\item changeant la grammaire pour que chaque application de règle ajouter des éléments.
+	\item Mémoisant les résultats
+	\item faisant de la programmation dynamique (si on arrive à donner à une grammaire la bonne forme)
+\end{itemize}

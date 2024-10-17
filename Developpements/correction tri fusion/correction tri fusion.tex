@@ -1,0 +1,84 @@
+\dev{Emile Martinez}{}
+
+\textit{Ce développement a pour but de prouver la terminaison et la correction rigoureuse du tri fusion. Il va donc à priori dans les leçons sur les tris, sur diviser pour régner et sur la correction de programme. En début de leçon est rappelé le code de tri\_fusion, mais qui a vocation à être dans le cours, et pas reécrit au tableau}
+
+\begin{algorithm}[H]
+	\caption{fusion($L_1$, $L_2$)}
+	$res \gets []$\\
+	$i,j \gets 0$\\
+	\Tq{
+		$i < |L_1|$	et $j < |L_2|$
+	}{
+		\eSi{$L_1[i] < L_2[j]$}{
+			$res$.ajouter($L_1[i]$) \\
+			$i \gets i + 1$
+		}{
+			$res$.ajouter($L_2[j]$) \\
+			$j \gets j + 1$
+		}
+	}
+	Ajouter le reste de $L_1$ et de $L_2$ à $res$\\
+	\Retour{$res$}
+\end{algorithm}
+
+\begin{algorithm}[H]
+	\caption{tri\_fusion($L$)}
+	$n \gets |L|$\\
+	\Si{$n\leq 1$}{
+		\Retour{$L$}
+	}
+	$L_1, L_2 \gets$ partionner($L$)\\
+	\Retour{fusion( tri\_fusion($L_1$), tri\_fusion($L_2$) )}
+\end{algorithm}
+
+\paragraph{Terminaison de fusion}
+	Prenons comme invariant $|L_1| - i + |L_2| - j$.\\
+	C'est bien un entier, positif (Car si $|L_1| > i$, $i+1 \leq |L_1|$ donc $|L_1| - (i+1) \geq 0$), qui décroit strictement à chaque itération : en effet 
+	
+		Soit $i \gets i+1$ donc $|L_1|-i \gets |L_1|-i-1$
+	
+		Soit $j \gets j+1$ donc $|L_2|-j \gets |L_2|-j \gets |L_2|-j-1$
+		
+	Donc fusion termine.
+
+\paragraph{Terminaison de tri\_fusion} On prend comme variant $|L| \in \N$.\\
+Les seuls appels récursifs à tri\_fusion se font sur des listes de taille strictement inférieures.\\
+Donc il n'y a qu'un nombre fini d'appels récursifs.\\
+Or fusion termine, donc chaque appel recursif termine. Donc tri\_fusion termine.
+
+\paragraph{Correction partielle de fusion}
+Spécification de fusion : Si $L_1$ et $L_2$ sont triés, alors fusion($L_1$, $L_2$) est $L_1 \sqcup L_2$ trié.\\
+
+Prenons comme invariant $\mathcal P$ : «$res = L_1[:i] \sqcup L_2[:j]$ trié et $L_1[i]$ et $L_2[j]$ sont plus grands que les éléments de $res$.»
+
+\begin{itemize}[label=$\star$]
+	\item Alors avant la boucle, on a bien $i = 0, j=0$ donc $res = [] = []\sqcup[]$ trié
+	\item Supposons $\mathcal P$ au début de la boucle. Alors 
+	\begin{itemize}[label=$\star\star$]
+		\item Si $L_1[i] \leq L_2[j]$\\
+		Alors on ajoute à $res$ $L_1[i]$. Donc par $\mathcal P$, $res$ est trié\\
+		Et comme $L_1$ est trié, $L_1[i+1] \geq L_1[i]$ et $L_2[j] \geq L_1[i]$. Donc par $\mathcal P$, $L_1[i+1]$ et $L_2[j]$ sont plus grands que tous les éléments de res.
+		Donc quand $i \gets i+1$, on obtient bien le résultat.
+		\item L'autre cas est symétrique.
+	\end{itemize}
+\end{itemize}
+
+Donc $\mathcal P$ est bien un invariant.\\
+Ainsi, à la fin $\mathcal P$ est vrai et comme la condition d'arrêt est à faux, on a $i = |L_1|$ ou $j = |L_2|$. Donc par $\mathcal P$, une des deux listes est totalement dans $res$, et il ne manque à l'autre que ses plus grands éléments, tous plus grands que ceux de res (ça c'est par $\mathcal P$ et car le listes d'entées étaient triées).
+
+A la fin de fusion, on a donc $res = L_1 \sqcup L_2$ trié.
+
+Donc fusion est partiellement correcte
+
+\paragraph{Correction partielle de tri\_fusion} Soit $\mathcal P$ la propriété définie pour $n \in \N^*$ par $\mathcal P(n)$ : «tri\_fusion($L$) trie $L$ pour toute liste de taille $n$».\\
+
+Soit $n \in \N*$ tel que $\forall k \in \N, \, \mathcal P (k)$. Soit $L$ une liste de taille $n$.
+
+\begin{itemize}[label=$\star$]
+	\item Si $n = 0$ ou $n=1$ alors tri\_fusion($L$) = $L$ qui est donc $L$ trié.
+	\item Sinon par $\mathcal P(\left\lfloor\frac n 2\right\rfloor)$ et $\mathcal P(\left\lceil\frac n 2\right\rceil)$ ), on a que tri\_fusion($L_1$) (resp. tri\_fusion($L_2$)) vaut $L_1$ (resp. $L_2$) trié. Donc $L_1$ et $L_2$ vérifient les préconditions de fusion. Donc fusion(tri\_fusion($L_1$), tri\_fusion($L_2$)) vaut $L_1 \sqcup L_2$ trié. Or $L_1$ et $L_2$ partionnent $L$ (leur union disjointes contient donc les mêmes éléments que $L$). Donc tri\_fusion($L$) renvoie $L$ trié.
+\end{itemize}
+
+Ainsi par principe de réccurence, tri\_fusion est partiellement correcte.
+
+\paragraph{Conclusion} tri\_fusion est correcte.

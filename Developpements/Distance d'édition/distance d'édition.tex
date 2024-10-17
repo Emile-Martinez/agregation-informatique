@@ -1,0 +1,157 @@
+
+\dev{Marin Malory}{\cite{crochemore}}
+
+\textit{Ce développement présente la distance d'édition entre deux chaînes de caractères, ainsi qu'un algorithme de programmation dynamique permettant de la calculer, s'intégrant ainsi dans les leçons \ref{L9} et \ref{L12}.}
+
+\paragraph{Définitions.} Il y a plusieurs définition de distance possible entre deux chaînes de caractères. On va définir la distance d'édition, ou distance de Levenshtein, entre deux chaînes de caractères $x$ et $y$ en considérant les opérations suivantes :
+\begin{itemize}
+\item la \textbf{substitution} d'une lettre de $x$ à une position donnée par une lettre de $y$;
+\item la \textbf{suppression} d'une lettre de $x$ à une position donnée ;
+\item l'\textbf{insertion} d'une lettre de $y$ dans $x$ à une position donnée.
+\end{itemize}
+
+\noindent Pour chaque opération, on définit un coût. Soit $a,b\in \Sigma$, on a :
+\begin{itemize}
+\item $\mathbf{sub}(a,b)$ : coût pour substituer $b$ par $a$ ;
+\item $\mathbf{sup}(a)$ : coût pour supprimer la lettre $a$ ;
+\item $\mathbf{ins}(b)$ : coût pour insérer la lettre $b$.
+\end{itemize}
+
+\begin{definition}
+Étant donné deux chaînes de caractères $x$ et $y$, la distance d'édition entre $x$ et $y$, noté $\mathbf{lev}(x,y)$ est défini par :
+$$
+\mathbf{lev}(x,y) = \min\{\text{coût de } \sigma : \sigma \in T_{x,y} \}
+$$
+où $T_{x,y}$ est l'ensemble des séquences d'opérations qui transforme $x$ en $y$, le coût d'une séquence étant la somme des coût de chaque opération.
+\end{definition}
+
+\begin{rem}~
+
+\begin{enumerate}
+\item La distance de Hamming est un cas particulier de la distance d'édition, où on considère seulement l'opération de substitution (on peut mettre un coût valant $+\infty$ pour ces deux opérations).
+
+\item Ici, on se contentera de prendre les coût $\mathbf{sup}$ et $\mathbf{ins}$ unitaire, et $\mathbf{sub}(a,b)= \mathbf{1}\{a\neq b\}$.
+\end{enumerate}
+\end{rem}
+
+\begin{example}[ADN]
+On considère deux mots sur l'alphabet $\{A,T,C,G\}$, $x=AATGC$ et $y=CAGC$. On a $\mathbf{lev}(x,y)=2$ puisque qu'il suffit de substituer le premier $A$ de $x$ à $C$, et supprimer le $T$.
+\end{example}
+
+
+\paragraph{Calcul de la distance.}
+
+On va donner un algorithme de programmation dynamique pour calculer la distance d'édition. Étant donné $x,y \in \Sigma^*$ de taille $m$ et $n$ respectivement, on définit le tableau $T$ à $m+1$ lignes et $n+1$ colonnes tel que :
+$$
+T[i,j] = \mathbf{lev}(x[0...i],y[0...j])
+$$
+pour $i \in \{-1,0,...,m-1\}$ et $j\in\{-1,0,...,n-1\}$. Pour calculer $T[i,j]$ on utilisera la proposition suivante :
+
+\begin{proposition}\label{prop1}
+Pour $i=0,....,m-1$ et $j=0,...,n-1$, on a 
+$$
+\begin{array}{lll}
+T[-1,-1] &= &0  \\
+T[i,-1] &= &T[i-1,-1] + \mathbf{supp}(x[i]) \\
+T[-1,j] &= &T[-1,j-1] + \mathbf{ins}(y[j]) \\
+T[i,j] &= &\min \left\lbrace 
+\begin{array}{l}
+T[i-1,j-1] + \mathbf{sub}(x[i],y[j]) \\
+T[i-1,j] + \mathbf{sup}(x[i]) \\
+T[i,j-1] + \mathbf{ins}(y[j]) \\
+\end{array}
+\right.
+\end{array}
+$$
+\end{proposition}
+
+
+On peut alors directement écrire l'algorithme et en déduire sa complexité.
+
+\begin{algorithm}
+$T[-1,-1] \leftarrow 0$ ;\\
+\Pour{$i=0...m-1$}{
+	$T[i,-1] \leftarrow T[i-1,-1] + \mathbf{sup}(x[i])$ \\
+}
+\Pour{$j=0...n-1$}{
+	$T[-1,j] \leftarrow T[-1,j-1] + \mathbf{ins}(y[j])$ ; \\
+	\Pour{$i=0...m-1$}{
+		$T[i,j] \leftarrow \min \left\lbrace 
+\begin{array}{l}
+T[i-1,j-1] + \mathbf{sub}(x[i],y[j]) \\
+T[i-1,j] + \mathbf{sup}(x[i]) \\
+T[i,j-1] + \mathbf{ins}(y[j]) \\
+\end{array}\right.
+$ ;\\
+	}
+}
+\Retour{$T[m-1,n-1]$}
+\caption{DynamicLev($x$,$y$)}
+\end{algorithm}
+
+\begin{example} On revient à notre exemple précédent en prenant chaque coût égal à $1$ :
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+& $\epsilon$ & A & A & T & G & C \\ \hline
+$\epsilon$ & {\color{red}2} & 1 & 2 & 3 & 4 & 5\\ \hline
+C & 1 & {\color{red}2} & 3 & 4 & 5 & 5\\ \hline
+A & 2 & 1 & {\color{red}2} & {\color{red}2} & 3 & 4\\ \hline
+G & 3 & 2 & 2 & 3 & {\color{red}2} & 3 \\ \hline
+C & 4 & 3 & 3 & 3 & 3 & {\color{red}2}\\ \hline
+\end{tabular}
+\end{center}
+\end{example}
+
+\paragraph{Correction de l'algorithme.}
+
+On utilisera ce lemme qu'on utilisera pour montrer la proposition précédente.
+
+\begin{lemma}
+Étant donné $a,b\in \Sigma$, $u,v \in \Sigma^*$, on a :
+$$
+\begin{array}{lll}
+\mathbf{lev}(ua,\epsilon) &= &\mathbf{lev}(u,\epsilon) + \mathbf{sup}(a) \\
+\mathbf{lev}(\epsilon,vb) &= &\mathbf{lev}(\epsilon,v) + \mathbf{ins}(b) \\
+T[i,j] &= &\min \left\lbrace 
+\begin{array}{l}
+\mathbf{lev}(u,v)+ \mathbf{sub}(a,b) \\
+\mathbf{lev}(u,vb) + \mathbf{sup}(a) \\
+\mathbf{lev}(ua,v) + \mathbf{ins}(b) \\
+\end{array}
+\right.
+\end{array}
+$$
+\end{lemma}
+
+\begin{proof}
+La séquence d'opérations qui transforme $ua$ en $\epsilon$ peut être réarranger  de telle sorte à finir par la suppression de la lettre $a$ (commutativité de la suppression). Le reste de la séquence transforme $u$ en $\epsilon$. Ainsi, on a :
+\begin{align*}
+\mathbf{lev}(ua,\epsilon) &= \min\{\text{coût de } \sigma : \sigma \in T_{ua,\epsilon}\} \\
+&=\min\{\text{coût de } \sigma'.(a,\epsilon) : \sigma' \in T_{u,\epsilon} \}\\
+&= \min\{\text{coût de} \sigma': \sigma' \in T_{u,\epsilon} \} +\mathbf{sup}(a)\\
+&= \mathbf{lev}(u,\epsilon)+\mathbf{sup}(a)
+\end{align*}
+
+Le second point se fait de la même manière. Pour le troisième point, on fait une distinction de cas selon l'opération d'édition.
+\end{proof}
+
+\begin{proof}[de la proposition \ref{prop1}]
+C'est une conséquence directe du fait que $\mathbf{lev}(\epsilon,\epsilon)=0$ et du lemme précédent en prenant $a=x[i], b=y[j], u=x[0...i-1]$ et $v=[y....j-1]$.
+\end{proof}
+
+\begin{corollary}
+L'algorithme DynamicLev retourne $\mathbf{lev}(x,y)$ sur l'entrée $(x,y)$.
+\end{corollary}
+
+
+\paragraph{Complexité.}
+
+\begin{proposition}
+L'algorithme {\tt DynamicLev}, sur une entrée $(x,y)$, s'exécute en temps $\mathcal{O}(|x| \times |y|)$ et en espace $\mathcal{O}(\min(|x|,|y|))$.
+\end{proposition}
+
+\begin{proof}
+La complexité en temps s'obtient directement via la double boucle. Pour la complexité en espace, il suffit de remarquer que seulement deux lignes (ou deux colonnes) sont nécessaires simultanément.
+\end{proof}

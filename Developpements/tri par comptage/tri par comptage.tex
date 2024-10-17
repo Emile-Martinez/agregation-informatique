@@ -1,0 +1,112 @@
+\dev{Emile Martinez}{Emile Martinez, Daphné Kany, sur une idée influencé par chat GPT}
+
+\begin{algorithm}[H]
+	\Entree{Un tableau $T$ d'entiers positifs\\ $|T| = n$}
+	\Sortie{$T$ trié}
+	
+	$N \gets max(T)$ \# $O(n)$\\
+	$T2 \gets$ tableau de taille $N+1$ initialisé à $0$.\\
+	\Pour{$x$ dans $T$}{
+		$T2[x] \gets T2[x] + 1$\\
+	}
+	$indice \gets 0$\\
+	\Pour{$i$ de $0$ à $N$}{
+		\Pour{$j$ de $0$ à $T2[i]$}{
+			$T[indice] \gets i$\\
+			$indice \gets indice + 1$\\
+		}
+	}
+	\Retour{$T$}
+	\caption{Tri par comptage}
+\end{algorithm}
+
+\begin{example}
+	$T = [2, 1, 5, 1, 2]$\\
+	$N = 5$\\
+	$T2 = [0, 2, 2, 0, 0, 1]$\\
+\end{example}
+
+\begin{rem}
+	Complexité spatiale : $O(N)$\\
+	Complexité temporelle : $O(n+N)$\\
+	\begin{com}
+		Dire que si $N$ vaut 500 000 000 on l'a dans le 
+	\end{com}
+	Ce tri n'est pas en place.
+\end{rem}
+
+
+\paragraph{Problème :} Comment généraliser cet algorithme pour des tableaux contenant d'autres valeurs ?
+
+\begin{algorithm}[H]
+	\Entree{Un tableau $T$ d'entiers \textcolor{red}{/ Un tableau $T$ d'éléments de $E$} \textcolor{red}{d'éléments de $E$} \\ \textcolor{red}{Une fonction $f : E \to \N$}}
+	\Sortie{$T$ trié}
+	$d \gets$ dictionnaire vide\\
+	\Pour{$x$ dans T}{
+		$i \gets$ $recherche(d, x)$ \textcolor{red}{/ $l \gets$ $recherche(d, f(x))$}\\
+		\eSi{$l \neq None$}{
+			\textcolor{red}{Ajouter $x$ à $l$}\\
+			$Insertion(d, x, i+1)$ \textcolor{red}{/ $Insertion(d, f(x), l)$}\\
+		}{
+			$Insertion(d, x, 1)$ \textcolor{red}{/ $Insertion(d, f(x), [x])$}\\
+		}
+	}
+	$T2 = []$\\
+	\Pour{$k$ dans $d$}{
+		Ajouter $k$ à $T2$\\
+	}
+	Trier $T2$\\
+	$indice \gets 0$\\
+	\Pour{$i$ dans $T_2$}{
+		$k \gets recherche(d, i)$ \textcolor{red}{/ $l \gets recherche(d, i)$}\\
+		\Pour{$j$ de $0$ à $k-1$ \textcolor{red}{/ $x \in l$}}{
+			$T[indice] \gets i$ \textcolor{red}{/ $T[indice] \gets x$}\\
+			$indice \gets indice + 1$
+		}
+	}
+	\caption{Généralisation du tri par comptage}
+\end{algorithm}
+
+
+
+\paragraph{Complexité :} \enspace \newline \begin{tabular}{rl}
+	Spatiale :& $O(n)$\\
+	Temporelle :& $O(n \times (C_i + C_r) + C_{tri}(m))$ en notant $m = |T2|$.\\
+	Implémentation en ARN : & $O(n \log m + C_{tri}(m)) = O(n \log m + m \log m) = O(n \log m)$ \\
+	Implémentation en table de hachage :& $\left\{ \begin{array}{ll}
+		\text{pire cas} & O(n \times m + C_{tri}(m))\\
+		\text{cas moyen} & O(n + C_{tri}(m)) = O(n + m \log m)
+	\end{array}\right.$
+\end{tabular}\\
+
+Avec des tables de hachage, on obtient en moyenne sur les insertions, dans le pire cas (où $n = m$) une complexité en $O(n) + C_{tri}(n) \sim C_{tri}(n)$ (car les meilleurs algorithmes de tri par comparaison sont au pire en $\Omega(n \log n)$). Ainsi, dans le pire cas, on a asymptotiquement le même nombre de comparaison.
+
+
+\paragraph{Remarque} Ce tri ne concerne que des entiers. On peut passer à n'importe quelle structure que l'on compare à travers une fonction entière par \textcolor{red}{les modifications en rouge}.
+
+\begin{example}
+	$T = ['abc', 'hello', 'world', 'aa', 'bc']$\\
+	$f$ : fonction qui compte les caractères \\
+	$d :\: \begin{array}{l}
+	3 : \: ['abc'] \\
+	5 : ['hello ', 'world']\\
+	2 : ['aa']
+	\end{array}$
+\end{example}
+
+\begin{proposition}
+	On obtient alors un tri stable (avec une complexité spatiale en $O(|T|)$)
+\end{proposition}
+
+\begin{com}
+	On connaît des algorithmes de tri par comparaison qui dans leur meilleurs cas sont linéaires (le Tim Sort de python, quand la liste est déjà trié), et dans le pire en $O(n \log n)$. Notre algorithme n'est donc pas pertinent dans toutes les situations . Il l'est si l'on veut trier des éléments avec beaucoup de redondances (ex : les français par code postaux).
+\end{com}
+
+\begin{com}
+	Cette remarque peut éventuellement être écrite si on manque de temps
+\end{com}
+
+\begin{com}
+	A ne faire que si vraiment on a trop trop de temps :\\
+	On peut également utiliser cet algorithme pour gagner des constantes. En effet, si on connait $f:E -> \N$ croissante où $\left| f^{-1}(i) \cap T \right| = \sqrt n$, alors on peut partitionner sur ces classes, trier ces classes, puis triés à l'intérieur de ces classes. (on obtient alors une complexité en $O(n) + \sqrt n\log \sqrt n \: + \: \sqrt n \times \sqrt n \log \sqrt n \: + \: \sqrt n \times o(\sqrt n \log \sqrt n) = \dfrac{1}{2} n\log n + o(n \log n)$)
+\end{com}

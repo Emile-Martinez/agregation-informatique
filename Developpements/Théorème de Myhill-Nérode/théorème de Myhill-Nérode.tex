@@ -1,0 +1,76 @@
+
+\dev{Marin Malory}{\cite{Belghiti}}
+
+\textit{
+Ce développement propose une preuve du théorème de Myhill-Nérode, ainsi qu'une application de ce théorème. L'application consiste à donner une condition nécessaire et suffisante pour qu'un langage soit rationnel dans le cas d'un alphabet unaire. Ce développement s'intègre dans la leçon \ref{L29}.}
+
+\paragraph{Introduction.} Étant donné un langage $L$ et un mot $u$, on appelle résiduel de $L$ par $u$ l'ensemble 
+$$
+u^{-1}L=\{v\in \Sigma^*| uv\in L\}
+$$
+\begin{theorem}
+Un langage est reconnaissable si, et seulement s'il n'admet qu'un nombre fini de résiduel.
+\end{theorem}
+
+\paragraph{Sens direct.} Soit $A=(\Sigma,Q,q_0,F,\delta)$ un automate complet déterministe reconnaissant $L$. 
+
+$$
+v\in u^{-1}L \Leftrightarrow uv \in L \Leftrightarrow \delta^*(q_0,uv)\in F \Leftrightarrow \delta^*(\delta^*(q_0,u),v)\in F
+$$
+Pour $q\in Q$, on note $L_q = \{v\in \Sigma^* | \delta^*(q,v)\in F\}$, on a :
+$$
+u^{-1}L=L_{\delta^*(q_0,u)}
+$$
+Puisqu'il y a un nombre fini d'état, on obtient alors un nombre fini de résiduels (c'est-à-dire pour tout mot $u\in \Sigma^*, u^{-1}L \in \{L_q\}_{q\in Q}$).
+
+\paragraph{Sens indirect.} Soit $Q$ l'ensemble des résiduels de $L$. On note $q_0 = L = \epsilon^{-1}L$, et $F$ l'ensemble des résiduels contenant le mot vide. On pose $A=(\Sigma,Q,q_0,F,\delta)$ avec :
+$$
+\delta(u^{-1}L,a) = (ua)^{-1}L
+$$
+
+Montrons que $L(A)=L$. On a 
+\begin{align*}
+w=w_1...w_n\in L(A) &\Leftrightarrow \delta^*(q_0,w)\in F \\
+&\Leftrightarrow \epsilon \in \delta^*(\epsilon^{-1}L,w) \\
+&\Leftrightarrow \epsilon \in \delta^*(w_1^{-1}L, w_2...w_n) \\
+&\Leftrightarrow \epsilon \in \delta^*((w_1w_2)^{-1}L, w_3...w_n) \\
+&\Leftrightarrow \epsilon \in w^{-1}L \\
+&\Leftrightarrow w \in L 
+\end{align*}
+
+\begin{proposition}
+Un automate minimal reconnaissant $L$ contient autant d'état que $L$ admet de résiduels.
+\end{proposition}
+
+\begin{proof}
+Étant donné un automate reconnaissant $L$, on peut associer à chaque état un résiduel via une fonction injective d'après la preuve du sens direct. Cet automate a donc plus d'états que $L$ admet de résiduels. Enfin, d'après le sens indirect, cette borne est atteinte.
+\end{proof}
+
+
+\begin{lemma}[de non pompage]
+Soit $L$ un langage sur un alphabet à une lettre $\Sigma=\{a\}$.
+
+$L$ est rationnel si, et seulement si, pour tout $v\in \Sigma^*$, il existe des entiers $m>n>0$ vérifiant $(v^m)^{-1}L=(v^n)^{-1}L$.
+\end{lemma}
+
+\begin{proof}
+Montrons le sens direct. Si $L$ est rationnel, alors il admet un nombre fini de résiduels. Ainsi, pour tout $v\in \Sigma^*$, d'après le principe des tiroirs, il existe $m>n>0$ tels que $(v^m)^{-1}L=(v^n)^{-1}L$.
+
+
+Montrons le sens indirect. En prenant $v=a$, notons $m>n>0$ tel que $(a^m)^{-1}L=(a^m)^{-1}L$. Montrons, par récurrence forte sur $k$, que :
+$$
+(a^k)^{-1}L\in \{(a^i)^{-1} | 0\leq i \leq m-1\}
+$$
+\begin{itemize}
+\item La propriété est trivialement vraie pour $k<m$.
+\item On suppose la propriété vraie jusqu'au rang $k\geq m-1$. On a :
+\begin{align*}
+(a^{k+1})^{-1}L &= (a^{k+1-m})^{-1}((a^m)^{-1}L) \\
+&=(a^{k+1-m})^{-1}((a^n)^{-1}L) \\
+&=(a^{k+1-m+n})^{-1}L \\
+\end{align*}
+Or, $k+1-m+n \leq k$, on peut donc appliquer l'hypothèse de récurrence et conclure.
+\end{itemize}
+
+Ainsi, le nombre de résiduels de $L$ est borné par $m$, et donc d'après le théorème de Myhill-Nérode, $L$ est rationnel. 
+\end{proof}

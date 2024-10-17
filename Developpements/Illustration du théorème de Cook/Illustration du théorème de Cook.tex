@@ -1,0 +1,159 @@
+\dev{Emile Martinez}{}
+
+\textit{Illustration du théorème de Cook et de la puissance du problème SAT en présentant sur des exemples (3-coloration et Subset-Sum) comment se ramener au problème SAT. Il peut illustrer les leçons de NP-complétude ou les leçons parlant de formules propositionnelles.}
+
+\begin{definition}
+	Le problème \textbf{coloration} est un problème sur les graphes non orientés.
+	
+	Une instance positive de coloration est un graphe $G = (S,A)$ et un entier $k$ tel que
+	$$\exists c:S \rightarrow  \llbracket1, k \rrbracket \enspace : \enspace \forall (u,v)\in A, \enspace c(u) \neq c(v)$$
+
+	On dit alors que $c$ est une $k$-coloration de $G$.
+
+\end{definition}
+
+\begin{example} Sur le graphe suivant :
+	\begin{center}
+		\begin{tikzpicture}[-, node distance=2.5cm]
+			\node[state] (q0) {};
+			\node[state, below left of = q0] (q1) {};
+			\node[state, below right of = q0] (q2) {};
+			\node[state, below right of = q1] (q3) {};
+			\node [state, above right of = q2] (q4) {};
+			
+			
+			\draw (q0) edge[] node{} (q1) ;
+			\draw (q1) edge[] node{} (q2) ;
+			\draw (q1) edge[] node{} (q3) ;
+			\draw (q2) edge[] node{} (q4) ;
+			\draw (q2) edge[] node{} (q0) ;
+			\draw (q2) edge[] node{} (q3) ;
+			
+		\end{tikzpicture}
+	\end{center}
+
+	\begin{tabular}{c|c}
+				\begin{tikzpicture}[-, node distance=2.5cm]
+		\node[state] (q0) {1};
+		\node[state, below left of = q0] (q1) {2};
+		\node[state, below right of = q0] (q2) {1};
+		\node[state, below right of = q1] (q3) {3};
+		\node [state, above right of = q2] (q4) {2};
+		
+		
+		\draw (q0) edge[] node{} (q1) ;
+		\draw (q1) edge[] node{} (q2) ;
+		\draw (q1) edge[] node{} (q3) ;
+		\draw (q2) edge[] node{} (q4) ;
+		\draw (q2) edge[] node{} (q0) ;
+		\draw (q2) edge[] node{} (q3) ;
+		
+		\end{tikzpicture} & \begin{tikzpicture}[-, node distance=2.5cm]
+		\node[state] (q0) {1};
+		\node[state, below left of = q0] (q1) {2};
+		\node[state, below right of = q0] (q2) {3};
+		\node[state, below right of = q1] (q3) {1};
+		\node [state, above right of = q2] (q4) {2};
+		
+		
+		\draw (q0) edge[] node{} (q1) ;
+		\draw (q1) edge[] node{} (q2) ;
+		\draw (q1) edge[] node{} (q3) ;
+		\draw (q2) edge[] node{} (q4) ;
+		\draw (q2) edge[] node{} (q0) ;
+		\draw (q2) edge[] node{} (q3) ;
+		
+		\end{tikzpicture} \\
+		n'est pas une 3-coloration  & est une 3-coloration\\
+	\end{tabular}
+	
+\end{example}
+
+\begin{theorem}
+	Il existe une transformation polynomiale d'une instance de coloration vers une instance de SAT.
+\end{theorem}
+
+\begin{proof}
+	Soit $G = (S,A)$ un graphe et $k \in \mathbb N^*$ une instance de coloration.
+	
+	Créons les variables $x_{v,i}$ pour $v \in S$ et $i \in \llbracket1, k \rrbracket$, dont on voudra donner la signification $x_{v,i}$ dira si $v$ est à la couleur $i$.
+	
+	\paragraph{Existence d'une couleur}
+	Créons pour $v \in S$, $E_v = \bigvee\limits_{i = 1}^k x_{v,i}$\newline
+	Ainsi, si $E_v$ est satisfaite, au moins un des $x_{v,i}$ est à vrai.
+	\paragraph{Unicité d'une couleur}
+	Créons pour $v \in S$, $U_v = \bigwedge_{i = 1}^k \bigwedge_{j = 1 \\ j \neg i}^k \neg x_{v, i} \vee \neg x_{v,j} $\newline
+	Ainsi, si $U_v$ est satisfaite, on ne peut pas avoir deux $x_{v, i}$ différents qui sont satisfaits. On en a donc au plus un.
+	\paragraph{Coloration}
+	Créons $C = \bigwedge\limits_{(u,v)\in A} \bigwedge\limits_{i = 1}^k \neg x_{u,i} \vee \neg x_{v,i}$\newline
+	Si $C$ est satisfaite, pour aucune couleur, deux voisins dans le graphe on leur variable à vrai. Dans notre interprétation, deux voisins ne peuvent pas avoir la même couleur.
+	
+	\paragraph{} On créer alors l'instance de SAT $I_{SAT} = \bigwedge\limits_{v\in S} E_v \wedge \bigwedge\limits_{v \in S} U_v \wedge C$
+	
+	\paragraph{ $\boxed{\implies}$ } Supposons que $G$ admette une $k$-coloration $c$. Alors on choisit comme valuation $\sigma (x_{v,i}) = V \iff c(v) = i$. Alors, $c$ étant une fonction, $\sigma$ évalue bien à vrai $E_v$ et $U_v$ (car il y a un et un seul $i$ tel que $c(v) = i$), et étant une coloration, $\sigma$ évalue à vrai $C$ car si $(u,v)\in A, \neg \left( c(u) = i \wedge c(v) = i \right)$ (car $c(u) \neq c(v)$)
+	
+	\paragraph{$\boxed{\impliedby } $} Supposons que $\sigma$ évalue $I_{SAT}$ à vrai.
+	Alors, pour $v \in S$, $U_v$ et $E_v$ nous disent qu'un unique $x_{v,i}$ est à vrai. 
+	$$\forall v \in S, \, \exists! i \in  \llbracket1, k \rrbracket \enspace : \enspace \sigma(x_{v,i}) = V$$
+	Notons $c(v)$ cet unique $i$. Alors par existence et unicité de $i$, $c : S \rightarrow \llbracket1, k \rrbracket $ est bien défini. De plus, si $(u,v) \in A$, alors $\sigma$ satisfaisant $C$, $\sigma\left(x_{u,c(u)}\right) = V \implies \sigma \left(x_{v, c(u)}\right) = F$ donc $c(v) \neq c(u)$.
+	
+	Ainsi, $I_{SAT}$ est une instance positive de $SAT$ si et seulement si $G, k$ en est une de coloration. De plus, cette instance est de taille $O(|A| \times k)$ (et créer en ce temps là), qui est polynomial si on se limite aux instances non triviales de coloration, où donc $k < |A|$.
+
+	
+
+\end{proof}
+
+	
+\begin{definition}
+	Une instance de SOUS-SOMME est une famille de nombre $\left(s_{i}\right)_{i \in  \llbracket1, n \rrbracket} \in \mathbb N$ et une cible $K \in \mathbb N$. On dit qu'une instance est positive si $$\exists I \subset   \llbracket1, k \rrbracket \: : \: \sum\limits_{i \in I} s_i = K$$
+\end{definition}
+
+\begin{rem}
+	A priori, ce problème est difficile dès que $n$ devient grand, car on a pour $I$, $2^n$ choix.
+\end{rem}
+
+\begin{theorem}
+	Il existe une transformation polynomiale d'une instance de SOUS-SOMME vers SAT.
+\end{theorem}
+
+\begin{proof}
+	
+	\paragraph{Notation}
+	\begin{itemize}
+		\item On identifiera ici $V$ avec $1$ et $F$ avec $0$.
+		\item Notons également $M = \max \left( \max\left\{ \lceil \log s_i \rceil \middle/ i \in  \llbracket1, n \rrbracket \right\}, \: \lceil \log K \rceil \right)$.
+		\item De plus, on notera $\overline{x} = \left(x_i\right)_{i \in  \llbracket0, M \rrbracket} \in \left\{ 0,1\right\}^{M+1}$.
+		\item Notons $b_{i,j} \in \{0,1\}$ le $j$-ième bit de $s_i$ et $b_{K, j}$ le $j$-ième bit de $K$.
+	\end{itemize}
+	
+	\paragraph{La somme} On cherche tout d'abord à créer une formule pour la somme. On cherche donc $F(\overline x, \overline y, \overline z , \overline r)$ tel que $F$ soit vrai si et seulement si $\sum\limits_{i = 0}^M x_i2^i + \sum\limits_{i=0}^M y_i 2^i \: = \: \sum\limits_{i=0}^M z_i 2^i$ avec $r_i$ la retenue de la $i$-ème addition.
+	
+	Pour cela on crée
+	$$
+	\begin{array}{rll}
+		F\left(\overline x, \overline y, \overline z, \overline r\right) = & \neg r_{-1} & \text{(car la retenue d'entrée est 0)}\\
+		\wedge & \bigwedge\limits_{i = 0}^{M} \left( x_i \oplus y_i \oplus r_{i-1} \right) = z_i & \text{(on ajoute les deux bits et la retenue précedente)} \\
+		\wedge & \bigwedge\limits_{i=0}^{M} r_i = \left( \left(x_i \wedge y_i\right) \vee \left(x_i \wedge r_{i-1}\right) \vee \left(r_{i-1} \wedge y_i\right)\right) & \text{(Il y a une retenue si au moins deux bits étaient 1)}\\
+		\wedge & \neg r_M & \text{(Il ne faut pas de dépassement de capacité)}\\
+	\end{array}
+	$$
+	
+	\paragraph{Le choix du sous-ensemble} On introduit maintenant les variables $(c_i)_{i\in  \llbracket1, n \rrbracket}$ dont on voudra qu'elle représente $i \in I$.
+	
+	\paragraph{Notre instance de SAT} On crée alors l'instance 
+	$$\begin{array}{rll}
+		I_{SAT} = & F\left( \left( b_{1,j} \times c_1 \right)_{j \in  \llbracket0, M \rrbracket}, \: \left( b_{2,j} \times c_2 \right)_{j \in  \llbracket0, M \rrbracket}, \, \overline{h_2}, \overline{r_2} \right) & \\
+		\wedge & \bigwedge\limits_{i = 3}^{n-1} F\left( \overline{h_{i-1}}, \left( b_{i,j} \times c_i \right)_{j \in  \llbracket0, M \rrbracket}, \overline{h_i}, \overline{r_i} \right) & \\
+		\wedge & F\left( \overline{h_{n-1}}, \left( b_{M,j} \times c_M \right)_{j \in  \llbracket0, M \rrbracket}, \left( b_{K,j}  \right)_{j \in  \llbracket0, M \rrbracket}, \overline{r_M} \right) &
+	\end{array}
+	$$
+	où les $h_{i,j}$ et les $r_{i,j}$ sont des variables fraîches
+	
+	\begin{com}
+		Là il faut expliquer à l'oral pourquoi ca marche, dans les deux sens. On peut ensuite discuter du fait qu'elle n'est pas en FNC, puisque F n'y est pas, mais presque puisque on peut remplacer les formules sur moins de 6 variables par des formules en FNC en faisant la table de vérité.
+		
+		On peut enfin discuter de la taille de l'instance, et pourquoi elle est linéaire en la taille de l'entrée.
+	\end{com}
+
+\end{proof}
+

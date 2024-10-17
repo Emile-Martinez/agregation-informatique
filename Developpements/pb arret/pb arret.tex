@@ -1,0 +1,72 @@
+\dev{Emile Martinez}{}
+
+\textit{Ce développement montre l'indécidabilité de la terminaison et de la correction partielle. Il se place à bas niveau, (début prépa) puisque on repasse sur toutes les difficultés de formalisation. Il est donc à priori plutôt adapter à des leçons comme sur la correction des programmes (qui aurait lieu tôt) que à des leçons qui auraient lieu tard (comme indécidabilité)}
+
+\begin{theorem}
+	Il n'existe pas d'algorithme $\mathcal A$ décidant pour tout algorithme $\mathcal B$, si $\mathcal B$ termine en temps fini sur une entrée $w$.
+\end{theorem}
+
+\underline{Algorithme :} Un programme C avec une mémoire infini qui a pour seule entrée une chaine de caractères. Cela représente du pseudo code.\\
+\underline{décider :} Renvoie Vrai ou Faux en temps fini
+\begin{proof}
+	Par l'absurde. Supposons qu'il existe un tel $\mathcal A$.\\
+	Construisons $\mathcal D$ qui sur l'entrée $<\mathcal C>$:\\
+	\indent Exécute $\mathcal A$ sur $< \mathcal C, <\mathcal C>>$\\
+	\indent Si $\mathcal A$ renvoie Vrai\\
+	\indent \indent Boucle\\
+	\indent Sinon\\
+	\indent \indent Termine\\
+
+On note alors $<a>$ la chaine de caractère décrivant l'objet $a$.
+\begin{example}
+	$<"patate", "carottes"> = "patate\#carottes"$.
+\end{example}
+
+\paragraph{Question} Est ce que $\mathcal D$ est un algorithme.
+\begin{itemize}[label=$\star$]
+	\item On peut vérifier si l'entrée est le code d'un programme C. (C'est la première étape que fait un compilateur)
+	\item On peut «exécuter $\mathcal A$», car $\mathcal A$ existant (par hypothèse) on peut écrire un code.
+	\item On peut écrire $<\mathcal C, <\mathcal C>>$, car $\mathcal C$ existe donc son code aussi.
+	\item Boucler ou terminer, on peut le faire en $C$.
+\end{itemize}
+
+\paragraph{Réponse} $\mathcal D$ est un algorithme.\\
+
+Regardons le comportement de $\mathcal D$ sur $<\mathcal D>$.\\
+\indent A-t-on le droit ? \\
+\indent Oui, car on définit $\mathcal D$ avant, donc $<\mathcal D>$ existe et $\mathcal D$ prend n'importe quel code d'algorithme.
+\begin{com}
+	On a donc pas de définition récursive. On ne définit pas $\mathcal D _{\mathcal D}$
+\end{com}
+
+\noindent Si $\mathcal D$ termine sur $<\mathcal D>$ termine :\\
+\indent Alors $\mathcal A$ sur $<\mathcal D, <\mathcal D>>$ renvoie Vrai, donc $\mathcal D$ sur $<\mathcal D>$ boucle.\\
+Sinon $\mathcal D$ sur $<\mathcal D>$ boucle :\\
+\indent Alors $\mathcal A$ sur $<\mathcal D, <\mathcal D>>$ renvoie Faux, donc $\mathcal D$ sur $<\mathcal D>$ termine.\\
+Ce qui est absurde.
+
+\end{proof}
+
+\begin{theorem}
+	La correction partielle est indécidable.\\
+	Plus rigoureusement, pour toute propriété $\mathcal P$ non triviale liant les entrées aux sorties, il n'existe pas d'algorithme $\mathcal A$ tel que sur l'entrée $<\mathcal B>$, $\mathcal A$ décide si, quand $\mathcal B$ termine, son entrée et sa sortie vérifie $\mathcal P$.
+\end{theorem}
+
+\begin{proof}
+	Supposons $\mathcal P$ : «La sortie vaut 2 fois l'entrée si l'entrée est un entier.»\\
+	Par l'absurde, supposons $\mathcal A$ décidant la correction partielle de $\mathcal P$.\\
+	On crée alors $\mathcal B$ qui sur l'entrée $<\mathcal C, w>$:\\
+	\indent Crée le programme $\mathcal D$ qui sur l'entrée $<n>$\\
+	\indent \indent Si $n = 2$\\
+	\indent \indent \indent Execute $\mathcal C$ sur $w$\\
+	\indent \indent \indent Renvoie $5$\\
+	\indent \indent Sinon\\
+	\indent \indent \indent Renvoie $2n$\\
+	\indent Execute $\mathcal A$ sur $\mathcal D$.\\
+	
+	$\mathcal B$ décide alors le problème de l'arrêt.
+\end{proof}
+
+\begin{com}
+	Suivant le temps qu'il reste, on peut ou non parler de est-ce que c'est un algorithme. On peut alors expliquer que ca en est un sans parler de machine universelle. En effet, pour créer le programme $\mathcal D$ on peut concaténer les instructions au programme $\mathcal C$. De même, on en a pas besoin pour exécuter $\mathcal A$. Il suffit d'écrire son code dans le programme.
+\end{com}

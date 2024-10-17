@@ -1,0 +1,91 @@
+\dev{Marin Malory}{\cite{Pinchinat}}
+
+\textit{
+Ce développement présente une preuve d'un sens du théorème de Codd conjonctif : on montre que toute requête de l'algèbre SPC satisfaisable, il existe une formule du calcul conjonctif correspondante. Il s'insère ainsi dans la leçon \ref{L22}.
+}
+
+\paragraph{Notation.} Pour différencier les deux sémantiques, on mettra un indice $A$ pour l'algèbre relationnelle et $C$ pour le calcul conjonctif. On se permettra aussi, dans les démonstrations, d'enlever l'indice $\mathcal{M}$ pour les sémantiques.
+
+
+\begin{proposition}
+Pour toute requête $q$ de l'algèbre SPC satisfaisable, il existe une formule $\varphi_q$ du calcul conjonctif telle que, pour toute base de donnée $\mathcal{M}$, 
+$$
+\llbracket q \rrbracket^{\mathcal{M}}_A = \llbracket \varphi_q \rrbracket^{\mathcal{M}}_C
+$$
+\end{proposition} 
+
+
+\begin{proof}
+Soit $q$ une requête de l'algèbre SPC satisfaisable. On raisonne par induction sur la structure de $q$.
+
+\begin{description}
+\item[Tuple] Si $q=\langle j : d\rangle$ avec $j$ un attribut et $d$ une constante.
+$$
+\langle j : d \rangle \rightsquigarrow x_j = d
+$$
+On a alors directement 
+$$
+\llbracket (x_j=d)\rrbracket_C = \{\langle j : d\rangle \} = \llbracket \langle j : d\rangle \rrbracket_A 
+$$
+
+\item[Relation] Si $q=R$ :
+$$
+R \rightsquigarrow R(x_1,...,x_n)
+$$
+où $R$ possède $n$ attributs. On a
+$$
+\llbracket R(x_1,...,x_n) \rrbracket_C =R^\mathcal{M} = \llbracket R \rrbracket_A
+$$
+
+\item[Projection] Si $q=\pi_{j_1,...,j_n}(q')$ où $j_1,...,j_n$ sont des attributs.
+$$
+\pi_{j_1,...,j_n}(q') \rightsquigarrow \exists y_1,...,y_m \varphi_{q'}
+$$
+où par hypothèse d'induction, $\llbracket q' \rrbracket^{\mathcal{M}}_A = \llbracket \varphi_{q'} \rrbracket^{\mathcal{M}}_C$, et 
+$$
+\{y_1,...,y_m\} = \text{Libre}(\varphi_{q'}) \backslash \{x_{j_1},...,x_{j_n}\}
+$$
+Ainsi, les variables libres de $\exists y_1,...,y_m \varphi_{q'}$ sont exactement $\{x_{j_1},...,x_{j_k}\}$. Finalement 
+$$
+\llbracket \exists y_1,...,y_m ~ \varphi_{q'} \rrbracket_C = \pi_{j_1,...,j_k}(\llbracket \varphi_{q'} \rrbracket_C)
+$$
+ce qui permet de conclure.
+
+\item[Produit cartésien] Si $q=q_1 \times q_2$. on prend 
+$$
+q_1 \times q_2 \rightsquigarrow \varphi_{q_1}(x_1,..,x_n) \wedge \varphi_{q_2}(y_1,...,y_m)
+$$
+où les $x_i$ et $y_j$ sont deux à deux disjoints.
+
+On a alors directement 
+\begin{align*}
+\llbracket q_1 \times q_2 \rrbracket_A &= \{ (d_1,d_2) | d_1\in \llbracket q_1 \rrbracket_A, d_2\in \llbracket q_2 \rrbracket_A \}\\
+&= \{ (d_1,d_2) | d_1\in \llbracket \varphi_{q_1} \rrbracket_C, d_2\in \llbracket \varphi_{q_2} \rrbracket_C \}\\
+&= \llbracket \varphi_{q_1} \rrbracket_C \underbrace{\Join_{(i,j) |x_i=y_j}}_{\text{Join sur l'ensemble vide = produit cartésien}}\llbracket \varphi_{q_2} \rrbracket_C \\
+&= \llbracket \varphi_{q_1}(x_1,...,x_n) \wedge \varphi_{q_2}(y_1,...,y_m) \rrbracket_C
+\end{align*}
+
+\item[Sélection constante] Si $q=\sigma_{j=a}(q')$,
+$$
+\sigma_{j=a}(q') \rightsquigarrow \varphi_{q'} \wedge (x_j=a)
+$$ 
+où $x_j$ est la variable associée à l'attribut $j$ et $a$ une constante. $x_j$ apparaît bien dans $\varphi_{q'}$, car sinon $j$ ne serait pas un attribut de $q'$ et on ne pourrait pas faire de sélection. En supposant que les tuples de $\llbracket q' \rrbracket_A$ ont $n$ attributs, on a:
+D'un côté,
+$$
+\llbracket \sigma_{j=a}(q') \rrbracket_A = \{(d_1,...,d_n)\in \llbracket q' \rrbracket_A | d_j= a \} \\
+$$ 
+et de l'autre, en sachant que $\llbracket (x_j=a) \rrbracket_C =\{\langle a \rangle\}$ :
+\begin{align*}
+&\llbracket \varphi_{q'}(x_1,...,x_n) \wedge (x_j=a) \rrbracket_C \\
+&= 
+\llbracket \varphi_{q'}(x_1,...x_n \rrbracket_C \Join_{(j,j)} \llbracket x_j = a \rrbracket_C \\
+&= \pi_{x_1,...,x_n}\{ \langle d_1,...,d_n,d_1'\rangle | (d_1,...,d_n) \in \llbracket \varphi_{q'}(x_1,...x_n) \rrbracket_C, (d_j')\in \llbracket x_j = a \rrbracket_C , d_j=d_j'\} \\
+&=  \{(d_1,...,d_n)\in \llbracket q' \rrbracket_A | d_j= a \}
+\end{align*}
+
+\item[Sélection variable] Si $q=\sigma_{j=k}(q')$, le raisonnement est similaire avec :
+$$
+\sigma_{j=k}(q') \rightsquigarrow \varphi_{q'} \wedge (x_j =x_k)
+$$
+\end{description}
+\end{proof}

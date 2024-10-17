@@ -1,0 +1,361 @@
+\dev{Emile Martinez}{}
+
+\section{Introduction}
+
+\begin{definition}
+	Un algorithme de tri prend en entrée un liste d'éléments $E$ muni d'un ordre total $\leq$ ( mais dont on peut se passer de l'antisymétrie) et renvoie o=une liste $S$ telle que : \begin{enumerate}
+		\item elle contient exactement les éléments de $E$
+		\item les éléments de $S$ apparaissent dans l'ordre croissant
+	\end{enumerate}
+\end{definition}
+
+\begin{appl}
+	Pourquoi trier ? Cela permet de simplifier des opérations (min, max, recherche, etc...)
+\end{appl}
+
+\begin{exercise}
+	Chercher à la main un mot dans une liste triée et non triée.
+\end{exercise}
+
+\begin{com}
+	\label{08-activite}
+	On peut faire cet exercice en seconde. Avec éventuellement le fait de comparer deux listes de mots. Tout ca pour voir l'intérêt du tri. Ensuite on peut leur demander comment faire pour trier, permettant de faire émerger des algorithmes sans le formalismes nécessaires. Et suivant le format des mots, on obtiendra probablement des choses différentes (une liste écrit sur un papier -> tri par sélection, des cartes avec les mots -> tri par insertion, tri a bulle, voir même du tri par paquet).
+	
+	Ainsi on peut faire de l'informatique sans l'écueil de  l'apprentissage de la syntaxe python qui bloque beaucoup d'élèves.
+\end{com}
+
+\begin{definition}[Propriétés des tris]
+	\begin{itemize}[label=$\bullet$]
+		\item en place : Utilise $O(1)$ espace en plus de l'espace des données d'entrées
+		\item stable : Si $E[i] \leq E[j]$ et si $E[j] \leq E[i]$, avec $i < j$, dans $S$, $E[i]$ apparaîtra avant $E[j]$
+		\item en ligne : on peut trier les données même si elles arrivent au fur et à mesure
+		\item parallélisable : on peut diviser le travail sur plusieurs fils.
+	\end{itemize}
+\end{definition}
+
+\section{Tri quadratiques}
+
+\subsection{Tri par sélection}
+
+\begin{minipage}{0.5\linewidth}
+	\begin{algorithm}[H]
+		\caption{$Tri\_par\_selection(E)$}
+		$S \gets [\,]$\\
+		\Pour{$i$ allant de $1$ à $|E|$}{
+			Extraire $mini$, le minimum de $E$\\
+			Ajouter $mini$ à la fin de $S$
+		}
+		\Retour $S$
+	\end{algorithm}
+\end{minipage} \begin{minipage}{0.5\linewidth}
+	\begin{example} \normalfont
+		\begin{center}$E = [4, \, 3, \, 6, \, 1]$\\
+			\begin{tabular}{|c|c|c|c|}
+				\hline $i$ & $E$ & $m$ & $S$\\
+				\hline $\times$ & [4, 3, 6, 1] & $\times$ & []\\
+				\hline 0 & [4, 3, 6] & 1 & [1]\\
+				\hline 1 & [4, 6] & 3 & [1, 3]\\
+				\hline 2 & [6] & 4 & [1, 3, 4]\\
+				\hline 3 & [] & 6 & [1, 3, 4, 6]\\
+				\hline
+			\end{tabular}\\
+			$S = [1, \, 3, \, 4, \, 6]$
+		\end{center}
+	\end{example}
+\end{minipage}
+
+\begin{com}
+	Cet exemple peut être remplacer par simplement : «Exemple : mettre un exemple d'execution de l'algorithme» si on manque de place
+\end{com}
+
+\begin{proposition}
+	\enspace\\
+	\begin{itemize}[label=$\star$]
+		\item Terminaison : l'algorithme n'utilise que des boucles bornées
+		\item Correction : Invariant de boucle «$S$ est trié et contient les $i$ plus petits de $E$»
+		\item Cout : environ $|E|^2$
+	\end{itemize}
+\end{proposition}
+
+\begin{proposition}
+	Le tri par sélection est stable (si on extrait le premier min) mais ni en ligne, ni en place, ni facilement parallélisable
+\end{proposition}
+
+\begin{exercise}
+	Réécrire le tri pour qu'il soit en place. Qu'advient-il de la stabilité ?
+\end{exercise}
+
+\subsection{Tri par insertion}
+
+\begin{algorithm}[H]
+	\caption{$Tri\_par\_insertion$}
+	\Pour{$i$ allant de $0$ à $|E|-1$}{
+		$v \gets E[i]$\\
+		$j \gets i-1$\\
+		\Tq{$j > 0$ et $E[j] > E[j+1]$}{
+			Échanger $E[j]$ et $E[i]$\\
+			$j \gets j-1$\\
+		}
+	}
+	\Retour{E}
+	\label{08-inser}
+\end{algorithm}
+
+\begin{proposition}
+	L'algorithme \ref{08-inser} est stable, en place et en ligne.
+\end{proposition}
+
+\begin{rem}
+	Il est difficilement parallélisable
+\end{rem}
+
+\begin{exercise}
+	Quel est la complexité de cet algorithme
+\end{exercise}
+
+\subsection{Recherche Dichotomique}
+
+\begin{algorithm}[H]
+	\caption{$Recherche\_dichotomique(E, x)$}
+	\eSi{$|E| = 0$}
+	{
+		\Retour{Faux}
+	}
+	{
+		$a \gets 0, \, b \gets |E|-1, \, m \gets \left\lfloor \dfrac{a+b}{2} \right\rfloor$\\
+		\Tq{$E[m] \neq x$ et $(b-a)>0$}{
+			\eSi{$E[m] < x$}
+				{$a \gets m+1$}
+				{$b \gets m-1$}
+			$m \gets \left\lfloor \dfrac{a+b}{2} \right\rfloor$
+		}
+		\eSi{$E[m] = x$}
+			{\Retour{Vrai}}
+			{\Retour{Faux}}
+	}
+\end{algorithm}
+
+\noindent\textbf{Terminaison :} variant de boucle : «$b-a$»\\
+\textbf{Correction :} invariant de boucle : «Si $x$ est dans $E$ alors son indice est entre $a$ et $b$»\\
+\textbf{Cout :} nombre de bit de $|E|$
+
+\begin{impl}
+	Implémentation en Python et comparaison avec la recherche linéaire
+\end{impl}
+
+\begin{exercise}
+	Écrire une version récursive de l'algorithme
+\end{exercise}
+
+\section{Tri efficace}
+
+\subsection{Tri fusion}
+
+\begin{definition}
+	L'algorithme de tri fusion est un algorithme de tri qui repose sur deux opérations : \begin{itemize}
+		\item $partitionner(L)$ : coupe $L$ en deux listes de taille équivalente $L_1$, $L_2$
+		\item $fusion(L_1, L_2)$ : avec $L_1$ et $L_2$ deux listes triées, renvoie $L3$ la liste triée contenant tous les éléments de $L_1$ et $L_2$.
+	\end{itemize}
+\end{definition}
+
+\begin{algorithm}[H]
+	\caption{fusion($L_1$, $L_2$)}
+	$res \gets []$\\
+	$i,j \gets 0$\\
+	\Tq{
+		$i < |L_1|$	et $j < |L_2|$
+	}{
+		\eSi{$L_1[i] < L_2[j]$}{
+			$res$.ajouter($L_1[i]$) \\
+			$i \gets i + 1$
+		}{
+			$res$.ajouter($L_2[j]$) \\
+			$j \gets j + 1$
+		}
+	}
+	Ajouter le reste de $L_1$ et de $L_2$ à $res$\\
+	\Retour{$res$}
+\end{algorithm}
+
+\begin{algorithm}[H]
+	\caption{tri\_fusion($L$)}
+	$n \gets |L|$\\
+	\Si{$n\leq 1$}{
+		\Retour{$L$}
+	}
+	$L_1, L_2 \gets$ partionner($L$)\\
+	\Retour{fusion( tri\_fusion($L_1$), tri\_fusion($L_2$) )}
+\end{algorithm}
+
+\textbf{Developpement :} Correction totale du tri fusion
+
+\begin{proposition}
+	Ce tri est stable mais pas en place. Parallélisable mais pas en ligne.
+\end{proposition}
+
+\textbf{Complexité :} $C(n) = 2\times C(\frac{n}{2})$ donc $C(n) = O(n \times \log n)$
+
+\subsection{Tri rapide}
+
+\begin{idee}
+	Choisir un élément appelé pivot et mettre à gauche tous les éléments plus petit, à droite tous les plus grands, puis à trier cette partie à droite et à gauche.
+\end{idee}
+
+\begin{algorithm}
+	\caption{$tri\_rapide(L, debut, fin)$}
+	\Si{$debut \geq fin -1$}
+		{\Retour{$L$}}	
+	$pivot \gets L[0]$\\	
+	$i \gets debut$\\
+	$j \gets fin$\\
+	\Tq{$i < j$}
+	{
+		\eSi{$L[i+1] \leq pivot$}
+		{
+			échanger $L[i+1]$ et $L[i]$\\
+			$i \gets i+1$
+		}{		
+			échanger $L[i+1]$ et $L[j]$\\
+			$j \gets j - 1$
+		}
+	
+		$tri\_rapide(L, debut, i-1)$\\	
+		$tri\_rapide(L, i+1, fin)$\\
+	}
+\end{algorithm}
+
+\begin{com}
+	Par manque de place, on peut remplacer l'écriture de cet algorithme par un dessin expliquant l'idée, et mettre son écriture en exo
+\end{com}
+
+\begin{proposition}[Complexité]
+	\begin{itemize}
+		\item pire des cas : $O(n^2)$
+		\item meilleur cas : $O(n\log n)$
+		\item cas moyen avec pivot aléatoire : $O(n\log n)$
+		\item pire cas avec pivot astucieux : $O(n\log n)$
+	\end{itemize}
+\end{proposition}
+
+\begin{proposition}
+	Ce tri est en place, non stable, non en ligne mais parallélisable
+\end{proposition}
+
+\begin{com}
+	On peut éventuellement mentionner que dans beaucoup d'implémentation, pour le pivot on prend quelques valeurs (exemple 5) et on prend la médiane de ces valeurs là (ainsi on est quasiment jamais dans le pire cas et sans devoir calculé la médiane). Mais avec l'avantage de rester en place
+\end{com}
+
+\begin{com}
+	Pour le caractère en place, il faut discuter de la pile d'appel. A priori, l'espace supplémentaire utilisé est en $O(\log n)$ (voir $O((\log n)^2$ si on considère le stockage des indices mais là on part un peu trop loin)) et non $O(1)$, mais on s'en contente souvent.
+\end{com}
+
+\begin{exercise}
+	Écrire une version stable de ce tri. Préserve-t-on le caractère en place.
+\end{exercise}
+
+\subsection{Tri par tas}
+
+\begin{algorithm}[H]
+	\caption{$tri\_tas(L)$}
+	Insérer les éléments de $L$ dans un tas initialement vide\\
+	Extraire successivement l'élément minimum du tas.
+\end{algorithm}
+
+\begin{exercise}
+	Quelles propriétés vérifie ce tri ?
+\end{exercise}
+
+\subsection{Minoration de la complexité du tri}
+
+\begin{proposition}
+	On ne peut pas trier n éléments avec une complexité inférieure à $n-1$
+\end{proposition}
+
+\begin{proposition}
+	Un algorithme de tri par comparaison aura une complexité pire cas au mieux $O(n \log(n))$
+\end{proposition}
+
+\begin{proof}
+	S'intéresser à l'arbre des chemins que prend l'algorithme en fonction du résultat des comparaisons.
+\end{proof}
+
+\begin{rem}
+	Si on ne trie pas par comparaison, on peut avoir des complexités plus faibles. Par exemple, si E ne contient que des entiers entre 0 et 9, on peut simplement compter le nombre de 0 et de 9 puis reconstruire là dessus le tableau trié.
+\end{rem}
+
+\textbf{Développement :} Amélioration du tri par comptage avec des dictionnaires
+
+\section{Application}
+
+\subsection{Algorithmes gloutons}
+
+\begin{definition}
+	Un algorithme glouton est un algorithme qui résout un problème d'une entrée $E$ de la forme : \begin{itemize}
+		\item on trie les éléments de $E$
+		\item on construit une solution en les parcourant, sans revenir en arrière
+	\end{itemize}
+\end{definition}
+
+\begin{example}
+	\label{08-gymnase}
+	On a $n$ évènements sportifs ayant lieu respectivement entre les dates $d_i$ et $f_i$ ($i \in \N$) ayant chacun besoin d'un gymnase. Comment allouer des gymnases à des évènements pour utiliser le moins possible de gymnase ? \\
+	
+	Algorithme glouton :\begin{enumerate}
+		\item Trié les évènements par $d_i$ croissant (impliquant souvent de trier)
+		\item Mettre chaque évènement dans le premier gymnase vide (peut en être un nouveau)
+	\end{enumerate}
+\end{example}
+
+\begin{proposition}
+	Le glouton de l'exemple \ref{08-gymnase} renvoie une solution optiamle (minimisant le nombre de gymnases)
+\end{proposition}
+
+\begin{exercise}
+	Écrire un algorithme glouton pour le problème de rendu de monnaie
+\end{exercise}
+
+\begin{definition}
+	Un arbre couvrant minimal d'un graphe pondéré est un sous graphe connexe acyclique de poids minimal
+\end{definition}
+
+\begin{algorithm}[H]
+	\caption{$kruskal$}
+	\Entree{$L$ liste d'arêtes}
+	\Sortie{Arbre couvrant de poids minimal}
+	Trier $L$\\
+	$res \gets []$
+	\Pour{$a \in L$}{
+		\Si{$\{a\}\cup res$ n'ajoute pas de cycles}{
+			$res \gets res \cup \{a\}$
+		}
+	}
+	\Retour{$res$}
+\end{algorithm}
+
+\begin{exercise}
+	Proposer des algorithmes gloutons pour la coloration de graphe. Sont-ils optimaux ?
+\end{exercise}
+
+\subsection{Implémentation des ensembles}
+
+\begin{com}
+	Cette partie fait un peu écho à l'activité mentionner dans le commentaire \ref{08-activite}
+\end{com}
+
+\begin{proposition}
+	On peut implémenter les ensembles par des listes, par des listes triées, par des listes que l'on trie pour l'union et l'intersection. On obtient alors les complexités suivantes :\\ \normalfont \begin{tabular}{|l|c|c|c|c|}
+		\hline Structure & Insertion & Suppression & Recherche & union / intersection\\
+		\hline liste & $O(n)$ & $O(n)$ & $O(n)$ & $O(n\times m)$ \\
+		\hline liste triée & $O(n)$ & $O(n)$ & $\log n$ & $O(n+m)$ \\
+		\hline liste avec tri & $O(1)$ & $O(n)$ & $O(n)$ & $O((n+m) \log(\min(n, m)))$ \\
+		\hline
+	\end{tabular}
+\end{proposition}
+
+\begin{exercise}
+	Proposer une implémentation mélangeant les listes triées et les listes avec tri ayant de meilleur complexité
+\end{exercise}
+
+\begin{com}
+	On s'attend ici à ce que on aient d'une part les éléments déjà triés, de l'autre les éléments pas encore, et on ne trie que quand on fait l'union ou l'intersection (ou éventuellement la recherche) en triant les éléments pas encore triés, puis en fusionnant (cf tri fusion) les deux listes.
+\end{com}

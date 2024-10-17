@@ -1,0 +1,92 @@
+\dev{Marin Malory}{\cite{Robert}}
+
+
+\textit{
+Ce développement propose un algorithme d'approximation pour un problème de clustering consistant à partitionner un ensemble de points en minimisant le diamètre de chaque cluster. 
+Ainsi, ce développement s'insère dans les leçons \ref{L11} et \ref{L14}.
+}
+\paragraph{Introduction.} On considère le problème de clustering suivant :
+
+\begin{definition}[Point Clustering ($\mathbf{PC}$)]~
+
+\textbf{Données} : ensemble $S$ de $n$ points dans un espace métrique $(\mathcal{X},d)$.
+
+\textbf{Sortie} : partition de $S$ en $k$ ensembles $C_1,...,C_k$ qui minimise 
+$$
+\max_{1\leq i \leq k} \delta(C_i)
+$$
+où $\delta(C) = \max_{x,x'\in C} d(x,x')$ est le diamètre d'un ensemble de points $C$.
+\end{definition}
+
+\paragraph{Un premier algorithme.} On suppose le diamètre optimal $\Delta^*$ connu. On considère l'algorithme suivant :
+
+\begin{algorithm}
+$i\leftarrow 1$ ;\\
+\Tq{$i\leq k$ et $S\neq \emptyset$}{
+	$p_i \leftarrow \text{Random}(S)$ ;\\
+	$C_i \leftarrow \{p' | d(p_i,p') \leq \Delta^*\}$ ;\\
+	$S\leftarrow S \backslash C_i$ ;\\
+	$i\leftarrow i+1$ ;\\
+}
+\Retour{$C_1,...,C_k$}
+\caption{PartitionAux($S$,$k$, $\Delta^*$)}\label{ClusteringAux}
+\end{algorithm}
+
+
+On veut montrer que l'algorithme ci-dessus est une $2$-approximation. Pour cela, il faut tout d'abord montrer qu'il retourne bien une partition de $S$.
+
+\begin{lemma}
+L'algorithme \ref{ClusteringAux} renvoie une partition de l'ensemble $S$ en entrée.
+\end{lemma}
+
+\begin{proof}
+Par l'absurde, on suppose qu'il existe un point $q$ qui n'est pas retenu par l'algorithme. On remarque alors que tous les $C_i$ sont non vides (et donc les $p_i$ sont bien définis). Ainsi, pour tout $1\leq i \leq k$, on a $d(p_i,q) >\Delta^*$, et de plus, pour tout $1\leq i <j \leq k$, on a $d(p_i,p_j)>\Delta^*$. Ainsi, $\{p_1,...,p_k,q\}$ est un sous-ensemble de $S$ contenant $k+1$ points tous distants d'au moins strictement $\Delta^*$. Un tel ensemble ne peut pas être partitionner en $k$ clusters de diamètre au plus $\Delta^*$, donc $S$ non plus. Or, $S$ peut être partitionné de la sorte par hypothèse, c'est absurde.
+\end{proof}
+
+\begin{proposition}
+L'algorithme \ref{ClusteringAux} est une $2$-approximation du problème $\mathbf{PC}$.
+\end{proposition}
+
+\begin{proof}
+Par le lemme précédent, l'algorithme retourne bien une partition $C_1,...,C_k$ de l'ensemble $S$ en entrée. Soit $1\leq i \leq k$ et $x,x' \in C_i$, on a :
+$$
+d(x,x') \leq d(x,p_i) + d(p_i,x') \leq 2 \Delta^*
+$$
+Ainsi, l'algorithme est bien une $2$-approximation.
+\end{proof}
+
+\paragraph{Cas général.} On ne suppose plus connaître $\Delta^*$. On considère alors l'algorithme qui sélectionne les centres successivement en prenant le point le plus loin des précédents, puis qui assigne chaque point au centre le plus proche.
+
+\begin{algorithm}
+$q_1 \leftarrow \text{Random}(S)$ ;\\
+\Pour{$i=2...k$}{
+	$q_i \leftarrow \text{argmax}_{x\in S} d(x, \{q_1,...,q_{i-1}\})$ ;\\
+}
+\Pour{$x\in S$}{
+	$i \leftarrow \text{argmin}_{1\leq i \leq k} d(x,q_i)$ ;\\
+	$C_i' \leftarrow C_i' \cup\{x\}$ ;
+}
+\Retour{$C_1',...,C_k'$}
+\caption{Partition($S$,$k$)}\label{Clustering}
+\end{algorithm} 
+
+\begin{rem}
+Dans l'algorithme, on considère une notion de distance à un ensemble $d(x,E)$ où $x\in S$ et $E\subset S$. Plusieurs définitions sont possibles, mais on utilisera ici 
+$$
+d(x,E) = \min_{y \in E} d(x,y)
+$$
+\end{rem}
+
+\begin{proposition}
+L'algorithme \ref{Clustering} est une $2$-approximation du problème $\mathbf{PC}$.
+\end{proposition}
+
+\begin{proof}
+On compare les exécutions des algorithmes \ref{ClusteringAux} et \ref{Clustering}. Si, lors de l'exécution du premier, les centres sélectionnés par le second sont disponibles, alors la proposition précédente est correcte.
+
+On suppose que ce n'est pas le cas, c'est-à-dire qu'il existe $1< i \leq k$ avec $q_i\in \bigcup_{j=1}^{i-1} C_i$ et $p_j=q_j$ pour $1\leq j <i$. Ainsi, il existe un indice $1<l<i$ avec $q_i \in C_l$, et donc $d(q_i,p_l) \leq \Delta^*$. Or, l'algorithme \ref{Clustering} choisit le point le plus loin pour nouveau centre. Autrement dit, 
+$$
+q_i = \text{argmax}_{x\in S} d(x, \{q_1,...,q_{i-1}\})
+$$
+Ainsi, pour tout $x\in S$, on a $d(x,\{q_1,...,q_{i-1}) \leq d(q_i,  \{q_1,...,q_{i-1}) \leq d(q_i,q_l) \leq \Delta^*$. Donc tous les points de $S$ sont à une distance au plus $\Delta^*$ des centres déjà sélectionnés. Avec un raisonnement similaire que pour l'algorithme précédent, on a bien une $2$-approximation dans ce cas. 
+\end{proof}

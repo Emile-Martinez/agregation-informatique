@@ -1,0 +1,170 @@
+\dev{Emile Martinez}{}
+
+\textit{à compléter}\\\\
+
+Les expressions booléennes sont aussi puissantes que les fonctions. ($\Leftarrow$ est immédiat).
+
+\paragraph{Notation} On note $f \simeq e$ pour dire qu'une fonction $f : \{0,1\}^n$ est équivalente à une expression booléenne $e$, i.e. $\forall \sigma : V \to \{0,1\}, [e]_\sigma = f\left(\sigma(x_1), \sigma(x_2), \dots, \sigma(x_n)\right)$\\
+
+$\boxed{\implies}$ On prend $f : \{0,1\}^n \to \{0,1\}$.
+\paragraph{Idée} On fait la table de vérité de f, et on fait une disjonction des cas sur la valeur de chaque argument.
+\paragraph{Exemple} $Pair : \{0,1\}^3 \to \{0,1\}$ qui vaut $1$ si on a un nombre pair de 1 \\
+
+
+\begin{tabular}{c|c|c|c}
+	$x_3$ & $x_2$ & $x_1$ & $Pair$ \\ \hline
+	0 & 0 & 0 & 1 \\
+	0 & 0 & 1 & 0 \\
+	0 & 1 & 0 & 0 \\
+	0 & 1 & 1 & 1 \\
+	1 & 0 & 0 & 0 \\
+	1 & 0 & 1 & 1 \\
+	1 & 1 & 0 & 1 \\
+	1 & 1 & 1 & 0 \\
+	
+\end{tabular} \quad \raisebox{-0.5\height}{\begin{tikzpicture}[-, node distance = 1cm]
+	\node[] (q0) {$x_3$} ;
+	\node[below left = 0.7cm and 1cm of q0] (q1) {$x_2$} ;
+	\node[below right = 0.7cm and 1cm of q0] (q2) {$x_2$} ;
+	\node[below left = 0.7cm and 0.2cm of q1] (q3) {$x_1$} ;
+	\node[below right = 0.7cm and 0.2cm of q1] (q4) {$x_1$} ;
+	\node[below left = 0.7cm and 0.2cm of q2] (q5) {$x_1$} ;
+	\node[below right = 0.7cm and 0.2cm of q2] (q6) {$x_1$} ;
+	\node[below left = 0.7cm and -0.2cm of q3] (q7) {1};
+	\node[below right = 0.7cm and -0.2cm of q3] (q8) {0};
+	\node[below left = 0.7cm and -0.2cm of q4] (q9) {0};
+	\node[below right = 0.7cm and -0.2cm of q4] (q10) {1};	
+	\node[below left = 0.7cm and -0.2cm of q5] (q11) {0};
+	\node[below right = 0.7cm and -0.2cm of q5] (q12) {1};	
+	\node[below left = 0.7cm and -0.2cm of q6] (q13) {1};
+	\node[below right = 0.7cm and -0.2cm of q6] (q14) {0};	
+	
+	\draw (q0) edge[left] node{0} (q1);
+	\draw (q0) edge[right] node{1} (q2);
+	\draw (q1) edge[left] node{0} (q3);
+	\draw (q1) edge[right] node{1} (q4);
+	\draw (q2) edge[left] node{0} (q5);
+	\draw (q2) edge[right] node{1} (q6);
+	\draw (q3) edge[left] node{0} (q7);
+	\draw (q3) edge[right] node{1} (q8);
+	\draw (q4) edge[left] node{0} (q9);
+	\draw (q4) edge[right] node{1} (q10);
+	\draw (q5) edge[left] node{0} (q11);
+	\draw (q5) edge[right] node{1} (q12);
+	\draw (q6) edge[left] node{0} (q13);
+	\draw (q6) edge[right] node{1} (q14);
+	
+	
+\end{tikzpicture}} \quad $\begin{array}{l}
+	 \overline{x_3} \wedge \left( \left(\overline{x_2} \wedge \overline{x_1} \right) \vee \left( x_2 \wedge x_1 \right) \right) \\
+	\vee \qquad x_3 \wedge \left(\left( x_2 \wedge \overline{x_1} \right) \vee \left( \overline{x_2} \wedge x_1 \right)\right)
+\end{array}$
+
+\begin{com}
+	On peut ne pas tout étiquetés dans l'arbre, et quand on construit la formule, on explique que on ne garde que on ne veut garder que les branches qui finissent par $1$. Que pour cela, soit on a $x_3$ qui est faux et on est a gauche dans l'arbre, soit $x_3$ est vrai est on est à droite dans l'arbre, etc...
+\end{com}
+
+\begin{proof}
+	Soit $\mathcal P$ la propriété définie sur $\N^*$ par $\mathcal P(n)$: «$\forall f:\{0,1\}^n \to \{0,1\}, \, \exists e \in EB : f \simeq e$»
+	
+	\begin{itemize}[label = $\star$]
+		\item Soit $f : \{0,1\} \to \{0,1\}$.\\
+		
+			$\begin{array}{rl}
+				\text{On prend alors } e = & \bot \\
+				\wedge & x_1 \text{ si } f(1) = 1 \\
+				\wedge & \overline{x_1} \text{ si } f(0) = 1
+			\end{array}$ \\
+		$[e]_\sigma = 1 \enspace \Leftrightarrow \enspace \text{ou} \begin{array}{c}
+			\sigma(x_1) = 1 \text{ et } f(1) = 1\\
+			\sigma(x_1) = 0 \text{ et } f(0) = 1\\
+		\end{array}  \Leftrightarrow \enspace \text{ou} \begin{array}{c}
+			\sigma(x_1) = 1 \text{ et } f(\sigma(x_1)) = 1\\
+			\sigma(x_1) = 0 \text{ et } f(\sigma(x_1)) = 1\\
+		\end{array}  \Leftrightarrow \enspace f(\sigma(x_1)) = 1  $
+		
+		Donc $\mathcal P(1)$
+		\item Soit $n \in \N^*$ tel que $\mathcal P (n)$. Soit $f : \{0,1\}^{n+1} \to \{0,1\}$\\
+		
+		$\begin{array}{lrcl}
+		\text{Alors définissons } f_0 : & \{0,1\}^n & \to  & \{0,1\} \\
+		& (b_1, \dots, b_n) & \mapsto & f(b_1, \dots, b_n, 0)
+		\end{array} $$\begin{array}{lrcl}
+		\text{et } f_1 : & \{0,1\}^n & \to  & \{0,1\} \\
+		& (b_1, \dots, b_n) & \mapsto & f(b_1, \dots, b_n, 1)
+		\end{array} $ \\
+		
+		On applique alors $\mathcal P(n)$ à $f_0$ et à $f_1$ pour obtenir $f_0 \simeq e_0$ et $f_1 \simeq e_1$.\\
+		On pose alors $e = \left(x_{n+1} \wedge e_1 \right) \enspace \vee \enspace \left(\overline{x_{n+1}} \wedge e_0\right) $
+		
+		$\begin{array}{rl}
+			[e]_\sigma = 1 \Leftrightarrow & \text{ou}\begin{array}{c}
+				\sigma (x_{n+1}) = 1 \text{ et } \left[ e_1 \right]\sigma = 1\\
+				\sigma  (x_{n+1}) = 0 \text{ et } \left[ e_0 \right]\sigma = 1
+			\end{array} \\ \\  \Leftrightarrow  & \text{ou}\begin{array}{c}
+				\sigma (x_{n+1}) = 1 \text{ et } f_1\left(\sigma(x_1), \sigma(x_2), \dots, \sigma(x_n)\right) = 1\\
+				\sigma  (x_{n+1}) = 0 \text{ et } f_0\left(\sigma(x_1), \sigma(x_2), \dots, \sigma(x_n)\right) = 1
+			\end{array} \\\\ \Leftrightarrow & \text{ou}\begin{array}{c}
+			\sigma (x_{n+1}) = 1 \text{ et } f_1\left(\sigma(x_1), \sigma(x_2), \dots, \sigma(x_n), 1\right) = 1\\
+			\sigma  (x_{n+1}) = 0 \text{ et } f\left(\sigma(x_1), \sigma(x_2), \dots, \sigma(x_n), 0\right) = 1
+			\end{array} \\\\ \Leftrightarrow & \text{ou}\begin{array}{c}
+			\sigma (x_{n+1}) = 1 \text{ et } f_1\left(\sigma(x_1), \sigma(x_2), \dots, \sigma(x_n), \sigma(x_{n+1})\right) = 1\\
+			\sigma  (x_{n+1}) = 0 \text{ et } f\left(\sigma(x_1), \sigma(x_2), \dots, \sigma(x_n), \sigma(x_{n+1})\right) = 1
+			\end{array}\\ \\ \Leftrightarrow & f\left(\sigma(x_1), \sigma(x_2), \dots, \sigma(x_n), \sigma(x_{n+1})\right) = 1 
+		\end{array}$ \\
+		
+		Ainsi, on obtient $\mathcal P(n+1)$
+	\end{itemize}
+	Par principe de récurrence, on obtient $\forall n \in \N^*, \mathcal P(n)$.
+\end{proof}
+
+\paragraph{Remarque}
+	Si on développe en utilisant la distributivité, on obtient la disjonction des conjonction qui mettent la formule à vrai. C'est ce que l'on appelle la forme normale disjonctive (FND) : \\
+	$\bigvee\limits_{\left(b_1, \,\dots, \, b_n\right) \in f^{-1}(\{1\})} \delta_{b_1}(x_1) \wedge \dots \wedge \delta_{b_n}(x_n) $ avec $\delta_1(y) = y$ et $\delta_0(y) = \overline y$
+
+%\begin{rem}
+%	Ici notre construction ne dépend que des valeurs de la fonction booléenne. On obtient une forme unique. On aurait également pu construire ce que l'on appelle la FND (forme normale disjonctive) consistant à prendre chaque ligne de la table de vérité qui est à vrai et à faire un grand OU.
+%	\\
+%	\begin{tabular}{c|c|c|c}
+%		$x_3$ & $x_2$ & $x_1$ & $Pair$ \\ \hline
+%		0 & 0 & 0 & 1 \\
+%		0 & 0 & 1 & 0 \\
+%		0 & 1 & 0 & 0 \\
+%		0 & 1 & 1 & 1 \\
+%		1 & 0 & 0 & 0 \\
+%		1 & 0 & 1 & 1 \\
+%		1 & 1 & 0 & 1 \\
+%		1 & 1 & 1 & 0 \\
+%		
+%	\end{tabular}$\begin{array}{l}
+%	\left( \overline{x_3} \wedge  \overline{x_2} \wedge \overline{x_1} \right) \quad \vee \quad \left( \overline{x_3} \wedge x_2 \wedge x_1 \right) \\
+%	\vee \quad \left( x_3 \wedge x_2 \wedge \overline{x_1} \right) \quad \vee \quad \left( x_3 \wedge \overline{x_2} \wedge x_1 \right)
+%	\end{array}$
+%	
+%	Ce qui nous donne formellement :
+%	
+%	$\bigvee\limits_{\left(b_1, \,\dots, \, b_n\right) \in \{0,1\}^n \big/ f(b_1, \dots, b_n) = 1} \delta_{b_1}(x_1) \wedge \dots \wedge \delta_{b_n}(x_n) $ avec $\delta_1(y) = y$ et $\delta_0(y) = \overline y$
+%\end{rem}
+
+\paragraph{Remarque} Notre preuve est constructif (bien) mais exponentiel (mal) (la taille $T_n$ vérifie $T_n = 2 + 2\times T_{n-1}$). Souvent, cette explosion est inévitable. Parfois elle l'est.
+
+\paragraph{Exemple} Pour $\max : \{0,1\}^n \to \{0,1\}$
+\begin{com}
+	Commencer à faire l'arbre avec des pointillés en montrant que toutes les feuilles du sous arbre droit vaudront 1 et donc il faudra toutes les prendre, et y en a $2^{n-1}$.
+\end{com}
+On a une expression exponentielle alors que l'on pourrait avoir $x_1 \vee \dots \vee w_n$.
+
+
+\paragraph{Optimisation possible}
+
+\subparagraph{En fusionnant des sous arbres}
+Idée : Si les deux sous arbres sont les mêmes, c'est que le choix sur la variable ne sert à rien.
+
+\begin{com}
+	Faire l'exemple sur max3 et montrer comment on arrive à fusionner les sous arbres
+\end{com}
+
+\subparagraph{En prenant la négation}
+
+On peut également essayer de prendre la négation de la formule, si on a beaucoup de 1 et peu de zeros.
+

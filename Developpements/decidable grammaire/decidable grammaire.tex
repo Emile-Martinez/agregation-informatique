@@ -1,0 +1,28 @@
+\dev{Emile Martniez}{}
+
+\begin{definition} CFG
+	\begin{itemize}
+		\item $\Sigma$ fini
+		\item $V$ fini($\Sigma \cap V = \emptyset$)
+		\item $\mathcal R \subset V\times \left(\Sigma \cup V\right)^*$ (noté $\to$)
+		\item $\S_0 \in V$
+	\end{itemize}
+\end{definition}
+
+\begin{example}
+	$\mathcal G : S \to aSb | \epsilon, \, \mathcal L_{\mathcal G}(S) =\left\{a^nb^n | n\in \N\right\}$
+\end{example}
+
+\begin{proposition}
+	\begin{itemize}
+		\item $\mathcal L_{\mathcal G}(S)$ est décidable (HP)
+		\item $\epsilon \in \mathcal L_{\mathcal G}(S)$ est décidable
+	\end{itemize}
+\end{proposition}
+
+\begin{proof}
+	$$
+	W_0 = \left\{ S \in V | S\to \epsilon\right\} \\
+	W_{n+1} = W_0 \cup \left\{S \in V | S \to w, w \in \right\}
+	$$
+\end{proof}

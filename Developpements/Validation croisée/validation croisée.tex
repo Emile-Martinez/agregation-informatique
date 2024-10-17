@@ -1,0 +1,82 @@
+\dev{Marin Malory}{\cite{Shalev}}
+
+\textit{ Ce développement présente la méthode de la validation croisée, ainsi qu'un exemple où celle-ci échoue. Cette méthode est particulièrement utilisée en apprentissage machine, illustrant ainsi la leçon \ref{L24}. De plus, cette méthode permet de tester un modèle sur des données de manière astucieuse, et illustre la leçon \ref{L3} si ce genre de tests sont abordés.}
+
+\paragraph{Objectif.} Pour valider un modèle, la méthode classique consiste à réserver une partie des données seulement pour cette partie. Cependant, lorsque les données sont rares, on ne veut pas en gaspiller. La méthode de validation croisée ($k$-fold) permet d'estimer la performance de notre modèle sans perdre trop de données.
+
+\paragraph{Principe.} Dans une validation croisée $k$-fold, on sépare notre jeu d'entraînement (les 80\% restant après le retrait des données servant au test) en $k$ sous-ensembles de taille $n/k$. Pour chaque sous-ensemble, on entraîne notre algorithme sur les données restantes et vérifie sur celui-ci. Enfin, on estime l'erreur en prenant la moyenne de toutes les erreurs.
+
+\begin{rem}
+On rappelle que l'erreur est une mesure définie avec le problème. Ainsi, étant donné un ensemble de test $S \in (\mathcal{X} \times \mathcal{Y})^n$, et une fonction $h : \mathcal{X} \rightarrow \mathcal{Y}$, on notera l'erreur $L_S(h)$. Si $\mathcal{Y}$ est discret :
+$$
+L_S(h) = \frac{1}{n} |\{1\leq i \leq n | h(x_i) \neq y_i\}|
+$$
+et si $\mathcal{Y}$ est continue, on peut prendre :
+$$
+L_S(h) = \frac{1}{n} \sum_{i=1}^n (h(x_i)-y_i)^2
+$$
+\end{rem}  
+
+\begin{rem}
+Lorsque $k=n$, on parle de méthode \textit{leave-one-out} (LOO).
+\end{rem}
+
+\paragraph{Sélection de modèle.} La validation croisée est principalement utilisée pour de la validation de modèle. On a donc un algorithme $A$, et un ensemble de paramètres $\Theta$. L'algorithme de sélection est alors l'algorithme \ref{validation} ci-dessous.
+
+\begin{algorithm}[!h]\label{validation}
+
+\Donnees{
+ensemble d'entraînement $S=(x_1,y_1),...,(x_n,y_n)$ \\
+ensemble de paramètres $\Theta$ \\
+algorithme d'apprentissage $A$ \\
+entier $k$
+}
+$S_1,...,S_k \leftarrow \text{Partition}(S)$ ;\\
+\Pour{$\theta \in \theta$}{
+	\Pour{$i=1...k$}{
+		$h_{i,\theta} = A(S\backslash S_i, \theta)$ ;\\
+	erreur($\theta$)$\leftarrow \frac{1}{k} \sum_{i=1}^k L_{S_i}(h_{i,\theta})$ ;\\	
+	}
+}
+$\theta^* \leftarrow \text{argmin}_{\theta}[\text{erreur}(\theta)]$ ;\\
+\Retour{$A(S ; \theta^*$}
+\caption{Validation croisée $k$-folds - sélection de modèle.}
+\end{algorithm}
+
+\paragraph{Complexité.} La complexité est :
+$$
+C_{VC-A}(n,k,\Theta) = k \sum_{\theta\in \Theta} C_A(n,\theta)
+$$
+
+\paragraph{Exemple.} Si on considère l'algorithme des $k$ voisins, on peut prendre $\Theta=\{1,...,n\}$ où $n$ est le nombre de points. Ce choix n'est pas bon en pratique à cause de la complexité.
+
+Considérons une implémentation des $k$ voisins naïve : on calcule toutes les distances en $n$ opérations élémentaires, et on cherche les $K$ minimums avec un tableau auxiliaire de taille $k$. On récupère alors les $k$ minimums en parcourant les $n-k$ sommets restants et en retirant le maximum du tableau. On obtient une complexité au plus $(n-k) k$.
+
+Ainsi, en notant $C_{\text{VC-kNN}}$ la complexité de la validation croisée appliquée à l'algorithme des $k$ voisins, on a :
+$$
+C_{\text{VC-kNN}} \leq k \sum_{i=1}^n i(n-i) + n = \mathcal{O}(kn^3)
+$$
+
+Il faut donc faire un choix raisonnable de $\Theta$, puisqu'en général prendre trop de voisins mène à un sous-apprentissage.
+
+\paragraph{Efficacité.} La validation croisée fonctionne bien en pratique. Mais cela peut échouer, comme le montre le cas suivant, qui est exemple un peu artificiel.
+
+On suppose qu'on dispose d'un jeu de données $S\in (\mathcal{X} \times \mathcal{Y})^n$. Pour tout $y\in \mathcal{Y}$, l'étiquette est choisi uniformément et aléatoirement parmi $\{0,1\}$.  On considère un algorithme d'apprentissage $A$ qui retourne le classifieur constant $h : x\mapsto 1$ si la parité des étiquettes sur l'ensemble d'entraînement vaut $1$, et le classifieur nul sinon. 
+
+\textbf{La différence entre l'erreur estimée par la validation croisée $n$-fold (FOO) et la vraie erreur est toujours $1/2$.}
+
+En effet, la vraie erreur est $\mathbb{E}_S(L_S(h))=n/2$ car $h$ est constante égale à $1$ ou $0$ avec probabilité $1/2$.
+
+Soit $S=(x_1,y_1),...,(x_n,y_n)$ un jeu de test et $h=A(S)$. On note $S_i =S \backslash \{(x_i,y_i)\}$ et $h_i=A(S_i)$. On note $n_1$ (resp. $n_0$) le nombre de $1$ dans $S$, et sans perdre de généralité, on suppose $n_1$ impair. 
+
+Soit $1\leq i \leq n$. 
+\begin{itemize}
+\item Si $y_i=1$, alors $S_i$ contient un nombre pair de $1$, et donc $h_i=0$. On a alors $L_{S_i}(h_i)=1$.
+\item Si $y_i=0$, alors $S_i$ contient un nombre impair de $1$, et donc $h_i=1$, et $L_{S_i}(h_i)=1$.
+\end{itemize} 
+
+On raisonne de même si $n_1$ est pair. Finalement, 
+$$
+\mathbb{E}_S\left( \frac{1}{n} \sum_{i=1}^n L_{S_i}(h_i)\right)=1
+$$
+et donc la différence d'erreur est toujours $1/2$.

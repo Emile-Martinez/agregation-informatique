@@ -1,0 +1,97 @@
+\dev{Marin Malory}{\cite{Cormen}}
+
+\textit{
+Ce développement consiste à montrer la correction d'un algorithme itératif, le balayage de Graham. Il trouve ainsi sa place tout naturellement dans la leçon \ref{L1} afin d'illustrer la notion d'invariant de boucle sur un algorithme complexe. Toute la subtilité de l'algorithme repose sur une gestion astucieuse d'une pile, ce qui permet de placer ce développement dans la leçon \ref{L5}. Enfin, un pré-traitement est nécessaire afin de trier tous les points par angle polaire dont on veut calculer l'enveloppe convexe, permettant d'illustrer la leçon \ref{L8}.
+}
+\paragraph{Balayage de Graham.} On considère un ensemble de points $Q$, dont on veut calculer l’enveloppe convexe $\mathbf{EC}(Q)$.Le balayage de Graham résout le problème de l'enveloppe convexe en gérant une pile $S$ de points candidats. Chaque point de l'ensemble $Q$ est empilé une fois, et les sommets qui ne sont pas dans $\mathbf{EC}(Q)$ finissent par être dépilés.
+
+On utilisera deux autres opérations sur la pile :
+\begin{itemize}
+\item {\tt Sommet(S)} : retourne le sommet de la pile sans changer son contenu ;
+\item {\tt Sous-Sommet(S)} : retourne l'élément juste en dessous du sommet de la pile, sans changer son contenu.
+\end{itemize}  
+
+À la fin de l'exécution, $S$ contiendra, du bas vers le haut, les sommets de $\mathbf{EC}(Q)$ dans l'ordre trigonométrique.
+
+\paragraph{Algorithme.} On suppose que l'on dispose d'une fonction {\tt Tri-Polaire($Q,p_0$)} qui trie les éléments de $Q$ par angle polaire respectivement à $p_0$, dans le sens trigonométrique. Si deux éléments ont le même angle, on garde seulement celui qui est le plus loin de $p_0$.\newline
+
+\begin{algorithm}[!h]
+$p_0 \leftarrow$ sommet de $S$ minimal pour l'ordre lexicographique sur (ordonnée, abscisse). ;\\
+$p_1,...,p_m \leftarrow$ Tri-Polaire($Q\backslash \{p_0\},p_0$) ; \\
+
+$S\leftarrow$ PileVide() ;\\
+
+Empiler($S,p_0$) ;\\
+Empiler($S,p_1$) ;\\
+Empiler($S,p_2$) ;\\
+\Pour{$i=3...m$}{
+	$q_1 \leftarrow $ Sous-Sommet($S$);\\
+	$q_2 \leftarrow $ Sommet($S$) ;\\
+	\Tq{$\widehat{q_1,q_2,p_i} >0$}{
+		Dépiler($S$) ;\\
+		$q_1 \leftarrow $ Sous-Sommet($S$);\\
+		$q_2 \leftarrow $ Sommet($S$) ;\\	
+	}
+	
+	Empiler($S,p_i$) ;\\
+}
+\Retour{$S$}
+\caption{BalayageGraham($Q$)}
+\end{algorithm}
+
+
+\begin{center}
+\textit{Il sera judicieux d'illustrer l'algorithme sur un exemple simple.}
+\end{center}
+
+\paragraph{Correction.} On montre alors la correction partielle de notre algorithme en exhibant un invariant.
+
+\begin{theorem}
+Si la procédure {\tt BalayageGraham} est exécutée sur un ensemble $Q$ de points tel que $|Q| \geq 3$, alors à la fin de la procédure, la pile $S$ contient du bas vers le haut, les sommets de $\mathbf{EC}(Q)$ dans le sens trigonométrique.
+\end{theorem}
+
+\begin{proof}
+Pour $1\leq i \leq m$, on pose $Q_i=\{p_1,...,p_i\}$. Quelques remarques :
+\begin{itemize}
+\item $Q\backslash Q_m$ est l'ensemble des points supprimés par {\tt Tri-Polaire}.
+\item $\mathbf{EC}(Q)=\mathbf{EC}(Q_m)$.
+\item pour tout $1\leq i \leq m$, $p_0,p_1,p_i \in\mathbf{EC}(Q_i)$ 
+\end{itemize}
+
+On montre alors l'invariant suivant :
+
+\begin{center}
+\og Au début de chaque itération du {\tt Pour},  la pile $S$ contient, du bas vers le haut, les sommets de $\mathbf{EC}(Q_{i-1})$ pris dans l'ordre trigonométrique.\fg{} 
+\end{center}
+
+\begin{description}
+\item[Initialisation] Pour $i=3$, on a $Q_{i-1}=\{p_0,p_1,p_2\}$. L'enveloppe convexe d'un triangle est lui-même et $S$ contient $p_0,p_1,p_2$.
+
+\item[Conservation] Au début de l'itération $i$, le sommet de la pile est $p_{i-1}$. Soit $p_j$ le sommet de la pile après l'exécution du {\tt Tant que} juste avant d'empiler $p_i$. En notant $P_i$ l'ensemble des sommets dépilés lors de la boucle {\tt Tant que} de l'itération $i$, on veut montrer que :
+\begin{equation}\label{conservation}
+\mathbf{EC}(Q_j \cup \{ p_i\}) = \mathbf{EC}(Q_i\backslash P_i) = \mathbf{EC}(Q_i)
+\end{equation}
+
+Soit $p_t$ un sommet dépilé, et soit $p_r$ le sommet qui était juste en dessous de $p_t$. On sait deux choses :
+\begin{itemize}
+\item l'angle polaire de $p_t$ (respectivement à $p_0$) est supérieur à celui de $p_r$ et inférieur à $p_i$;\\
+\item l'angle $(p_r,p_t,p_i)$ est positif.
+\end{itemize}
+On en déduit alors que $p_t$ est dans le triangle $p_0,p_r,p_i$ et donc n'est pas dans $\mathbf{EC}(Q_i)$ (sauf s'il est sur le segment $[p_i;p_r]$, mais ce cas ne pose pas problème). Ainsi, on a :
+$$
+\mathbf{EC}(Q_i\backslash \{p_t\}) = \mathbf{EC}(Q_i)
+$$
+et en répétant ce raisonnement pour tous les points de $P_i$, on a 
+$$
+\mathbf{EC}(Q_i\backslash P_i) = \mathbf{EC}(Q_i)
+$$
+
+Or, par définition, on a $Q_i\backslash P_i = Q_j \cup \{p_i\}$ et donc on en déduit l'égalité \ref{conservation}.
+
+Cette égalité nous permet de justifier que $S$ contient exactement les sommets de $\mathbf{EC}(Q_i)$, et l'ordre est trivial.
+
+\item[Terminaison] Quand la boucle termine, on a $i=m+1$ et donc $S$ contient les sommets de $\mathbf{EC}(Q_m)$ dans l'ordre trigonométrique du bas vers le haut. 
+\end{description}
+\end{proof}
+
+\paragraph{Complexité.} Le balayage de Graham réalise $\mathcal{O}(n \log n)$ opérations élémentaires où $n$ est le nombre de points. La recherche de $p_0$ est linéaire, et le tri se fait en $\mathcal{O}(n\log n)$. Le traitement suivant se fait alors en $\mathcal{O}(n)$ en complexité amortie. En effet, chaque sommet est empilé exactement une fois et chaque sommet ne peut être dépilé qu'une fois. Au total, on réalise exactement $m$ fois {\tt Empiler} et au plus $m-2$ fois {\tt Dépiler} (car $p_0,p_1$ et $p_m$ ne sont jamais dépilés). Puisque $m\leq n$, on réalise tout le traitement en $\mathcal{O}(n)$ opérations.

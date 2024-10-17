@@ -1,0 +1,77 @@
+
+
+\dev{Marin Malory}{\cite{Shalev}}
+
+{
+Ce développement présente l'algorithme des $k$-moyennes, utilisé en apprentissage non supervisé. On présente aussi un résultat mathématiques de performance : on montre que la fonction objectif décroît à chaque itération de l'algorithme. Il s'insère dans la leçon \ref{L24}.
+}
+
+\paragraph{Introduction.} On considère un espace métrique $(\mathcal{X},d)$ et un ensemble de points $S$. Une approche classique pour faire du clustering consiste à définir une fonction de coût parmi l'ensemble des clusterings (partitions de $S$) possibles et d'en trouver un de coût minimal. Cette fonction a pour entrée un clustering $C=(C_1,...,C_k)$ et est à valeur dans $\mathbb{R}$.
+
+On présente ici la fonction objectif la plus commune.
+
+\paragraph{Fonction objectif des k-moyennes.} Cette fonction objectif mesure la distance quadratique de chaque point de $S$ au centroïde de son cluster. Étant donné un cluster $C_i$, son centroïde est défini par :
+$$
+\mu_i(C_i) = \text{argmin}_{\mu \in \mathcal{X}} \sum_{x\in C_i} d(x,\mu)^2
+$$
+On peut alors définir la fonction objectif :
+$$
+G_{k-m}(C_1,...,C_k) = \sum_{i=1}^k \sum_{x\in C_i} d(x,\mu_i(C_i))^2
+$$
+
+\paragraph{Problème.} Il est cependant complexe de trouver le minimum de cette fonction. En revanche, l'algorithme suivant est souvent utilisé. On considère la distance euclidienne $\|.\|$.
+
+\begin{algorithm}
+\Donnees{$X\subset \mathcal{X}$ ; nombre de clusters $k$}
+
+$\mu_1,...,\mu_k \leftarrow$ centroïdes initiaux pris aléatoirement dans $X$ ;\\
+\Tq{non convergence}{
+	\Pour{$i=1...k$}{
+		$C_i \leftarrow \{x\in X  : i =\text{argmin}_j \|x-\mu_j\|\}$ ;
+	}
+	\Pour{$i=1...k$}{
+		$\mu_i \leftarrow \frac{1}{|C_i|} \sum_{x\in C_i} x$ ;
+	}
+
+}
+\caption{k-Moyennes($k$,$X$)}
+\end{algorithm}
+
+On peut alors montrer le résultat suivant.
+
+\begin{lemma}
+La fonction objectif des k-moyennes décroît strictement à chaque itération de l'algorithme ci-dessus.
+\end{lemma}
+
+\begin{proof}
+On pose $G(C_1,...,C_k)$ la fonction objectif, que l'on peut réécrire :
+\begin{equation}\label{KMeansEq1}
+G(C_1,...,C_k) = \min_{\mu_1,...,\mu_n \in \mathcal{X}} \sum_{i=1}^k \sum_{x\in C_i} \|x-\mu_i\|^2 
+\end{equation}
+
+On pose $\mu(C_i) = \frac{1}{|C_i|} \sum_{x\in C_i} x$. On remarque :
+\begin{equation}\label{KMeansEq2}
+\mu(C_i) = \text{argmin}_{\mu\in \mathcal{X}} \sum_{x\in C_i} \|x-\mu\|^2
+\end{equation}
+(Pour le montrer, il suffit de remarquer que la fonction est strictement convexe, et on regarde quand le gradient s'annule).
+
+On peut alors réécrire :
+$$
+G(C_1,...,C_k) = \sum_{i=1}^k \sum_{c\in C_i} \|x-\mu(C_i)\|^2
+$$
+
+On considère la mise à jour à l'itération $t$. On note $C_1^{(t-1)}$,...,$C_k^{(t-1)}$ la partition précédente, et soit $\mu_i^{(t-1)} = \mu_{i}(C_i^{(t-1)})$, et soit $C_1^{(t)}$,...,$C_k^{(t)}$ la nouvelle partition à l'itération $t$. En utilisant l'équation \ref{KMeansEq1}
+\begin{equation}\label{KMeansEq3}
+G(C_1^{(t)},...,C_k^{(t)}) \leq \sum_{i=1}^k \sum_{x\in C_i^{(t)}} \|x-\mu_i^{(t-1)}\|^2
+\end{equation}
+
+Or, la nouvelle partition $(C_1^{(t)},...,C_k^{(t)})$ minimise l'expression $\sum_{i=1}^k \sum_{x\in C_i} \|x-\mu_i^{(t-1)}\|^2$ parmi tous les partitionnements possibles. Donc 
+$$
+\sum_{i=1}^k \sum_{x\in C_i^{(t)}} \|x-\mu_i^{(t-1)}\|^2 \leq \sum_{i=1}^k \sum_{x\in C_i^{(t-1)}} \|x-\mu_i^{(t-1)}\|^2
+$$
+
+On utilise l'équation \ref{KMeansEq2} pour le membre droite, et l'équation \ref{KMeansEq3} puis \ref{KMeansEq2} sur le membre gauche, on a :
+$$
+G(C_1^{(t)},...,C_k^{(t)}) \leq  G(C_1^{(t-1)},...,C_k^{(t-1)})
+$$ 
+\end{proof}

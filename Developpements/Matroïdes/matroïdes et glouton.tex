@@ -1,0 +1,83 @@
+\dev{Marin Malory}{\cite{Robert}}
+
+\textit{Ce développement consiste à donner une brève introduction à la théorie des matroïdes. On montre que l'algorithme glouton est optimal pour ces structures, s'intégrant ainsi dans la leçon \ref{L1} et \ref{L12}. La principale application de cette théorie étant la preuve de l'optimalité de l'algorithme de Kruskal, ce développement peut aussi illustrer la leçon \ref{L10}.
+}
+
+\begin{definition}[Matroïde, Whitney, 1935]~
+
+Le couple $(S,I)$ est un matroïde si $S$ est un ensemble à $n$ éléments, $I\subset P(S)$ et si :
+\begin{enumerate}
+\item $X\in I \Rightarrow (\forall Y \subset X, X\in I)$ (hérédité) ;
+\item $(A,B\in I, |A| <|B|) \Rightarrow \exists x \in B\backslash A, A\cup\{x\} \in I$ (propriété d'échange).
+\end{enumerate}
+Tout ensemble $X\in I$ est dit \textbf{indépendant}.
+\end{definition}
+
+\paragraph{Exemple de matroïde.}On peut montrer que l'ensemble des forêts d'un graphe est un matroïde. 
+
+\begin{theorem}
+Soit $G=(V,E)$ un graphe, $S=E$ et $I=\{A\subset E | \text{$A$ ne contient pas de cycle} \}$. Le couple $(S,I)$ est un matroïde.
+\end{theorem}
+
+\begin{proof}
+Un ensemble $X\in I$ est indépendant si, et seulement si, $X$ est une forêt du graphe $G$.
+
+\begin{enumerate}
+\item Un sous-ensemble d'une forêt est encore une forêt. En effet, si $X\subset I$ et il existe $Y\subset X$ contenant un cycle, alors $X$ contient aussi ce cycle, ce qui est absurde.
+
+\item Soient $A$ et $B$ deux forêts de $G$ avec $|A| <|B|$. Chaque sommet de $G$ est contenu dans un arbre de $A$ (si le sommet est isolé, alors il est dans un arbre à un sommet). Ainsi, $A$ contient $|V|-|A|$ arbres (resp. $|V|-|B|$ pour $B$). En effet, dès qu'on ajoute une arête, on fusionne deux arbres et le nombre total d'arbres diminue de un.
+
+Ainsi, $B$ contient moins d'arbres que $A$, et donc il existe un arbre $T$ de $B$ qui n'est pas inclus dans un arbre de $A$ (si ce n'était pas le cas, on aurait $|V|-|B|\geq|V|-|A|$ car chaque arbre de $B$ est dans un arbre de $A$). Autrement dit, il existe deux sommets $u,v\in V$ tels que $u$ et $v$ sont dans $T$ mais pas dans le même arbre de $A$. Il existe donc une arête $(x,y)$ sur le chemin de $T$ allant de $u$ à $v$ qui n'est pas dans $A$. On a alors $A\cup\{(x,y)\}$ qui est toujours une forêt.
+\end{enumerate}
+\end{proof}
+
+
+\paragraph{Ensemble indépendant maximal.} On introduit ici la notion d'ensemble indépendant maximal et de matroïde pondéré.
+
+\begin{definition}
+Soit $F\in I$. $x\notin F$ est une \textbf{extension} de $F$ si $F\cup \{x\} \in I$. Un ensemble indépendant est \textbf{maximal} s'il n'a aucune extension.
+\end{definition}
+
+\begin{lemma}
+Tous les ensembles indépendants maximaux d'un matroïde ont le même cardinal.
+\end{lemma}
+
+\begin{proof}
+Par l'absurde, on utilise la propriété d'échange et on contredit la maximalité du plus petit des deux ensembles indépendants.
+\end{proof}
+
+\begin{definition}[Matroïde pondéré]
+Un matroïde pondéré est un matroïde $(S,I)$ muni d'une fonction de poids $w : S \rightarrow \mathbb{N}$. Le poids d'un ensemble $X\subset S$ est défini par $w(X) = \sum_{x\in X} w(x)$.
+\end{definition}
+
+\paragraph{Algorithme glouton sur un matroïde pondéré.}
+
+On cherche à trouver un ensemble indépendant de poids maximum. On peut montrer que dans le cas d'un matroïde, l'algorithme glouton est optimal.
+
+\begin{algorithm}[!h]
+\Donnees{matroïde $(S,I)$ avec $S=\{s_1,...,s_n\}$ trié par poids décroissants}
+\Res{Ensemble indépendant $A$ de poids maximum.}
+
+$A \leftarrow \emptyset$ ;\\
+\Pour{$i=1...n$}{
+	\Si{$A\cup\{s_i\} \in I$}{
+		$A\leftarrow A\cup \{s_i\}$ ;\\
+	}
+}
+\Retour{$A$}
+\caption{GloutonMatroide($S$,$I$, $w$)}
+\end{algorithm}
+
+\begin{theorem}
+L'algorithme {\tt GloutonMatroïde} renvoie une solution optimale.
+\end{theorem}
+
+\begin{proof}
+
+Soit $X=\{x_1,...,x_m\}$ la solution renvoyée par l'algorithme glouton. On a alors $w(x_1) \geq ...\geq w(x_m)$. Soit $Y=\{y_1,...,y_m\}$ une solution optimale avec $w(y_1) \geq ... \geq w(y_m)$. On montre que pour tout $1\leq i \leq m$, $w(x_i) \geq w(y_i)$. L'optimalité de la solution en découle directement.
+
+
+Si ce n'était pas le cas, prenons $k$ le plus petit indice tel que $w(x_k) < w(y_k)$. On remarque que $k>1$ car $\{x_1\}$ est le singleton indépendant de poids maximum. On regarde alors $A=\{x_1,...,x_{k-1}\}$ et $B=\{ y_1,...,y_k\}$. Puisque $|B|=|A|+1$, on peut appliquer la propriété d'échange et il existe $1\leq i \leq k$ tel que $A\cup\{y_i\}$ est indépendant et $y_i \notin A$. On a alors $w(y_i) \geq w(y_k) > w(x_k)$. L'algorithme glouton aurait alors choisit $y_i$ avant $x_k$ (il suffit de prendre le sous-ensemble de $A\cup \{y_i\}$ des éléments ayant un poids inférieur à $w(y_j)$, qui est indépendant par hérédité).
+\end{proof}
+
+\paragraph{Optimalité de l'algorithme de Kruskal.} Le théorème précédent nous permet de montrer que l'algorithme de Kruskal qui construit un arbre couvrant renvoie bien un arbre optimal. En effet, les arêtes sont triées par poids croissant et on choisit de manière gloutonne la prochaine arête qui ne crée pas de cycle. 

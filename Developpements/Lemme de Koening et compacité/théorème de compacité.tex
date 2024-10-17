@@ -1,0 +1,70 @@
+\dev{Marin Malory}{\cite{Pinchinat}}
+
+\textit{
+L'idée de ce développement est de démontrer la théorème de compacité de la logique propositionnelle en partant du lemme de König, et de proposer une application en coloriage de graphe. Il s'intègre alors parfaitement dans la leçon \ref{L28}. Si ce développent insiste plus sur le lemme de König, il peut alors illustrer les leçons \ref{L7} et 
+\ref{L10}.
+}
+
+\paragraph{Lemme de König.} On se propose de montrer le lemme suivant. Pour un arbre $T$ et un noeud $x$, on notera $T_x$ le sous-arbre de $T$ enraciné en $x$.
+
+\begin{lemma}[Lemme de König]
+Tout arbre infini à branchement fini admet une branche infinie.
+\end{lemma}
+
+\begin{proof}
+Soit $T$ un arbre enraciné ayant une infinité de nœuds et tel que chaque nœud interne a un degré fini. On construit une suite $(x_n)_{n\in \mathbb{N}}$ telle que pour tout $n\in \mathbb{N}$, $T_{x_n}$ est infini à branchement fini. 
+\begin{itemize}
+\item On prend $x_0$ la racine de $T$, et la propriété est vérifiée au rang $0$.
+\item On suppose qu'on dispose déjà de $x_0...x_n$. Par hypothèse de récurrence sur $n$, le sous-arbre de $T_{x_n}$ est infini à branchement fini. On note $f_1,...,f_k$ les enfants de cet arbre. Par l'absurde, si tous les $(T_{f_i})$ sont finis, chacun contenant $n_i$ nœuds, alors $T_{x_n}$ contient $\sum_{i=1}^k n_i$ noeuds, ce qui est absurde. Donc il existe $1\leq i \leq k$ tel que $T_{f_i}$ soit infini à branchement fini, on pose $x_{n+1} = f_i$. 
+\end{itemize}
+On a ainsi construit par récurrence un chemin infini dans $T$.
+\end{proof}
+
+\paragraph{Un théorème de compacité.}
+\begin{theorem}[Compacité de la logique propositionnelle]~
+
+Étant donné un ensemble dénombrable $\mathcal{F}$ de formules propositionnelles sur un ensemble de variables $V$ dénombrable, $\mathcal{F}$ est satisfiable si, et seulement si, $\mathcal{F}$ est finiment satisfiable.
+\end{theorem}
+
+\noindent \textbf{Rappel :}
+\begin{enumerate}
+\item $\mathcal{F}$ est satisfiable s'il existe une valuation $d : V \rightarrow \{0,1\}$ telle que pour toute formule $F\in \mathcal{F}$, $d(F)=1$.
+\item $\mathcal{F}$ est finiment satisfiable si toute partie finie de $\mathcal{F}$ est satisfiable.
+\end{enumerate}
+
+\begin{proof}
+Le sens direct est trivial. Étant donné une valuation $d : \mathcal{F} \rightarrow \{0,1\}$ telle que $d(\mathcal{F})=1$ et un sous-ensemble $\mathcal{G} \subset \mathcal{F}$ fini, on a toujours $d(\mathcal{G})=1$.
+
+Réciproquement, on va construire un arbre afin d'appliquer le lemme de König. Soit $(\phi_n)_{n\in \mathbb{N}}$ une énumération de $\mathcal{F}$, et $(v_n)_{n \in \mathbb{N}}$ une énumération de $V$. On construit un arbre $T$ de racine $r$ de la manière suivante :
+\begin{itemize}
+\item pour $n\in \mathbb{N}$, les sommets de $T$ de hauteur $n+1$ sont étiquetés par $v_n$ ou $\overline{v_n}$ ;
+\item pour un sommet $x$ de $T$ de hauteur $n$, alors $y \in \{v_n,\overline{v_n}\}$ est un enfant de $x$ si, et seulement s'il existe une valuation satisfaisant $x,y,\phi_0,...,\phi_n$ et tous les ancêtres de $x$. 
+\end{itemize}
+
+
+Montrons que $T$ est infini à branchement fini. Chaque nœud a au plus deux enfants, donc $T$ est à branchement fini. Il reste à montrer que $T$ est infini, et pour cela, on montre que pour tout $n> 0$, $T$ a au moins un nœud à la profondeur $n$. 
+Soit $n>0$, par hypothèse $\{\phi_0,...,\phi_{n-1} \}$ est satisfiable par une valuation $d$. Ainsi, il existe au moins une branche de longueur $n$ dans $T$ en prenant pour $1\leq i \leq n$, $x_i$ si $d(x_i)=1$ et $\overline{x_i}$ sinon.
+
+Ainsi, par application du lemme, il existe une branche infini $(x_i)_{i>0}$ dans $T$. On pose alors $d(v_i) =1$ si $x_i = v_i$ et $d(v_i)=0$ si $x_i = \overline{x_i}$. Cette valuation satisfait alors toute formule de $\mathcal{F}$.
+\end{proof}
+
+
+\paragraph{Application : coloriage de graphe.} On se propose de montrer le résultat suivant :
+
+\begin{theorem}
+Soit $K>0$ et $G$ un graphe. $G$ est $K$-coloriable si, et seulement si, tous ses graphes finis le sont.
+\end{theorem}
+
+\textit{L'idée ici n'est pas de faire une preuve très détaillée du théorème. On pourra se contenter de donner les points clés de la preuve, l'idée principale étant de montrer une application du théorème de compacité.}\newline
+
+\begin{proof}
+Le sens direct est trivial, puisqu'il suffit de prendre une restriction du $K$-coloriage de $G$ pour colorier un de ses sous-graphes. 
+
+Réciproquement, on définit pour tout graphe $H=(V,E)$ une formule $\Phi_H$ satisfiable si, et seulement si $H$ est $K$-coloriable. L'idée est de considérer l'ensemble des variables $(x_{v,l})_{v\in V, l \in \llbracket 1 ; K \rrbracket }$. On pourra prendre :
+$$
+\Phi_H = \left( \bigwedge_{v\in V} \left( \bigvee_{1\leq l \leq K} x_{v,l} \right) \wedge \left( \bigwedge_{1\leq l < l' \leq K} \neg (x_{v,l} \wedge x_{v,l'}) \right)\right) \wedge \left( \bigwedge_{uv \in E} \bigwedge_{1\leq l\leq K} \neg(x_{u,l} \wedge x_{v,l})\right)
+$$
+\end{proof}
+
+Soit $\mathcal{H}$ l'ensemble des sous-graphes finis de $G$. On pose $\mathcal{F} = (\Phi_H)_{H\in \mathcal{H}}$ et on remarque que $\mathcal{F}$ est finiment satisfiable. En effet, si on prend un sous-ensemble fini de $\mathcal{F}$, l'union des sous-graphes finis correspondants est encore un sous-graphe fini de $G$ et est donc $K$-coloriable. Ainsi, il existe une valuation satisfaisant ce sous-ensemble. Par le théorème de compacité, $\mathcal{F}$ est satisfiable par une valuation $d$ de laquelle on peut extraire un $K$-coloriage de $G$.
+
