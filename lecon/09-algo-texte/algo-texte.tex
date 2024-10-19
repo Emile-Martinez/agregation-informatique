@@ -1,0 +1,315 @@
+\dev{Emile Martinez}{}
+
+Un auteur envoie son manuscrit à un éditeur. Il commence par compresser le texte. A la réception, l'éditeur compare le manuscrit à d'autres ouvrages pour vérifier qu'il n'y a pas plagiat. Il peut ensuite chercher un motif dans le texte.
+
+\begin{com}
+	Cela justifie l'ordre dans lequel on a mis nos parties. De plus, suivant le niveau du cours, on pourrait inaugurer chaque partie en rappelant quelle partie de ce contexte cela concerne. Mais là le niveau (MPI) est un peu élevé pour s'apesentir sur ce genre de choses
+\end{com}
+
+\textbf{Notation :} On prend les conventions de slicing de python
+
+
+\begin{com}
+	Il n'y a pas de partie application car souvent les applications sont directes depuis les algorithmes. Ainsi on les dissémine illustrant directement le concept	
+\end{com}
+
+
+\section{Encodage et compression}
+
+\subsection{Encodage par lettre}
+
+\begin{definition}[Algorithme de compresssion]
+	Un algorithme de compression sans perte est la donnée d'une fonction $f : \Sigma^* \to \Sigma^*$ injective (il existe un unique décodage). 
+\end{definition}
+
+\begin{algo}[Codage préfixe]
+	\enspace
+	\begin{enumerate}
+	\item Prétraitement : On construit un arbre binaire $\mathcal A$ qu’on appelle arbre de Huffman dont les feuilles sont les lettres $c \in \Sigma$.
+	
+	\item Compression : On code chaque lettre c par une suite de 0 et 1 correspondant au chemin (0 : gauche, 1 : droite) de la racine à la feuille contenant c dans $\mathcal A$.
+	
+	\item Décompression : On décode une suite de 0 et 1 en parcourant le chemin correspondant dans $\mathcal A$.
+	\end{enumerate}
+\end{algo}
+
+\begin{algo}[Codage de Huffman]
+	\label{09-Huff}
+	\normalfont On note $f_a$ la fréquence du caractère $a$ dans le texte et on note $f_{\mathcal A} = \sum\limits_{a \in \mathcal A} f_a$\\
+	\begin{algorithm}[H]
+		Créer une forêt $\mathcal F$ d'arbres binaires réduits à un noeud $(a, f_a)$\\
+		\Tq{$|\mathcal F| > 1$}
+		{
+			Extraire de $\mathcal F$ les arbres $\mathcal A_1$ et $\mathcal A_2$ de plus petites fréquences \tcp{$f_{\mathcal A_1} <= f_{\mathcal A_2}$ à la racine}
+			Insérer un arbre de racine $f_{\mathcal A_1} + f_{\mathcal A_2}$ ayant pour fils $\mathcal A_1$ et $\mathcal A_2$ dans $\mathcal F$
+		}
+		\Retour{$\mathcal A_H$ tel que $\mathcal F = \left\{\mathcal A_H\right\}$}
+	\end{algorithm}
+\end{algo}
+
+\begin{com}
+	Mentionner à l'oral qu'on ferait le lien avec le fait que c'est un algorithme glouton sur les arbres unifiant ceux de fréquences des lettres agrégés minimal.
+\end{com}
+
+\begin{theorem}
+	L'arbre construit par le codage de Huffman \ref{09-Huff} minimise la quantité $S = \sum\limits_c\in \Sigma f_c d_c$ où $d_c$ est la profondeur du caractère $c$ dans l'arbre. 
+\end{theorem}
+
+\begin{idee}
+	Cela revient à dire que l'algorithme de Huffman est optimal parmi les codages préfixes
+\end{idee}
+
+\begin{exercise}
+	Quelle structure pour $\mathcal F$ dans l'algorithme \ref{09-Huff} ? Quelle complexité alors ?
+\end{exercise}
+
+\subsection{Encodage par séquences}
+
+\begin{idee}
+	On va associer un code à une séquence de lettres (ou motifs)
+\end{idee}
+
+\begin{rem}
+	Pour cela, on peut utiliser le codage de Huffman, en prenant comme alphabet les mots apparaissant dans le livre. Mais on peut faire quelque chose de spécifique aux séquences, mais moins spécifiques à un livre (car ici le caractère " " comme délimitateur est arbitraire).
+\end{rem}
+
+\begin{com}
+	Si on manque de places, on peut faire cette remarque uniquement à l'oral
+\end{com}
+
+\begin{idee}
+	L'agorithme LZW détermine un codage dans un dictionnaire $d$ au fur et à mesure de la lecture du texte (algorithme online). On va coder certains motifs (groupement de lettres consécutives) présents dans le texte.
+\end{idee}
+
+\begin{algo}[Compression par LZW]
+	\enspace \\
+	\begin{algorithm}[H]
+		Initialement, les lettres de $\Sigma$ sont codées par un entier (par ex. avec le code ASCII).\\
+		$m \gets ''$\\
+		\Tq{il reste du texte $s$ à coder}
+		{
+			Retirer le plus long préfixe $w$ de $s$ qui soit dans $d$\\
+			Ajouter le codage de $w$ à la fin de $m$\\
+			$w' \gets w$ concaténé avec la prochaine lettre de $s$\\
+			Ajouter un nouveau codage pour $w'$ dans $d$
+		}
+		\Retour{m}
+	\end{algorithm}
+\end{algo}
+
+\begin{rem}
+	Pour la décompression, il n'est pas nécessaire de transmettre le dictionnaire car on peut le reconstruire à la volée. 
+\end{rem}
+
+\begin{appl}
+	Le format de fichier .zip compresse un dossier en utilisant (entre autre) les algorithmes de Huffman et LZW. 
+\end{appl}
+
+\textbf{Développement :} Présentation de la compression et de la décompression de l'algorithme LZW
+
+\section{Comparaison}
+
+\subsection{Plus longue sous-suite commune (PLSSC)}
+
+\begin{definition}[Problème PLSSC]
+	Soit $x, y \in \Sigma^*$. Une plus longue sous-suite commune à $x$ et $y$, noté $PLSSC(x,y)$ est $argmin \left\{k \: \big/ \: \exists i,j : x[i:i+k] = y[j:j+k]\right\}$
+\end{definition}
+
+\begin{appl}
+	Ce problème correspond au fait de trouver des morceaux d'ADN communs entre deux séquençages.
+\end{appl}
+
+\begin{example}
+	Pour $x = 'patate'$ et $y = 'frites'$ on a $'te'$
+\end{example}
+
+\begin{algo}[Brute force]
+	On essaie toutes les séquences possibles $\to$ exponentiel
+\end{algo}
+
+\begin{algo}[programmation dynamique]
+	\label{09-PLSCC}
+	On considère les sous-problèmes  $c_{i,j} = \left| PLSSC(x[:i], y[:j]) \right|$.\\
+	On a alors $c_{i,j} = \left\{
+	\begin{array}{ll}
+		0 & \text{si } i = 0 \text{ ou } j = 0 \\
+		c_{i-1, j-1} & \text{si } x[i-1] = y[j-1]\\
+		\max(c_{i-1, j}, c_{i, j-1}) & \text{sinon} \\
+	\end{array}\right.$
+\end{algo}
+
+\begin{proposition}
+	L'algorithme \ref{09-PLSCC} calcule $PLSSC(x, y)$ en $O(|x| \times |y|) $
+\end{proposition}
+
+\begin{rem}
+	Pour obtenir la sous suite, on sauvegarde d'où l'on vient pour pouvoir reconstruire la solution
+\end{rem}
+
+\subsection{Distance entre deux chaînes}
+
+\begin{definition}[distance]
+	Une distance sur un ensemble $E$ est une application $d : E^2 \to R^+$ tq :
+	$$\begin{array}{ll}
+		d(x,y) = d(y,x) & \text{(symétrie)}\\
+		d(x,y) = 0 \equiv x = y & \text{(séparation)}\\
+		d(x, z) <= d(x,y) + d(y, z) & \text{(inégalité triangulaire)}
+	\end{array}
+	$$
+\end{definition}
+
+\begin{definition}[Distance de Hamming]
+	La distance de Hamming entre deux chaines de caractères de même taille est le nombre de caractères distincts.
+\end{definition}
+
+\begin{appl}
+	Dans un protocole réseau, on peut ajouter des bits de contrôle, ayant une information redondante avec les bits du message. Certains messages sont donc invalides (si les bits de contrôle ne correspondent pas). On prend alors le message valide ayant la plus petite distance de Hamming (et ainsi, on peut espérer retrouver le message corrigé).
+\end{appl}
+
+\begin{example}
+	Pour «truc» et «troc» c'est 1.
+\end{example}
+
+\begin{definition}
+	La distance d'édition (ou de levenshtein) entre deux chaînes de est le nombre minimal de transformation pour passer de l'une à l'autre parmi ($a\in\Sigma$, $i\in \N$) : \begin{itemize}
+	\item $ins_{a,i}$ : insertion de $a$ à la position $i$
+	\item $sub_{a,i}$ : substitution de la $i$-ème lettre par $a$
+	\item $sup_i$ : suppression de la $i$-ème lettre.
+	\end{itemize}
+\end{definition}
+
+\begin{appl}
+	On peut utiliser cette algorithme pour détecter des mutations ponctuelles dans des brins d'ADN, et ainsi essayer de les faire correspondre.
+\end{appl}
+
+\begin{appl}
+	Dans les logiciels de traitement de texte, les correcteurs orthographiques cherchent dans un dictionnaire le mot le plus proche de celui mal orthographié pour proposer une correction. 
+\end{appl}
+
+\begin{proposition}
+ 	La distance d'édition  $lev : \Sigma^* \times \Sigma^* \to \N$ est une distance. De plus,
+	$$lev(u.a, v.b) = \min \left\{ \begin{array}{ll}
+		lev(u,v) + (a \neq b) & \text{Rien, ou substitution si $a\neq b$}\\
+		lev(u, v.b) + 1 & \text{Suppression de }a \\
+		lev(u.a, v) + 1 & \text{Insertion de }b\\
+	\end{array}\right.$$
+\end{proposition}
+
+\begin{corollary}
+	Il existe un algorithme de programmation dynamique calculant $lev(a, b)$ en $O(|a| \times |b|)$
+\end{corollary}
+
+\section{Recherche de motifs}
+
+\subsection{Recherche de motifs dans un texte}
+
+\begin{definition}[Problème de recherche de motif]
+	Pour $m\in \Sigma^*$, $t\in \Sigma^*$, $m$ est il un sous mot de $t$ ?.
+\end{definition}
+
+\begin{rem}
+	On peut éventuellement rajouter les questions «où ?» et «combien de fois»
+\end{rem}
+
+\begin{appl}
+	CTRL + F
+\end{appl}
+
+
+\begin{algo}[Solution naïve]
+	On essaie toutes les positions possibles pour m dans t. L'algorithme est donc en $O(|m|*|t|)$
+\end{algo}
+
+\begin{proposition} \enspace
+	\begin{enumerate}
+		\item Le problème est équivalent à savoir si $t \in \Sigma^* m \Sigma^*$ qui est rationnel.
+		\item Déterminer si un mot est dans un langage rationnel est linéaire en la longueur du mot
+		\item On peut résoudre le problème en $O(|t|) + f(m)$ (où $f$ peut être très grand)
+	\end{enumerate}
+\end{proposition}
+
+\textbf{Développement :} Construction de l'automate des motifs
+
+\begin{idee}
+	On essaye de décaler de plus de 1 quand on se trompe
+\end{idee}
+
+\begin{com}
+	C'est ce qu'on fait avec l'automate des motifs. Mais on peut essayer de le faire directement sans passer par le formalisme des automates
+\end{com}
+
+\begin{algo}{Boyer-Moore}
+	Amélioration de l'algorithme naif en décalant de plus de 1 à chaque fois qu'on se trompe
+	
+	\begin{algorithm}[H]
+		$i \gets 0$
+		\Tq{$i < |t| - |m|$}
+		{
+			\Pour{$j$ allant de $|m|-1$ à $0$}
+			{
+				\Si{$t[i+j] \neq m[j]$}
+				{
+					$i \gets i + decalage[t[i+j]]$\\
+					break
+				}
+			}
+		}
+	\end{algorithm}
+	où $decalage[a]$ : l'indice en partant de la fin de la dernière occurrence de $a$ dans $m$ ($|m|$ si $a$ non présent)
+\end{algo}
+
+\begin{proposition}Complexité :\\
+	Pire des cas : $O(|t|\times|m|)$\\
+	meilleur des cas : $O\left(\frac{|t|}{|m|}\right)$
+	Précalcul : $O(|m|)$ (mais dans le meilleur cas en $O(|\Sigma|)$)
+\end{proposition}
+
+\begin{rem}
+	On peut mélanger les deux idées pour obtenir quelque chose qui sera en général sous linéaire, mais au pire linéaire (en $|t|$ mais on augmente le cout du précalcul).
+\end{rem}
+
+\begin{idee}
+	Dans l'algorithme de Rabin Karp, on compare directement t[i : i + |m|]  avec m grâce à des fonctions de hachage (donc rapidement). Si  les hachages sont égaux, on vérifie caractère à caractère, et sinon on incrémente i.
+\end{idee}
+
+\begin{rem}
+	Le hachage $h$ défini par$ h(t_0, ..., t_{|m|-1}) = \sum\limits_{j = 1}^{|m|-1} B^{|m|-1-j}\times t_j$ peut se calculer en $O(1)$ à partir du calcul précédent : $h(t_i+1,...t_i+|m|) = B \times (h(t_i,...t_i+|m|-1) - B^{|m|-1}t_i) + t_i+1$
+\end{rem}
+
+\subsection{Analyse lexicale}
+
+\begin{appl}
+	Lors de la compilation d'un programme C, le compilateur reconnait des léxèmes définis par des langages réguliers.
+\end{appl}
+
+\begin{example}
+	\texttt{if (abs < 5) abs += 52;} reconnu en IF LPAR VAR INF INT RPAR VAR PLUSEGAL INT
+\end{example}
+
+\begin{algo} \enspace
+	\begin{itemize}[label=$\bullet$]
+		\item On ordonne les règles $e_i \to t_i$ et on construit $\mathcal A_i$ un automate reconnaissant $\mathcal L(ei)$
+		\item On exécute en parallère les $\mathcal A_i$ sur le texte.
+		\item Quand tous les automates sont bloqués on prend : \begin{itemize}
+			\item le préfixe du texte le plus long qui finit dans un état acceptant d'un automate
+			\item en prenant l'automate de priorité maximale si plusieurs reconnaissent le même préfixe
+		\end{itemize}
+		\item On recommence sur le texte restant. 
+	\end{itemize}
+\end{algo}
+
+\begin{com}
+	Par manque de place on peut ici résumer plus succintement l'algorithme en disant simplement qu'on reconnait chaque lexème avec un automate, en parrallèle pour trouver le bon.
+\end{com}
+
+\begin{appl}
+	grep suivi d'une regexp en norme POSIX et de noms de fichiers affiche toutes les lignes des fichiers qui contiennent la regexp. 
+\end{appl}
+
+\begin{appl}
+	En SQL, on peut comparer des attributs de type CHAR avec des expression régulières grâce au mot clef LIKE.
+\end{appl}
+
+\begin{example}
+	SELECT prénom FROM clients WHERE nom LIKE "\%on\%";
+\end{example}
