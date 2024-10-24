@@ -1,0 +1,394 @@
+\dev{Emile Martinez}{}
+
+Beaucoup de problèmes sont durs à résoudre. On cherchera alors à sacrifier un peu de la fiabilité du résultat pour gagner en complexité. Il y a deux manières de faire un tel compromis : \begin{itemize}
+	\item utiliser des algorithmes probabilistes (pouvant prendre beaucoup de temps, ou renvoyer faux)
+	\item n'utiliser des algorithmes ne fournissant que des solutions approchées.
+\end{itemize}
+
+\section{Algorithmes probabilistes}
+
+\begin{definition}
+	Un algorithme est déterministe si, pour une entrée x donnée, il s’exécute toujours de la même manière. En particulier, la sortie ne dépend que de l'entrée.
+	
+	Un algorithme probabiliste est un algorithme dont l'exécution dépend de son entrée x et de valeurs obtenues via un générateur de nombre (pseudo)-aléatoire.
+\end{definition}
+
+\begin{example}
+	\label{11-prem-ex}
+	\normalfont
+	Recherche dans un tableau $T$ de booléens d'un indice $i$ tel que $T[i] == True$\\
+	\begin{minipage}{0.45\linewidth}
+		\begin{algorithm}[H]
+			\caption{$deterministe(T)$}
+			\Pour{$i$ de $1$ à $|T|$}{
+				\Si{$T[i]$}
+				{
+					\Retour{True}
+				}
+			}
+			\Retour{False}
+		\end{algorithm}
+	\end{minipage} \qquad
+	\begin{minipage}{0.45\linewidth}
+		\begin{algorithm}[H]
+			\caption{$probabiliste(T, k)$}
+			\Pour{$j$ de $1$ à $k$}{
+				Tirer uniformément $i$ dans $\llbracket 1, n \rrbracket$\\
+				\Si{$T[i]$}
+				{
+					\Retour{True}
+				}
+			}
+			\Retour{False}
+		\end{algorithm}
+	\end{minipage}
+\end{example}
+
+\begin{rem}
+	Soit $p<1$ la proportion de booléen à Faux dans $T$. Alors l'algo probabiliste se trompe avec une probabilité = $p^k$.	
+	Pour $p = \frac{1}{4}$ et $k=5$, cela fait $10^{-3}$
+\end{rem}
+
+\subsection{Algorithme de type Monte-Carlo}
+
+\begin{definition}
+	Un algorithme probabiliste A pour un pb P est de type Monte-Carlo si pour toute instance i de P, \begin{itemize}
+		\item $A(i)$ est une solution, erronée avec une certaine probabilité
+		\item Le temps d'exécution de $A$ sur $i$ est indépendant des choix aléatoires.
+	\end{itemize} 
+\end{definition}
+
+\begin{example}
+	L'algorithme probabiliste de l'exemple \ref{11-prem-ex} est de type Monte-Carlo
+\end{example}
+
+\textbf{Développement 1 :} Vérification probabiliste du produit matriciel
+
+\begin{proposition}[Amplification]
+    Soient $0 < \varepsilon_2 < \varepsilon_1 < 1$.
+    
+	S’il existe un algorithme Monte Carlo pour un problème $\Pi$ ayant une probabilité d’erreur $\varepsilon_1$, alors on peut construire un algorithme Monte Carlo pour le problème $\Pi$ ayant une probabilité d’erreur $\varepsilon_2$, en appliquant plusieurs fois l'algorithme initial.
+\end{proposition}
+
+\begin{algorithm}[H]
+	\label{11-mediane}
+	\caption{$mediane(L)$}
+	$n \gets |L|$\\
+	$L_{0} \gets k = n^{\frac{3}{4}}$ éléments de $L$ aléatoirement\\
+	Trier $L_0$\\
+	$x_1 \gets L_0[\frac{k}{2} - \sqrt{n}]$\\
+	$x_2 \gets L_0[\frac{k}{2} + \sqrt{n}]$\\
+%	$L_1, \, L_2, \, L_3 \gets[], \, [], \, []$\\
+%	\Pour{$x \in L$}
+%	{
+%		\eSi{$x \leq x_1$}
+%		{
+%			Ajouter $x_1$ à $L_1$
+%		}{
+%		\eSi{$x \leq x_2$}
+%		{
+%			Ajouter $x$ à $L_2$
+%		}
+%		{
+%			Ajouter $x$ à $L_3$
+%		}
+%		}
+%	}
+	$L_1 \gets $ liste des éléments $< x_1$\\
+	$L_2 \gets$ liste des éléments entre $x_1$ et $x_2$\\
+	$L_3 \gets$ liste des éléments $> x_2$\\
+	\Si{$|L_1| > \frac{n}{2}$ ou $|L_3| > \frac{n}{2}$}{\Retour{n'importe quoi}\tcp*{$L_2$ n'a pas capturé la médiane}}
+	\Si{$|L_2| > n^{\frac{3}{4}}$}{\Retour{n'importe quoi}\tcp*{On a trop d'éléments dans $L_2$ pour les trier}}
+	Trier $L_2$\\
+	\Retour{$L_2[\frac{n}{2} - |L_1|]$}
+\end{algorithm}
+
+\begin{idee}
+	On fait la médiane sur un échantillon de $L$. Puis on prend tous les éléments autour de cette médiane et on les trie pour trouver la vraie médiane (si elle y est, sinon tant pis).
+\end{idee}
+
+\begin{com}
+	Ici le temps dépend du hasard. On considère quand même que c'est un Monte Carlo car c'est borné et prend le temps moyen est un $\Omega$ du temps dans le pire des cas. On pourrait aussi a la place de retourner n'importe quoi, trier $n^{3/4}$ éléments et remplir $L_2$ avec des $= \infty$ mais alors on complexifie pour rien.
+\end{com}
+
+\subsection{Algorithmes de type Las Vegas}
+
+\begin{definition} 
+	Un algorithme probabiliste $A$ est de Las Vegas si :
+	\begin{itemize}
+		\item Si $A$ termine, alors la solution renvoyée est correcte.
+		\item Le temps d'exécution de $A$ est une variable aléatoire.
+	\end{itemize}
+\end{definition}
+
+\begin{rem}
+	Quand on parle de complexité en moyenne pour un algorithme de Las Vegas, on ne considère pas (ou pas uniquement) la moyenne des complexité sur toutes les entrées possibles prisent uniformément, mais la plus grande espérance du temps d'exécution sur une entrée
+\end{rem}
+
+
+\begin{algo}
+	\normalfont \enspace\\
+	\label{11-tri-rapide}
+	\begin{algorithm}[H]
+		\caption{$tri\_rapide\_randomise(T)$}
+		\Si{$|T| = 1$}{\Retour}
+		Tirer $q$ uniformément dans $\llbracket 1, |T| \rrbracket$ \tcp*{$T[q]$ sera le pivot}
+		$i \gets partition(T, q)$\\
+		$tri\_rapide\_randomise(T[:i])$\\
+		$tri\_rapide\_randomise(T[i+1:])$\\
+	\end{algorithm}
+	où $partition(T, q)$ mets dans $T$, tous les éléments $< T[q]$ puis tous les éléments supérieurs, et renvoie l'indice du milieu.
+\end{algo}
+
+\begin{rem}
+	Le temps d'exécution de l'algorithme \ref{11-tri-rapide} dépend du choix du pivot : $O(n^2)$ dans le pire cas, $O(n\log n)$ dans le meilleur et en moyenne. 
+\end{rem}
+
+\begin{rem}
+	Il est possible de transformer un algorithme de type Las Vegas en Monte Carlo en l'exécutant pendant un temps défini et en générant une réponse aléatoire s'il n'a pas terminé.
+\end{rem}
+
+\begin{rem}
+	Si on peut vérifier efficacement la validité du résultat, on peut également faire l'inverse.
+\end{rem}
+
+\begin{example}
+	A la place de l'échec dans l'algorithme \ref{11-mediane}, on peut relancer l'algorithme. On obtient alors un algorithme trouvant toujours la médiane, la calculant en moyenne en $1,5n$ comparaisons, sans adversaires, ce qui est mieux que tout algorithme déterministe (qui ont nécessairement besoin d'au moins $2n$ comparaisons en moyenne).
+\end{example}
+
+\section{Algorithmes d'approximation}
+
+\subsection{Définition}
+
+
+\begin{definition}
+	Un problème d’optimisation est un problème $\Pi = (I, S, c)$ où \begin{itemize}
+		\item $I$ est l'ensemble des instances
+		\item $\forall i \in I, S(i)$ est l'ensemble des solutions pour $i$
+		\item $c : I \times S \to R$ fonction d'évaluation.
+	\end{itemize}
+	Étant donnée une instance $i \in I$, l’objectif est de construire une solution $s^{*} \in S(i)$ vérifiant : $c(i, s^{*}) = \min\left\{c(x, s) \big/ s \in S(i)\right\}$
+\end{definition}
+
+\begin{com}
+	On peut aussi demander à ce que $c$ soit calculable en temps polynomial mais ce n'est pas nécessaire. Les deux définitions coexistent.
+\end{com}
+
+\begin{rem}
+	On se ramène au max en prenant $-c$.
+\end{rem}
+
+\begin{definition}
+	    Une $\lambda$-approximation est un algorithme polynomial $A$ donnant pour chaque instance $i$ de $\Pi$ une solution tel que $\max\left(\left| \dfrac{A(i)}{OPT(i)} \right|, \left| \dfrac{OPT(i)}{A(i)} \right|\right) \leq \lambda$
+\end{definition}
+
+\subsection{Exemples}
+
+\begin{definition}[Couvertue par des sommets (Vertex-Cover)]
+	Entrée : Un graphe $G = (S, A)$
+	Solution : Un ensemble $S \subset V$ tel que $\forall u, v \in E, \,v\in S \text{ ou } u \in S$
+\end{definition}
+
+\begin{algorithm}[H]
+	\label{11-glouton-vc}
+	\caption{Glouton Vertex Cover}
+	$S \gets \{\}$\\
+	\Tq{il existe une arête $(u,v) \in A$ tel que $u\notin S$ et $v \notin S$}
+	{
+		Choisir $(u,v)$ une telle arête\\
+		$S \gets S \cup \{(u,v)\}$
+	}
+	\Retour{$S$}
+\end{algorithm}
+
+\begin{proposition}
+	L'algorithme \ref{11-glouton-vc} est une 2-approx du problème de la couverture par les sommets.
+\end{proposition}
+
+
+
+\noindent \textbf{Développement :} Une $\frac{3}{2}$-approximation et une $\frac{7}{6}$-approximation gloutonnes pour le problème d'ordonnancement de tâches indépendantes sur 2 processeurs.
+
+
+
+\begin{definition}[Voyageur de commerce (TSP)]
+	Instance : $G = (S, A, c)$ un graphe orienté complet pondéré\\
+	Solution : Un cycle hamiltonien sur $G$ de poids minimal
+\end{definition}
+
+\begin{theorem}
+	Il n'existe pas d'algorithme d'approximation pour TSP, sauf si $P = NP$.
+\end{theorem}
+
+\begin{algo}[Algorithme pour TSP]
+	\label{11-approx-tsp}
+	\enspace \begin{enumerate}
+		\item $\mathcal A \gets$ arbre couvrant de poids minimal de $G$
+		\item $P \gets$ parcours en profondeur préfixe de $\mathcal A$
+		\item Renvoyer $P$
+	\end{enumerate}
+\end{algo}
+
+\begin{proposition}
+	L'algorithme \ref{11-approx-tsp} est une 2-approx si $c$ vérifie l'inégalité triangulaire ($\forall x, y, z\in C, \, c(x, y) + c(y, z) \geq c(x, z)$)
+\end{proposition}
+
+\begin{example} \normalfont \enspace \\
+	\begin{tikzpicture}[-]
+		%etape 1
+		\node[state, scale=0.4] (a0) {};
+		\node[state, scale=0.4, below left = 1cm and 0.75cm of a0] (a1) {};
+		\node[state, scale=0.4, below right = 1cm and 0.75cm of a0] (a2) {};
+		\node[state, scale=0.4, above right = 0.4cm and 1.2cm of a0] (a3) {};
+		\node[state, scale=0.4, above = 1.2cm of a0] (a4) {};
+		\node[state, scale=0.4, above left = 0.4cm and 1.2cm of a0] (a5) {};
+		
+		\draw (a0) edge[green] (a1);
+		\draw (a0) edge[green] (a2);
+		\draw (a0) edge[green] (a3);
+		\draw (a0) edge[green] (a4);
+		\draw (a0) edge[green] (a5);
+		
+		\draw (a1) edge[black] (a2);
+		\draw (a2) edge[black] (a3);
+		\draw (a3) edge[black] (a4);
+		\draw (a4) edge[black] (a5);
+		\draw (a5) edge[black] (a1);
+		
+		\draw (a1) edge[red] (a3);
+		\draw (a2) edge[red] (a4);
+		\draw (a3) edge[red] (a5);
+		\draw (a4) edge[red] (a1);
+		\draw (a5) edge[red] (a2);
+		
+		%légende
+		\node[below left = 1cm and 0cm of a1] (l1) {};
+		\node[right = 0.5cm of l1] (l2) {};
+		\node[right = 0cm of l2] {coût 1};
+		\node[below = 0.2cm of l1] (l3) {};
+		\node[right = 0.5cm of l3] (l4) {};
+		\node[right = 0cm of l4] {coût 1};
+		\node[below = 0.2cm of l3] (l5) {};
+		\node[right = 0.5cm of l5] (l6) {};
+		\node[right = 0cm of l6] {coût 2};
+		
+		\draw (l1) edge[red] (l2);
+		\draw (l3) edge[green] (l4);
+		\draw (l5) edge[black] (l6);
+		
+		%flèche 1
+		\node[below right = 0.9cm and 1.4cm of a0] (f1) {};
+		\node[below right = 0.6cm and 0.9cm of f1] (f2) {};
+		
+		\draw (f1) edge[->, above right] node{1} (f2);
+		
+		%etape 2
+		\node[state, scale=0.4, label = {[yshift=-1cm]A}, below right = 1.1cm and 1.6 cm of f2] (b0) {};
+		\node[state, scale=0.4, label = B, below left = 1cm and 0.75cm of b0] (b1) {};
+		\node[state, scale=0.4, label = C, below right = 1cm and 0.75cm of b0] (b2) {};
+		\node[state, scale=0.4, label = D, above right = 0.4cm and 1.2cm of b0] (b3) {};
+		\node[state, scale=0.4, label = E, above = 1.2cm of b0] (b4) {};
+		\node[state, scale=0.4, label = F, above left = 0.4cm and 1.2cm of b0] (b5) {};
+		
+		\draw (b0) edge[green] (b1);
+		\draw (b0) edge[green] (b2);
+		\draw (b0) edge[green] (b3);
+		\draw (b0) edge[green] (b4);
+		\draw (b0) edge[green] (b5);
+		
+		%flèche 2
+		\node[above = 0.7cm of b4] (f3) {};
+		\node[above = 0.9cm of f3] (f4) {};
+		
+		\draw (f3) edge[->, right] node{2} (f4);
+		
+		%etape 3
+		\node[above = 0cm of f4] (c0) {ABCDEFA};
+		
+		%flèche 3
+		\node[below right = 0cm and 0.5cm of c0] (f5) {};
+		\node[below right = 0.6cm and 2cm of f5] (f6) {};
+		
+		\draw (f5) edge[->, above right] node{3} (f6);
+		
+		%etape 4
+		\node[state, scale=0.4, below right = 1cm and 1.8cm of f6] (d0) {};
+		\node[state, scale=0.4, below left = 1cm and 0.75cm of d0] (d1) {};
+		\node[state, scale=0.4, below right = 1cm and 0.75cm of d0] (d2) {};
+		\node[state, scale=0.4, above right = 0.4cm and 1.2cm of d0] (d3) {};
+		\node[state, scale=0.4, above = 1.2cm of d0] (d4) {};
+		\node[state, scale=0.4, above left = 0.4cm and 1.2cm of d0] (d5) {};
+		
+		\draw (d0) edge[green] (d1);
+		\draw (d1) edge[black] (d2);
+		\draw (d2) edge[black] (d3);
+		\draw (d3) edge[black] (d4);
+		\draw (d4) edge[black] (d5);
+		\draw (d5) edge[green] (d0);
+		
+		%conclusion
+		\node[below = 1.5cm of d0] {On a un coût de 10 et non de 6};
+		
+	\end{tikzpicture}
+\end{example}
+
+\section{Algorithmes d'approximation probabilistes}
+
+Il existe des algorithmes d'approximation probabilistes. Ce sont alors souvent des algorithmes de Monte Carlo.
+
+\subsection{Max Sat}
+
+\begin{definition}
+	Instance : $n$ variables $\{x_1, \dots, x_n\}$, p clauses $C_1, \dots, C_p$ sur $(x_1, \dots, x_n$) contenant au moins k littéraux
+	Solution : Trouver une valuation maximisant le nombre de clauses à vrai
+\end{definition}
+
+\begin{example}
+	Si $\varphi = \bigwedge\limits_{i=1}^p C_i$ est satisfiable, une solution optimale est une valuation satisfaisant $\varphi$
+\end{example}
+
+\begin{algo}
+	Renvoyer une valuation aléatoire.
+\end{algo}
+
+\begin{theorem}
+	L'espérance du nombre de clauses satisfaites $\mathbb E(\varphi)$ vérifie $\mathbb E(\varphi) \geq p\left( 1 - \dfrac{1}{2^k}\right) \geq \dfrac{c}{2}$
+\end{theorem}
+
+\begin{rem}
+	On peut créer un algorithme déterministe qui est une $\left( 1 - \dfrac{1}{2^k} \right)$-approx.
+\end{rem}
+
+\subsection{Calcul de $\pi$}
+
+On peut calculer une valeur approchée de $\pi$ par des méthodes probabilistes
+
+\begin{algorithm}
+	\caption{$calcul\_pi(N)$}
+	$i \gets O$\\
+	\Repeter{$N$ fois}
+	{
+		Tirer deux flottants $x, y$ dans $[-1, 1]$ uniformément\\
+		\Si{$x^2+y^2 < 1$ }
+		{
+			$i \gets i+1$ \tcp*{On a tapé dans le cercle d'aire $\pi$}
+		}
+	}
+	\Retour $\dfrac{4i}{N}$\tcp*{Nombre de points dans le cercle / aire du carré = $\frac{\pi}{4}$}
+\end{algorithm}
+
+\begin{com}
+	On peut aussi mettre un dessin ici pour expliquer ce qui se passe.
+\end{com}
+
+\begin{com}
+	Si on veut parler plus précisément d'algorithme d'approximation, on prendrait dans la def, pour $I$ la manière de représenter les flottants (nb de bits d'exposant, de mentisse, etc\dots) et pour $S$ de tels flottants. La fonction de coût $c$ serait alors la distance à $pi$ (même si pas facilement calculable en temps polynomial)
+\end{com}
+
+\begin{rem}
+	On peut généraliser la méthode pour le calcul d'intégrales
+\end{rem}
+
+\begin{rem}
+	Cette méthode se généralise en une méthode de Monte Carlo où l'on échantillone le problème, on calcule la solution sur cette échantillon, puis on généralise la solution à partir de cet échantillon.
+\end{rem}
