@@ -1,0 +1,27 @@
+\dev{Emile Martinez}{}
+
+Quand on aborde un problème à la main, on essaye souvent de construire des solutions au fur et à mesure, en faisant plein de choix locaux. Essayons de mettre cela en oeuvre algorithmiquement.
+
+\section{Algorithmes gloutons}
+
+\subsection{Définition}
+
+\begin{definition}
+	Un algorithme glouton construit une solution à un problème par choix successifs considérés localement optimaux, sans jamais revenir en arrière.
+\end{definition}
+
+\textbf{Avantage :} C'est souvent peu coûteux, et potentiellement en ligne.
+
+\begin{example}[Gymnases]\enspace
+	\begin{itemize}
+		\item[Instances :] $n$ évènements, leur date de début $\left\{d_i\right\}_{i \in \{1, \dots, n\}}$ et de fin $\left\{f_i\right\}_{i \in \{1, \dots, n\}}$
+		\item[Problème :] trouver un nombre minimal de gymnases pour organiser les évènements
+	\end{itemize}
+\end{example}
+
+\begin{algo}\enspace
+	\begin{enumerate}
+		\item Trier les évènements par dates de début croissantes
+		\item Allouer successivement le premier gymnase disponible. En ouvrir un si nécessaire.
+	\end{enumerate}
+\end{algo}

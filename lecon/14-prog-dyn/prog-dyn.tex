@@ -1,0 +1,244 @@
+\dev{Emile Martinez}{}
+
+\begin{com}
+	On présentera d'abord le principe de la méthode diviser pour régner. Ensuite on divise nos exemples, en deux : ceux qu'on verrait dans la leçon diviser pour régner car ils sont là spécifiquement pour illustrer le paradigme, et ceux que l'on verrait au cours de l'année, et s'appuyant sur le fait qu'on ait déjà vu la méthode diviser pour régner. Cette distinction vient du fait que dans un vrai cours, on ferait comme ça, et les problèmes de la dernière partie serait insérer dans autre chose, et on souligne alors le fait que on ne ferait pas simplement une liste d'algo, mais que pour que le paradigme soit assimiler, il faut mieux le présenter et y revenir régulièrement, plutôt que d'introduire plusieurs fois beaucoup de concepts. (et on met ainsi de la structure sans faire simplement une liste)
+\end{com}
+
+\section{Principe}
+
+\subsection{Motivation}
+
+\begin{algo}
+	Implémentation naïve de la suite de Fibonacci\\
+	\begin{algorithm}[H]
+		\caption{$fibo(n)$}
+		\eSi{$n = 0$ ou $n = 1$}
+			{\Retour{$n$}}
+			{\Retour{$fibo(n-1) + fibo(n-2)$}}
+	\end{algorithm}
+\end{algo}
+
+\begin{proposition}
+	Complexité en $O(2^n)$
+\end{proposition}
+
+Graphe des dépendances des sous problèmes pour $n = 5$
+
+\begin{minipage}{0.3\linewidth}
+	\begin{tikzpicture}[->, node distance=2cm]
+		\node[state] (q0) {$F_5$};
+		\node[state, below left of = q0] (q1) {$F_3$};
+		\node[state, below right of =q0] (q2) {$F_4$};
+		\node[state, below of =q1] (q3) {$F_1$};
+		\node[state, below of =q2] (q4) {$F_2$};
+		\node[state, below right of=q3] (q5) {$F_0$};
+		
+		\draw (q0) edge[] (q1);
+		\draw (q0) edge[] (q2);
+		\draw (q2) edge[] (q1);
+		\draw (q1) edge[] (q3);
+		\draw (q1) edge[] (q4);
+		\draw (q2) edge[] (q4);
+		\draw (q4) edge[] (q3);
+		\draw (q4) edge[] (q5);
+		
+	\end{tikzpicture}
+\end{minipage} \qquad
+\begin{minipage}{0.6\linewidth}
+	Les sous-problèmes se chevauchent : la méthode diviser pour régner est inefficace.\\\\
+	En programmation dynamique, on stocke les valeurs des sous-problèmes pour éviter de recalculer.
+\end{minipage}
+
+\begin{algo}
+	\label{14-fibo2}
+	Fibonacci avec stockage.\\
+	\begin{algorithm}[H]
+		\caption{$Fibo(n)$}
+		$F \gets [0, 1]$\\
+		\Pour{$i$ allant de $2$ à $n$}
+			{Ajouter $F[i-1] + F[i-2]$ à $F$}
+		\Retour{$F[n]$}
+	\end{algorithm}
+\end{algo}
+
+\subsection{Définition}
+
+\begin{definition}
+	La programmation dynamique consiste à résoudre un problème en le décomposant en sous-problèmes, puis à résoudre les sous-problèmes, des plus petits aux plus grands en stockant les résultats intermédiaires.
+\end{definition}
+
+\begin{principe}
+	\enspace
+	\begin{enumerate}
+		\item Complexifier le problème en créant plein de sous-problèmes (dont un sera celui que l'on veut résoudre)
+		\item Trouver une relation entre les sous-problèmes
+		\item Résoudre les sous-problèmes en partant du plus petit, en utilisant la relation :\begin{itemize}
+			\item Soit impérativement en ayant un tableau des sous-problème qui stockera leur résultat, et en le remplissant avec une (ou des) boucle (méthode ascendante)
+			\item Soit récursivement en mémoïsant. (méthode descendante)
+		\end{itemize}
+		
+	\end{enumerate}
+\end{principe}
+
+\begin{rem}
+	L'algorithme \ref{14-fibo2} utilise la méthode ascendante. On aurait pu utiliser uniquement deux variables et écraser les résultats intermédiaires.
+\end{rem}
+
+\begin{rem}
+	Dans le paradigme diviser pour régner, les sous pb sont indépendants. On peut donc se passer de la mémoïsation.
+\end{rem}
+
+\begin{rem}
+	Pour obtenir, en plus de la valeur de la solution optimale, quelle est cette solution, on peut mémoriser quel(s) sous-problème(s) on a utilisé pour l'obtenir.
+\end{rem}
+
+\textbf{Développement :} Illustration du paradigme sur le problème du chemin dans la pyramide.
+
+\section{Algorithmes illustrant le principe}
+
+\subsection{Rendu de monnaie}
+
+\textbf{Instance :} $n$ pièces $p_1, ... p_n$, $S \in \N$
+
+\textbf{Pb :} trouver un $n$-uplet $T = (x_1,  \dots, x_n) \in \N^n$ te que $\sum\limits_{i = 1}^n x_i p_i = S$ et qui minimise $\sum\limits_{i = 1}^n x_i $.
+(i.e. trouver le nombre de pièces minimum pour rendre la monnaie)
+
+\begin{algo}
+	Approche gloutonne : \begin{enumerate}
+		\item Ajouter la pièce $p_i$ de plus grande valeur $\leq S$
+		\item Recommencer avec $S -p_i$
+	\end{enumerate}
+\end{algo}
+
+Cet algorithme est-il optimal ?
+\begin{exercise}
+	Avec les pièces $(4, 3, 1)$, trouver une somme $S$ pour laquelle le glouton n'est pas optimal ($S = 6$ convient)
+\end{exercise}
+
+\begin{algo}[Approche par programmation dynamique du rendu de monnaie]
+	\enspace
+	\begin{enumerate}
+		\item On considère les sous-problèmes $R(s)$ pour $s \in \llbracket 0, S \rrbracket$
+		\item Pour trouver la relation de récurrence, on regarde la dernière pièce rendue $p_i$. On a alors $$R(S) = \left\{ \begin{array}{ll}
+			+\infty & \text{si } S<0\\
+			0 & \text{si } S = 0\\
+			\min\limits_{i\in \{1, \dots, n\}} (R(s-p_i)+1) &\text{sinon}
+		\end{array}\right.$$
+		\item Résolution des sous problèmes (méthode descendante)\\
+		\begin{algorithm}[H]
+			\caption{$rendu(P, S, m)$}
+			\Entree{$P$ est un tableau tel que $P[i] = p_i$}
+			\multientree{$m$ tableau de mémoïsation initialisé à 0}
+			\Si{$S = 0$}
+				{\Retour{0}}
+			\Si{$m[S] > 0$}
+				{\Retour{$m[s]$}}
+			$n \gets +\infty$\\
+			\Pour{$p \in P$}
+				{$n \gets \min(n, 1+rendu(P, S-p, m))$}
+			$m[S] \gets n$\\
+			$\Retour{n}$
+		\end{algorithm}
+	\end{enumerate}
+	Complexité : $O(n\times S)$
+\end{algo}
+
+\begin{exercise}
+	Écrire la méthode ascendante de résolution (i.e. trouver l'ordre de remplissage du tableau)
+\end{exercise}
+
+\subsection{Sac à dos}
+
+\textbf{Instance :} $n$ objets de poids $\{w_1, \dots, w_n\} \in \N^n$, et de valeur $\{v_1, \dots, v_n\}\in \N^n$. Une capacité $W \in \N$.
+\textbf{Problème :} Trouver $T = (x_1, \dots, x_n) \in \{0, 1\}^n$ tel que $\sum\limits_{i = 1}^n x_iw_i \leq W$ et qui maximise $\sum\limits_{i=1}^n w_iv_i$
+
+\begin{exercise}
+	Proposer des algorithmes gloutons pour résoudre le pb du sac à dos. Sont-ils optimaux ?
+\end{exercise}
+
+\begin{algo}[Approche par programmation dynamique du problème du sac à dos]
+	\enspace
+	\begin{enumerate}
+		\item On considère les sous-problèmes $SD(i,w)$ réduit aux $i$ premiers objets avec une capacité $w$. La solution qui nous intéresse est celle de $SD(n, W)$
+		\item $T(i, w)= \left\{ \begin{array}{l}
+			0 \text{ si } i = 0 \text{ ou } w = 0\\
+			\max\Big( \underset{\substack{\text{si l'optimal prend}\\\text{pas l'objet }i}}{\underbrace{T(i-1, w)}} \,,\, \underset{\substack{\text{si l'optimal prend}\\\text{l'objet }i}}{\underbrace{T(i-1, w-w_i) + v_i}} \enspace \Big) \text{ sinon}
+		\end{array} \right.$
+		\item On remplit à $i$ et $w$ croissant.
+	\end{enumerate}
+\end{algo}
+
+\begin{rem}
+	Le problème de décision associé au problème de sac à dos est NP-complet. Ici, l'algorithme résout le problème d'optimisation en $O(S\times n)$, or la taille de l'instance d'entrée est en $\log|S| + n$, donc notre algorithme n'est pas polynomial en la taille de l'instance.
+\end{rem}
+
+\section{Autres applications}
+
+\subsection{L'algorithme de Floyd-Warshall}
+\textbf{Instance :} Un graphe orienté $G = (S, A)$ sans circuit absorbant et une fonction de poids $w : A \to \mathbb Z$
+\textbf{Problème :} Déterminer les valeurs des plus courts chemins entre toutes les paires de sommets de $G$
+
+\begin{algo}[Résolution du problèmes des plus courts chemins en découpant selon les sommets que l'on utilise]
+	\begin{enumerate}
+		\item On numérote les sommets de $G$ : $S = \{1, \dots, n\}$. On s'intéresse aux sous problèmes $FW(i,j,k)$ qui correspond au plus court chemin de $i$ à $j$ empruntant des sommets intermédiaires dans $\{1, \dots, k\}$. Les problèmes qui nous intéressent sont $FW(i,j,n)$ pour $i \neq j$.
+		\item $FW(i, j, k) = \left\{ \begin{array}{l}
+			w(i,j) \text{ si } k = 0\\
+			\min \Big( \underset{\substack{\text{si le plus court}\\\text{chemin de $i$ à $j$}\\\text{n'utilise pas } k}}{\underbrace{F(i,j, k-1)}} \, , \, \underset{\substack{\text{si le plus court}\\\text{chemin de $i$ à $j$}\\\text{utilise } k}}{\underbrace{F(i,k, k-1)} + F(k, j, k-1)} \Big) \text{ sinon}
+		\end{array}\right.$
+		\item Résolution par la méthode ascendante\\
+		\begin{algorithm}[H]
+			\caption{$Floyd-Warshall(G)$}
+			$W \gets$ matrice d'adjacence de $G$\\
+			\Pour{$k$ allant de $1$ à $n$}
+			{
+				\Pour{$i$ allant de $1$ à $n$}
+					{
+						\Pour{$j$ allant de $1$ à $n$}
+							{
+								$W[i,j] \gets \min (W[i,j], W[i,k] + W[k,j])$
+							}
+					}
+			}
+		\end{algorithm}
+	\end{enumerate}
+	Complexité : $O(|S|^3)$
+\end{algo}
+
+\begin{rem}
+	On écrase la matrice au fur et à mesure car l'étape $k$ ne dépend que de l'étape $k-1$
+\end{rem}
+
+\begin{rem}
+	On aurait pu découper les sous problèmes différemment. Par exemple, on peut découper au chemin de taille au plus $k$. On retombe alors sur un algorithme de routage en réseau.
+\end{rem}
+
+\textbf{Développement :} Terminaison et discussion autour de l'algorithme de Bellman-Ford
+
+\subsection{Distance de Levenshtein (d'édition)}
+
+\begin{definition}
+	La \textbf{distance de Levenshtein} correspond au nombre minimum d'opérations (suppression, modification ou ajout d'une lettre) pour transformer un chaîne de caractère en l'autre.\\
+	
+	Plus formellement, pour $a \in \Sigma$, $i \in \N$ on définit
+	\begin{itemize}[label=$\star$]
+		\item $ins_{a, i} : \Sigma^* \to \Sigma^*$ : insertion de la lettre $a$ à la position $i$
+		\item $sub_{a, i} : \Sigma^* \to \Sigma^*$ : modification de la lettre à la position $i$ en $a$
+		\item $sup_{i} : \Sigma^* \to \Sigma^*$ : suppression de la lettre à la position $i$
+	\end{itemize}
+	et alors $lev(w_1, w_2) = \min\Big\{ k \in \N \quad \big/ \quad \exists f_1, \dots, f_k \in \{ins_{a,i}, sub_{a,i}, sup_i / a\in \Sigma, i \in \N \} : w_2 = f_k \circ \dots \circ f_1 (w_1) \Big\}$ 
+\end{definition}
+
+\begin{exercise}
+	C'est une distance.
+\end{exercise}
+
+\begin{com}
+	Ici on ne donne que l'idée parce que on a pas la place et parce que l'élève peut avoir le recul pour trouver lui-même
+\end{com}
+\begin{algo}[Idée de l'approche par programmation dynamique pour la distance de levenshtein]
+	\begin{enumerate}
+		\item Considérer la distance d'édition entre tous les préfixes de $w_1$ et $w_2$
+		\item Considérer la modification sur la dernière lettre (rien, insertion, suppression ou modification)
+		\item Résoudre à préfixe croissant
+	\end{enumerate}
+\end{algo}

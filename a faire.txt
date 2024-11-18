@@ -1,0 +1,10 @@
+zomm sur tcp -> gestion du flux par TCP
+
+refaire peterson avec notre introduction
+
+plan lecon 14 : 
+	Rajouter la complexité spatiale
+	Laisser apprpche gloutonne ? 
+	Rendre plus formel floyd warshall ? (genre à la place de mettre une phrase, mettre le pcc dans le sous-graphe...)
+	Est ce que l'algo de flyd warshall fait exactement ce qu'on dit (vu comment on écrase)
+	Parler plus ou moins de levenshtein (problèmes de place, et de la possiblité d'être rigoureux pour l'étape 2)

@@ -251,3 +251,9 @@ literate=
 }
 %Copyright
 
+
+\newlength\mylen
+\newcommand\multientree[1]{%
+	\settowidth\mylen{\Entree{}}%
+	\setlength\hangindent{\mylen}%
+	\hspace*{\mylen}#1\\}
