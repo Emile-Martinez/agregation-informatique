@@ -1,5 +1,9 @@
 \dev{Emile Martinez}{}
 
+\begin{com}
+	L'idée du plan, c'est de voir des gloutons exactes. Dans l'idée, on fait des choix locaux et ca marche. On finit par un problème qui nous dit que en fait des gloutons aussi simples, ne peuvent pas tout faire. Des fois, c'est impossible en temps polynomial. Donc, au lieu de faire des choix définitifs, on s'autorise à revenir sur nos choix, et donc à tout essayer. Mais ensuite, on se rend compte que tout essayer c'est trop long, donc on va s'autoriser à ne pas trouver la valeur exacte, mais seulement une solution approchée.
+\end{com}
+
 Quand on aborde un problème à la main, on essaye souvent de construire des solutions au fur et à mesure, en faisant plein de choix locaux. Essayons de mettre cela en oeuvre algorithmiquement.
 
 \section{Algorithmes gloutons}
@@ -12,16 +16,361 @@ Quand on aborde un problème à la main, on essaye souvent de construire des sol
 
 \textbf{Avantage :} C'est souvent peu coûteux, et potentiellement en ligne.
 
-\begin{example}[Gymnases]\enspace
-	\begin{itemize}
-		\item[Instances :] $n$ évènements, leur date de début $\left\{d_i\right\}_{i \in \{1, \dots, n\}}$ et de fin $\left\{f_i\right\}_{i \in \{1, \dots, n\}}$
-		\item[Problème :] trouver un nombre minimal de gymnases pour organiser les évènements
-	\end{itemize}
-\end{example}
+\begin{definition}[Gymnases]\enspace
+	
+	\textbf{Instance :} $n$ évènements, leur date de début $\left\{d_i\right\}_{i \in \{1, \dots, n\}}$ et de fin $\left\{f_i\right\}_{i \in \{1, \dots, n\}}$
+	
+	\textbf{Problème :} trouver un nombre minimal de gymnases pour organiser les évènements
+\end{definition}
 
 \begin{algo}\enspace
+	\label{12-algo1}
 	\begin{enumerate}
 		\item Trier les évènements par dates de début croissantes
 		\item Allouer successivement le premier gymnase disponible. En ouvrir un si nécessaire.
 	\end{enumerate}
 \end{algo}
+
+\begin{proposition}
+	L'algorithme \ref{12-algo1} est optimal et en $O(n \log n)$
+\end{proposition}
+
+\begin{proof}
+	On prend une solution optimal, et on montre qu'on la transforme en notre solution gloutonne, sans augmenter le nombre de gymnases.
+\end{proof}
+
+\begin{rem}
+	Ce type de preuve est souvent généralisable.
+\end{rem}
+
+\subsection{Exemples}
+
+\begin{definition}[Arbre couvrant de poids minimal] \enspace
+	
+	\textbf{Instance :} Un graphe $G = (S, A)$ non orienté, $w : A \to \N$
+	
+	\textbf{Problème :} Trouver un arbre couvrant S de poids minimal
+\end{definition}
+
+\begin{algorithm}
+	\label{12-kruskal}
+	\caption{$Kruskal(G)$}
+	Trier les arêtes par poids croissants\\
+	$L \gets []$\\
+	\Pour{$a$ arête}
+	{
+		\Si{$L\cup \{a\}$ ne contient pas de cycle}
+			{Ajouter $a$ à $L$}
+	}
+	\Retour{$L$}
+\end{algorithm}
+
+\begin{proposition}
+	L'algorithme \ref{12-kruskal} est optimal
+\end{proposition}
+
+\begin{rem}
+	Comment détécter l'absence de cycle ? En faisant les classes de connexité par union find.
+\end{rem}
+
+\begin{proposition}
+	Si l'union find est implémenté avec le rang, on a O(|A| log(|A|))
+\end{proposition}
+
+\begin{rem}
+	l'algorithme de Huffman est glouton
+\end{rem}
+
+\begin{definition}[Indep2]\enspace
+	
+	\textbf{Instance :} $n$ tâches de poids $\{p_i\}_{i \in \{1, \dots, n\}}$ indépendantes
+	
+	\textbf{Problème :} Allouer les tâches sur 2 processeurs en minimisant la date de fin.
+\end{definition}
+
+
+\begin{algo}
+	\label{12-glouton-indep}
+	Allouer les tâches au fur et à mesure, au processus le moins plein
+\end{algo}
+
+\begin{proposition}
+	Cet algorithme est en $O(n)$ et est en ligne.
+\end{proposition}
+
+\begin{proposition}
+	Si $pi = 1$, l'algorithme est optimal.\\
+	Dans le cas quelconque, l'algorithme n'est pas optimal.
+\end{proposition}
+
+\begin{definition}[Somme Sous Ensmble (Subset Sum)]\enspace
+	
+	\textbf{Instance :} $n$ entiers $\{s_i\}$, $K \in \N$
+	
+	\textbf{Problème :} Existe-t-il $I \subset \{1, \dots, n\}$ tel que $\sum\limits_{i \in I} s_i = K$
+\end{definition}
+
+\begin{rem}
+	Savoir s'il existe un ordonnancement parfait sur 2 machines revient à résoudre SSE avec $K = \dfrac{\sum p_i}{2}$ or ce problème est dur à résoudre (NP-complet, c'est 2-Partition). 
+\end{rem}
+
+\section{Retour sur trace}
+
+La stratégie gloutonne (notamment le fait de ne jamais revenir sur un choix) est parfois trop restrictive.
+
+\subsection{Définition}
+
+\begin{definition}
+	Un algorithme de retour sur trace fait tous les choix possibles, jusqu'à pouvoir résoudre le problème.
+\end{definition}
+
+\begin{rem}
+	Si on enlève le tant que de la définition, on tombe sur un algorithme de force brute.
+\end{rem}
+
+\begin{algorithm}
+	\caption{$SSE(X, S)$}
+	\Entree{$X$ une famille de $\N$}
+	\multientree{$S\in \N$ la cible}
+	\Sortie{Booléen: «$\exists I : \sum\limits_{i \in I} X[i] = S$»}
+	\Si{$S = 0$}{\Retour{Vrai}}
+	\Si{$S < 0$ ou $X = \empty$}{\Retour{Faux}}
+	Choisir $x \in X$\\
+	\Retour{$SSE(X\backslash \{x\}, S-x)$ ou $SSE(X\backslash\{x\}, S)$}
+\end{algorithm}
+
+\begin{principe}[Généralisation du principe de retour sur trace]
+	\enspace\\
+	\begin{algorithm}[H]
+		\caption{$RST(n)$}
+		\Entree{$n$ solution partielle}
+		\Sortie{booléen : Est-ce que on peut compléter $n$ en une solution ?}
+		\Si{$est\_solution(n)$}
+			{\Retour{Vrai}}
+		\Si{$impossible(n)$}
+			{\Retour{Faux}}
+		Choisir un choix\\
+		\Pour{chaque option $o$ possible}
+		{
+			\Si{$RST(o)$}
+			{
+				\Retour{Vrai}
+			}
+		}
+		\Retour{Faux}
+	\end{algorithm}
+\end{principe}
+
+\subsection{Construction de la solution au fur et à mesure}
+
+\begin{com}
+	Ici, on ne se limite plus implicitement comme précédemment aux problèmes de décision
+\end{com}
+
+\begin{rem}
+	Quand on parcourait récursivement les solutions, on modifie potentiellement les variables globales. Il faut alors penser à les remettre en état.
+\end{rem}
+
+\begin{algorithm}
+	\caption{$Sudoku(grille)$}
+	\Entree{Tableau 9 par 9 sans contradiciton de Sudoku}
+	\Si{aucune case n'est à 0}
+	{
+		\Retour{Vrai}
+	}
+	$i,j \gets$ premier indice tel que $grille[i][j] = 0$
+	\Pour{$val$ de 1 à 9}
+	{
+		\Si{$val$ n'est pas dans la ligne $i$, la colonne $j$ ou le carré $i/3 \enspace j/3$}
+		{
+			$grille[i][j] \gets val$\\
+			\Si{$Sudoku(grille)$}
+			{
+				\Retour{Vrai}
+			}
+		}
+	}
+	\textcolor{red}{$grille[i][j] \gets 0$} \quad \tcp{rétablit la grille}
+	\Retour{Faux}
+\end{algorithm}
+
+\begin{rem}
+	Ici, on a seulement renvoyer si il y avait une solution, mais dans la grille on a une solution.
+\end{rem}
+
+\begin{exercise}
+	Implémenter une solution du problèmes des $N$-reines en OCaml
+\end{exercise}
+
+\begin{rem}
+	OCaml est adapté au retour sur trace : récursivité et structures immuables.
+\end{rem}
+
+\subsection{Problèmes de terminaison}
+
+\begin{definition}[Jeu du Taquin]\enspace
+	
+	\textbf{Instance :} grille $n\times n$ contenant des entiers entre $1$ et $n^2-1$ et un trou
+	
+	\textbf{Solution :} La grille réordonnée (en ayant échanger le trou avec des voisins) avec si possible le trou en dernière position
+\end{definition}
+
+\begin{algorithm}
+	\label{12-taquin}
+	\caption{$Taquin(grille)$}
+	\Si{$grille$ est ordonnée}
+	{
+		\Retour{Vrai}
+	}
+	$i,j \gets $ position du trou\\
+	\Pour(\tcp{Au plus haut, bas, gauche et droite}){$i', j'$ case voisine de $i,j$}
+	{
+		Échanger $grille[i][j]$ et $grille[i'][j']$\\
+		\Si{$Taquin(grille)$}
+			{\Retour{Vrai}}
+		Échanger $grille[i][j]$ et $grille[i'][j']$ \quad \tcp{On rétablit la grille}
+	}
+	\Retour{Faux}
+\end{algorithm}
+
+\begin{idee}
+	L'algorithme \ref{12-taquin} ne termine pas toujours.\\
+	Solution : \begin{itemize}
+		\item Ajouter en entrée un nombre max d'itérations
+		\item Mémoriser les positions déjà parcourues
+		\item autre
+	\end{itemize}
+\end{idee}
+
+\begin{definition}
+	Une \textbf{grammaire} est un quadruplet $(\Sigma, V, R, S)$ avec :
+	\begin{itemize}[label = $\bullet$]
+		\item $\Sigma$ : alphabet de terminaux
+		\item $V$ : ensemble fini de non terminaux
+		\item $R \subset V \times (\Sigma \cup V)^*$ : ensemble de règles
+		\item $S \in V$ : l'axiome
+	\end{itemize}
+	Une \textbf{dérivation} est une application successive de règles à des non terminaux du mot courant, en partant de l'axiome.\\
+	Si le mot ne contient plus que des terminaux, on dit que le mot est \textbf{accepté}.
+\end{definition}
+
+\textbf{Développement :} Algorithme d'analyse syntaxique descendant par retour sur trace, illustrant les différents problèmes.
+
+\subsection{Point sur la complexité}
+
+Tous les algorithmes de retour sur trace précédents sont exponentiels. Pour certains problème on ne connaît pas d'algorithmes polynomial.
+
+\begin{com}
+	On parle de cet algorithme car il est au programme et il paraît que l'endroit est tout indiqué pour le mentionner
+\end{com}
+
+\begin{definition}[SAT]\enspace
+	
+	\textbf{Instance :} $p$ clauses sur les variables $x_1, \dots, x_n$
+	
+	\textbf{Problème :} Existe-t-il une valuation qui satisfait les $p$ clauses.
+\end{definition}
+
+\begin{algorithm}[H]
+	\caption{$Quine(C)$}
+	\Entree{$C$ liste de clauses}
+	\Si{$C = []$}
+		{\Retour{Vrai}}
+	\Si{$\bot \in C$}
+		{\Retour{Faux}}
+	$x \gets $ variable apparaissant dans $C$\\
+	\tcp{On affecte à $x$ chaque valeur possible, en on simplifie les clauses avec cette valeur}
+	\Si{$Quine(C[x \gets \top])$}
+		{\Retour{Vrai}}
+	\Si {$Quine(C[x \gets \bot])$}
+		{\Retour{Vrai}}
+	\Retour{Faux}
+\end{algorithm}
+
+\section{Algorithme d'approximation glouton}
+
+On peut alors (surtout pour des problèmes d'optimisation associés à des problèmes de décision NP-complet) se contenter d'approximation
+
+\subsection{Définition}
+
+\begin{definition}
+	Un problème d'optimisation $\Pi$ est un triplet ($I, S, c$) où :
+	\begin{itemize}
+		\item $I$ est l'ensemble des instances
+		\item $\forall i \in I, S(i)$ est l'ensemble des solutions réalisables
+		\item $c : I\times S \in \mathbb R$ est une fonction d'évaluation 
+	\end{itemize}
+	Le but est de trouver $\forall i \in I, s^* \in S(i)$ tel que $c(i,s) = \min \{c(i, s^*) / s \in S(i)\}$
+\end{definition}
+
+\begin{rem}
+	On se ramène à un problème de maximisation en prenant $c' \gets -c$
+\end{rem}
+
+\begin{definition}
+	Une $\lambda$-approximation est un algorithme polynomial $\mathcal A$ donnant pour chaque instance $i$ de $\Pi$ une solution telle que 	
+	$$\max\left(\left| \dfrac{\mathcal A(i)}{OPT(i)} \right|, \left| \dfrac{OPT(i)}{\mathcal A(i)} \right|\right) \leq \lambda$$
+\end{definition}
+
+\begin{example}
+	L'algorithme \ref{12-glouton-indep} est une $\frac{3}{2}$-approximation dans le cas général.
+\end{example}
+
+\textbf{Développement :} Une $\frac{3}{2}$-approximation et une $\frac{7}{6}$-approximation pour Indep2.
+
+\subsection{Exemples}
+
+\begin{definition}[Couverture par des sommets]\enspace
+	
+	\textbf{Instance :} Un graphe $G = (S, A)$ non orienté
+	
+	\textbf{Solution :} $V \subset S$ tel que $\forall (u,v) \in A, u \in A \text{ ou } v \in A$ de taille minimale
+\end{definition}
+
+\begin{algorithm}
+	\caption{$Couverture\_par\_sommets\_glouton(G)$}
+	$Couv \gets \{\}$\\
+	\Tq{il existe $(u,v) \in A$ tel que $u \notin Couv$ et $v \notin Couv$}
+	{
+		$Couv \gets Couv \cup \{u,v\}$
+	}
+	\Retour{$Couv$}
+\end{algorithm}
+
+\begin{proposition}
+	L'algorithme précédent est une 2-approximation
+\end{proposition}
+\begin{proof}
+	$Couv$ est un ensemble d'arêtes indépendantes. L'optimal doit couvrir ces arêtes
+\end{proof}
+
+\begin{definition}[Sac à dos]\enspace
+	
+	\textbf{Instance :} $n$ objets de poids $\{w_1, \dots, w_n\} \in \N^n$, et de valeur $\{v_1, \dots, v_n\}\in \N^n$. Une capacité $W \in \N$.
+	
+	\textbf{Problème :} Trouver $I \subset \{1, \dots, n\}$ tel que $\sum\limits_{i \in I} w_i \leq W$ et qui maximise $\sum\limits_{i\in I} v_i$
+\end{definition}
+
+\begin{algo}Algorithme glouton pour Sac à dos :
+	\label{12-glouton-sad}
+	\begin{enumerate}
+		\item Trier les objets par $\frac{v_i}{w_i}$ décroissants
+		\item Prendre chaque objet s'il reste de la place
+	\end{enumerate}
+\end{algo}
+
+\begin{proposition}
+	Cette algorithme n'est pas une approximation
+\end{proposition}
+
+\begin{algo}
+	Prendre le maximum entre $\max\limits_{i = 1}^n \left(v_i\right)$ et le résultat de l'algorithme \ref{12-glouton-sad}
+\end{algo}
+
+\begin{proposition}
+	Cette algorithme est une 2-approximation.
+\end{proposition}
+
+\begin{rem}
+	On peut également adapter l'idée du retour sur trace aux problèmes d'optimisation, en parcourant l'arbre des possibles, et en élaguant quand on a une meilleure borne. Cette stratégie s'appelle Séparation et Évaluation (Branch and Bound). Elle s'adapte bien au problème du sac à dos.
+\end{rem}

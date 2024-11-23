@@ -149,8 +149,8 @@ Cet algorithme est-il optimal ?
 
 \subsection{Sac à dos}
 
-\textbf{Instance :} $n$ objets de poids $\{w_1, \dots, w_n\} \in \N^n$, et de valeur $\{v_1, \dots, v_n\}\in \N^n$. Une capacité $W \in \N$.
-\textbf{Problème :} Trouver $T = (x_1, \dots, x_n) \in \{0, 1\}^n$ tel que $\sum\limits_{i = 1}^n x_iw_i \leq W$ et qui maximise $\sum\limits_{i=1}^n w_iv_i$
+\textbf{Instance :} $n$ objets de poids $\{w_1, \dots, w_n\} \in \N^n$, et de valeur $\{v_1, \dots, v_n\}\in \N^n$. Une capacité $W \in \N$.\\
+\textbf{Problème :} Trouver $I \subset \{1, \dots, n\}$ tel que $\sum\limits_{i \in I} w_i \leq W$ et qui maximise $\sum\limits_{i\in I} v_i$
 
 \begin{exercise}
 	Proposer des algorithmes gloutons pour résoudre le pb du sac à dos. Sont-ils optimaux ?
@@ -235,7 +235,8 @@ Cet algorithme est-il optimal ?
 \begin{com}
 	Ici on ne donne que l'idée parce que on a pas la place et parce que l'élève peut avoir le recul pour trouver lui-même
 \end{com}
-\begin{algo}[Idée de l'approche par programmation dynamique pour la distance de levenshtein]
+\begin{algo}
+	Idée de l'approche par programmation dynamique pour la distance de levenshtein
 	\begin{enumerate}
 		\item Considérer la distance d'édition entre tous les préfixes de $w_1$ et $w_2$
 		\item Considérer la modification sur la dernière lettre (rien, insertion, suppression ou modification)
