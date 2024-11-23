@@ -8,3 +8,7 @@ plan lecon 14 :
 	Rendre plus formel floyd warshall ? (genre à la place de mettre une phrase, mettre le pcc dans le sous-graphe...)
 	Est ce que l'algo de flyd warshall fait exactement ce qu'on dit (vu comment on écrase)
 	Parler plus ou moins de levenshtein (problèmes de place, et de la possiblité d'être rigoureux pour l'étape 2)
+
+plan lecon 15 :
+	Intérêt de la première définition ?
+	A la fin, faire les schémas
