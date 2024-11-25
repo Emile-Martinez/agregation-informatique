@@ -2,6 +2,9 @@ zomm sur tcp -> gestion du flux par TCP
 
 refaire peterson avec notre introduction
 
+plan lecon 4:
+	Voir si pour le dernier exemple on peut pas plutot prendre t : (X, Σ) -> X et définir inductivement t* : (X, Σ*) -> X. En ensuite y a plein de propriétés à montrer par induction (notamment que t*(t*) = t*, que t*(x, wa) = t(t*(x, w), a) (si on l'a définit par le début), etc...
+
 plan lecon 14 : 
 	Rajouter la complexité spatiale
 	Laisser apprpche gloutonne ? 
