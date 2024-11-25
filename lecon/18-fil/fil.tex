@@ -120,7 +120,8 @@ for(int i = 0; i < m; i++){
 for(int i = 0; i < m; i++){
 	int s = res + T[2*i + 1];
 	res = s;  }\end{lstlisting}
-	\end{minipage}
+	\end{minipage}\\
+	On peut donc aller deux fois plus vite.
 	
 	\paragraph{Question :} Que se passe-t-il sur l'exécution F1:1 $\to$ F2:2 $\to$ F1:3 $\to$ F2:3 ?
 \end{example}
@@ -136,18 +137,15 @@ for(int i = 0; i < m; i++){
 \end{example}
 
 \begin{definition}
-	Un mutex (verrou) est une structure de données permettant deux opérations : \begin{itemize}
+	Un verrou (ou mutex) est une structure de données permettant deux opérations : \begin{itemize}
 		\item \texttt{prendre()} : appel bloquant qui demande l'accès au verrou
 		\item \texttt{rendre()} : appel qui libère le verrou
 	\end{itemize}
 \end{definition}
 
-
-Une implémentation efficace des verrous doit avoir les propriétés suivantes : \begin{enumerate} 
-	\item Exclusion mutuelle : Un fil à la fois a accès au verrou
-	\item Absence de famine : Si un fil demande le verrou, il finira par l'obtenir
-	\item Équité : Aucun fil n'est favorisé 
-\end{enumerate}
+\begin{proposition}
+	Une implémentation efficace des verrous devrait garantir l'exclusion mutuelle, l'absence de famine et l'équité.
+\end{proposition}
 
 \begin{algo}
 	L'algorithme de Peterson propose une implémentation des verrous pour deux fils vérifiant ces propriétés.
