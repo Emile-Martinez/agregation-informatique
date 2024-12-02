@@ -27,6 +27,7 @@
 \usepackage{multirow}
 \usepackage{ulem}
 \usepackage{hhline}
+\usepackage{circuitikz}
 \usetikzlibrary{automata, positioning, arrows}
 \usetikzlibrary{shapes,shapes.geometric}
 \usepackage{cancel}
@@ -54,100 +55,108 @@
 
 %Design des théorèmes
 \usepackage{framed}
+\usepackage{xparse}
 
 
-\newmdtheoremenv[
-outerlinewidth=1pt,
-innerlinewidth=0pt,
-roundcorner=2pt,
-linecolor=black,
-shadow=true,
-tikzsetting={shading=axis,top color=gray!10},
-innertopmargin=1\baselineskip,
-skipabove={\dimexpr0.5\baselineskip+\topskip\relax},
-needspace=3\baselineskip ,
-frametitlefont={\sffamily\bfseries},
-]{theorem}%
-{\color{BrickRed}Théorème}[chapter]
+% Configuration des compteurs de théorème
+\newcounter{theoremcounter}[chapter] % Compteur commun, remis à zéro à chaque chapitre
+\renewcommand{\thetheoremcounter}{\thechapter.\arabic{theoremcounter}} % Format : Chapitre.Numéro
 
-\newmdtheoremenv[
-outerlinewidth=1pt,
-innerlinewidth=0pt,
-roundcorner=2pt,
-linecolor=black,
-shadow=true,
-tikzsetting={shading=axis,top color=gray!10},
-innertopmargin=1\baselineskip,
-skipabove={\dimexpr0.5\baselineskip+\topskip\relax},
-needspace=3\baselineskip ,
-frametitlefont={\sffamily\bfseries},
-]{proposition}%
-{\color{IndianRed}Proposition}[chapter]
+\definecolor{vert-def}{RGB}{51, 160, 0}
+\definecolor{orange-exo}{RGB}{255, 102, 0}
 
-\newmdtheoremenv[
-outerlinewidth=1pt,
-innerlinewidth=0pt,
-roundcorner=2pt,
-linecolor=black,
-shadow=true,
-tikzsetting={shading=axis,top color=gray!10},
-innertopmargin=1\baselineskip,
-skipabove={\dimexpr0.5\baselineskip+\topskip\relax},
-needspace=3\baselineskip ,
-frametitlefont={\sffamily\bfseries},
-]{lemma}%
-{\color{IndianRed}Lemme}[chapter]
+% Définir un style général pour les environnements
+\newmdenv[
+linecolor=black, % Couleur du trait vertical
+linewidth=2pt, % Épaisseur du trait
+topline=false, % Pas de ligne en haut
+bottomline=false, % Pas de ligne en bas
+rightline=false, % Pas de ligne à droite
+skipabove=10pt, % Espacement avant
+skipbelow=10pt, % Espacement après
+innerleftmargin=10pt, % Marge interne à gauche
+innerrightmargin=10pt, % Marge interne à droite
+innertopmargin=5pt, % Marge interne en haut
+innerbottommargin=5pt, % Marge interne en bas
+]{tstyleNoir}
 
-\newmdtheoremenv[
-outerlinewidth=1pt,
-innerlinewidth=0pt,
-roundcorner=2pt,
-linecolor=black,
-shadow=true,
-tikzsetting={shading=axis,top color=gray!10},
-innertopmargin=1\baselineskip,
-skipabove={\dimexpr0.5\baselineskip+\topskip\relax},
-needspace=3\baselineskip ,
-frametitlefont={\sffamily\bfseries},
-]{corollary}%
-{\color{IndianRed}Corollaire}[chapter]
+\newmdenv[
+linecolor=red, % Couleur du trait vertical
+linewidth=2pt, % Épaisseur du trait
+%topline=false, % Pas de ligne en haut
+%bottomline=false, % Pas de ligne en bas
+%rightline=false, % Pas de ligne à droite
+skipabove=10pt, % Espacement avant
+skipbelow=10pt, % Espacement après
+innerleftmargin=10pt, % Marge interne à gauche
+innerrightmargin=10pt, % Marge interne à droite
+innertopmargin=5pt, % Marge interne en haut
+innerbottommargin=5pt, % Marge interne en bas
+]{tstyleRouge}
+
+\newmdenv[
+linecolor=blue, % Couleur du trait vertical
+linewidth=2pt, % Épaisseur du trait
+topline=false, % Pas de ligne en haut
+bottomline=false, % Pas de ligne en bas
+rightline=false, % Pas de ligne à droite
+skipabove=10pt, % Espacement avant
+skipbelow=10pt, % Espacement après
+innerleftmargin=10pt, % Marge interne à gauche
+innerrightmargin=10pt, % Marge interne à droite
+innertopmargin=5pt, % Marge interne en haut
+innerbottommargin=5pt, % Marge interne en bas
+]{tstyleBleu}
+
+\newmdenv[
+linecolor=vert-def, % Couleur du trait vertical
+linewidth=2pt, % Épaisseur du trait
+%topline=false, % Pas de ligne en haut
+%bottomline=false, % Pas de ligne en bas
+%rightline=false, % Pas de ligne à droite
+skipabove=10pt, % Espacement avant
+skipbelow=10pt, % Espacement après
+innerleftmargin=10pt, % Marge interne à gauche
+innerrightmargin=10pt, % Marge interne à droite
+innertopmargin=5pt, % Marge interne en haut
+innerbottommargin=5pt, % Marge interne en bas
+]{tstyleDef}
+
+\newmdenv[
+linecolor=vert-def, % Couleur du trait vertical
+linewidth=2pt, % Épaisseur du trait
+topline=false, % Pas de ligne en haut
+bottomline=false, % Pas de ligne en bas
+rightline=false, % Pas de ligne à droite
+skipabove=10pt, % Espacement avant
+skipbelow=10pt, % Espacement après
+innerleftmargin=10pt, % Marge interne à gauche
+innerrightmargin=10pt, % Marge interne à droite
+innertopmargin=5pt, % Marge interne en haut
+innerbottommargin=5pt, % Marge interne en bas
+]{tstyleVert}
 
 
-\newmdtheoremenv[
-outerlinewidth=1pt,
-innerlinewidth=0pt,
-roundcorner=2pt,
-linecolor=black,
-shadow=true,
-tikzsetting={shading=axis,top color=gray!10},
-innertopmargin=1\baselineskip,
-skipabove={\dimexpr0.5\baselineskip+\topskip\relax},
-needspace=3\baselineskip ,
-frametitlefont={\sffamily\bfseries},
-]{definition}%
-{\color{ProcessBlue}Définition}[chapter]
-
-
-\newmdtheoremenv[
-outerlinewidth=1pt,
-innerlinewidth=0pt,
-roundcorner=2pt,
-linecolor=black,
-shadow=true,
-tikzsetting={shading=axis,top color=gray!10},
-innertopmargin=1\baselineskip,
-skipabove={\dimexpr0.5\baselineskip+\topskip\relax},
-needspace=3\baselineskip ,
-frametitlefont={\sffamily\bfseries},
-]{principe}%
-{\color{DarkGreen}Principe}[chapter]
+\newmdenv[
+linecolor=orange-exo, % Couleur du trait vertical
+linewidth=2pt, % Épaisseur du trait
+topline=false, % Pas de ligne en haut
+bottomline=false, % Pas de ligne en bas
+rightline=false, % Pas de ligne à droite
+skipabove=10pt, % Espacement avant
+skipbelow=10pt, % Espacement après
+innerleftmargin=10pt, % Marge interne à gauche
+innerrightmargin=10pt, % Marge interne à droite
+innertopmargin=5pt, % Marge interne en haut
+innerbottommargin=5pt, % Marge interne en bas
+]{tstyleOrange}
 
 
 \makeatletter
 \def\newframedGtheorem#1{%
 \theoremprework{
 \renewcommand*\FrameCommand{%
-  {\color{DimGrey}\vrule width 3pt \hspace{2.5pt}}}
+  {\color{DimGrey}\vrule width 1pt \hspace{2.5pt}}}
   \framed}%
 \theorempostwork{\endframed}%
 \newtheorem@i{#1}%
@@ -156,23 +165,153 @@ frametitlefont={\sffamily\bfseries},
 %%%
 
 
+% Environnements spécifiques avec un argument optionnel
+\newenvironment{theorem}[1][\empty]{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleRouge}%
+		\textcolor{red}{\textbf{Théorème~\thetheoremcounter}%
+			\ifx#1\empty\else~(\textbf{#1})\fi :}~%
+	}{%
+	\end{tstyleRouge}%
+}
+
+\newenvironment{proposition}[1][\empty]{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleRouge}%
+		\textcolor{red}{\textbf{Propriété~\thetheoremcounter}%
+			\ifx#1\empty\else~(\textbf{#1})\fi :}~%
+	}{%
+	\end{tstyleRouge}%
+}
+
+\newenvironment{principe}[1][\empty]{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleRouge}%
+		\textcolor{red}{\textbf{Principe~\thetheoremcounter}%
+			\ifx#1\empty\else~(\textbf{#1})\fi :}~%
+	}{%
+	\end{tstyleRouge}%
+}
+
+\newenvironment{corollary}[1][\empty]{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleRouge}%
+		\textcolor{red}{\textbf{Corollaire~\thetheoremcounter}%
+			\ifx#1\empty\else~(\textbf{#1})\fi :}~%
+	}{%
+	\end{tstyleRouge}%
+}
+
+\newenvironment{lemma}[1][\empty]{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleRouge}%
+		\textcolor{red}{\textbf{Lemme~\thetheoremcounter}%
+			\ifx#1\empty\else~(\textbf{#1})\fi :}~%
+	}{%
+	\end{tstyleRouge}%
+}
+
+\newenvironment{example}[1][\empty]{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleBleu}%
+		\textcolor{blue}{\textbf{Exemple~\thetheoremcounter}%
+			\ifx#1\empty\else~(\textbf{#1})\fi :}~%
+	}{%=false, % Pas de ligne en bas
+	\end{tstyleBleu}%
+}
+
+\newenvironment{rem}[1][\empty]{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleBleu}%
+		\textcolor{blue}{\textbf{Remarque~\thetheoremcounter}%
+			\ifx#1\empty\else~(\textbf{#1})\fi :}~%
+	}{%
+	\end{tstyleBleu}%
+}
+
+\newenvironment{definition}[1][\empty]{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleDef}%
+		\textcolor{vert-def}{\textbf{Définition~\thetheoremcounter}%
+			\ifx#1\empty\else~(\textbf{#1})\fi :}~%
+	}{%
+	\end{tstyleDef}%
+}
+
+\newenvironment{exercise}[1][\empty]{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleOrange}%
+		\textcolor{orange-exo}{\textbf{Exercice~\thetheoremcounter}%
+			\ifx#1\empty\else~(\textbf{#1})\fi :}~%
+	}{%
+	\end{tstyleOrange}%
+}
+
+\NewDocumentEnvironment{personalise}{O{} O{}}
+{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleNoir}%
+		\textbf{#1~\thetheoremcounter}%
+		\ifx#2\empty\else~(\textbf{#2})\fi
+		:~%
+	}{%
+	\end{tstyleNoir}%
+}
+
+\newenvironment{idee}[1][\empty]{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleBleu}%
+		\textcolor{blue}{\textbf{Idée~\thetheoremcounter}%
+			\ifx#1\empty\else~(\textbf{#1})\fi :}~%
+	}{%
+	\end{tstyleBleu}%
+}
+
+\newenvironment{algo}[1][\empty]{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleBleu}%
+		\textcolor{blue}{\textbf{Algorithme~\thetheoremcounter}%
+			\ifx#1\empty\else~(\textbf{#1})\fi :}~%
+	}{%
+	\end{tstyleBleu}%
+}
+
+
+\newenvironment{syntaxe}[1][\empty]{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleVert}%
+		\textcolor{vert-def}{\textbf{Syntaxe~\thetheoremcounter}%
+			\ifx#1\empty\else~(\textbf{#1})\fi :}~%
+	}{%
+	\end{tstyleVert}%
+}
+
+\newenvironment{appl}[1][\empty]{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleBleu}%
+		\textcolor{blue}{\textbf{Application~\thetheoremcounter}%
+			\ifx#1\empty\else~(\textbf{#1})\fi :}~%
+	}{%
+	\end{tstyleBleu}%
+}
+
+\newenvironment{impl}[1][\empty]{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleBleu}%
+		\textcolor{blue}{\textbf{Implémentation~\thetheoremcounter}%
+			\ifx#1\empty\else~(\textbf{#1})\fi :}~%
+	}{%
+	\end{tstyleBleu}%
+}
+
+
 %Définition des différents environnements
-\newframedGtheorem{rem}{\color{DimGrey}Remarque}[chapter]
-\newframedGtheorem{com}{\color{Blue}Commentaire}[chapter]
-\newtheorem{example}{\textbf Exemple}[chapter]
-\newtheorem{exercise}{\color{orange}\textbf Exercice}[chapter]
-\newtheorem{idee}{\textbf Idée}[chapter]
-\newtheorem{temps}{\color{gray} Temps}[chapter]
+\newframedGtheorem{com}{\color{DimGrey}Commentaire}[chapter]
+\newframedGtheorem{temps}{\color{DimGrey}Temps}[chapter]
 
 
-\newtheorem{notion}{\textbf Notion}[chapter]
-\newtheorem{algo}{\textbf Algorithme}[chapter]
+%\newtheorem{notion}{\textbf Notion}[chapter]
 
-
-\newtheorem{impl}{\textbf Implémentation}[chapter]
-\newtheorem{syntaxe}{\textbf Syntaxe}[chapter]
-\newtheorem{appl}{\textbf Application}[chapter]
-\newtheorem{idea}{\textbf Idée}[chapter]
 
 \newenvironment{proof}[1][\unskip]{\noindent \textit{Démonstration #1. }}{\hfill $\square$ \\}
 

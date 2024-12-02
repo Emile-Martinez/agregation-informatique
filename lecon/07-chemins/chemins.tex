@@ -1,10 +1,10 @@
 \dev{Emile Martinez}{}
 
-\section{Definition}
-
 \begin{com}
 	Les applications sont éparpillées tout le long de la leçon, et relativement peu développer, donc il peut-être rentable des les souligner pendant la défense de plan.
 \end{com}
+
+\section{Definition}
 
 \begin{definition}[chemin]
 	Dans un graphe orienté $G$ (resp. non orienté) on appelle chemin de longueur $\lambda$ une suite de $(\lambda + 1)$ sommets $(s_0, \, s_1, \,\dots, \, s_\lambda)$
@@ -197,9 +197,10 @@ Pour les composantes fortement connexes, il faudra plus qu'un simple parcours.
 
 Lorsque la fonction de poids est à valeur dans $\N$, on peut utiliser l'algorithme de Dijkstra.
 
-\begin{algo}
-	\begin{algorithm}
-		\caption{dijkstra(G, S)}
+\begin{algo} 
+	\enspace \\
+	\begin{algorithm}[H]
+		\caption{$dijkstra(G, S)$}
 		$distance \gets $ tableau de taille $|S|$ initialisé à $+\infty$\\
 		$distance[s] \gets 0$\\	
 		$F \gets FilePriorite()$\\
@@ -222,6 +223,7 @@ Lorsque la fonction de poids est à valeur dans $\N$, on peut utiliser l'algorit
 		\Retour $distance$
 	\end{algorithm}
 \end{algo}
+
 
 \begin{proposition}
 	L’algorithme de Dijkstra réalise au plus $|S|$ appels à $Inserer$ et $ExtraireMin$, et $|A|$ appels à $DiminuerPriorite$.\\
@@ -282,3 +284,5 @@ Lorsque le graphe ne contient aucun cycle absorbant, l'algorithme de Floyd Warsh
 \begin{com}
 	On a fait une leçon sur les graphes, sans aucun dessin de graphes. En vrai, il pourrait y en avoir sur des exemples, et puis les schémas ne sont pas absolument necessaires pour illustrer la plupart des concepts, dont surtout la formalisation est imporante (la def d'un chemin est explicite).
 \end{com}
+
+

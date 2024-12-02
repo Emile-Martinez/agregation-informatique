@@ -1,0 +1,264 @@
+\documentclass[11pt,a4paper]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{appendix}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\usepackage{mathrsfs}
+\usepackage{graphicx}
+\usepackage[ruled,vlined, french, algochapter]{algorithm2e}
+\usepackage{ntheorem}
+\usepackage[table,dvipsnames,svgnames]{xcolor}
+\usepackage[framemethod=tikz]{mdframed}
+\usetikzlibrary{shadows,shadings}
+\usepackage{sectsty}
+\usepackage{multicol}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{float}
+\usepackage[explicit]{titlesec}
+\usepackage{colortbl}
+\usepackage{enumitem}
+\usepackage{tikz} %Tikz !
+\usepackage{multirow}
+\usepackage{ulem}
+\usepackage{hhline}
+\usetikzlibrary{automata, positioning, arrows}
+\usetikzlibrary{shapes,shapes.geometric}
+\usepackage{cancel}
+
+\usepackage{xcolor}
+\definecolor{mGreen}{rgb}{0,0.6,0}
+\definecolor{mGray}{rgb}{0.5,0.5,0.5}
+\definecolor{mPurple}{rgb}{0.58,0,0.82}
+\definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
+
+\tikzset{elliptic state/.style={draw,ellipse}}
+
+% En-tête et pied de page
+\newcommand{\mask}[1]{}
+
+\pagestyle{fancy}
+\renewcommand\headrulewidth{1pt}
+\fancyhead[L]{Leçons d'Informatique}
+\fancyhead[R]{Préparation à l'Agrégation d'Informatique 2022}
+\fancyfoot[R]{\tiny $\copyright$ 2024 Martinez 2022 M. Marin}
+
+\setcounter{tocdepth}{1} 
+
+
+
+%Design des théorèmes
+\usepackage{framed}
+\usepackage{lipsum}
+
+
+\newmdtheoremenv[
+outerlinewidth=1pt,
+innerlinewidth=0pt,
+roundcorner=2pt,
+linecolor=black,
+shadow=true,
+tikzsetting={shading=axis,top color=gray!10},
+innertopmargin=1\baselineskip,
+skipabove={\dimexpr0.5\baselineskip+\topskip\relax},
+needspace=3\baselineskip ,
+frametitlefont={\sffamily\bfseries},
+]{theorem}%
+{\color{BrickRed}Théorème}[chapter]
+
+\newmdtheoremenv[
+outerlinewidth=1pt,
+innerlinewidth=0pt,
+roundcorner=2pt,
+linecolor=black,
+shadow=true,
+tikzsetting={shading=axis,top color=gray!10},
+innertopmargin=1\baselineskip,
+skipabove={\dimexpr0.5\baselineskip+\topskip\relax},
+needspace=3\baselineskip ,
+frametitlefont={\sffamily\bfseries},
+]{proposition}%
+{\color{IndianRed}Proposition}[chapter]
+
+\newmdtheoremenv[
+outerlinewidth=1pt,
+innerlinewidth=0pt,
+roundcorner=2pt,
+linecolor=black,
+shadow=true,
+tikzsetting={shading=axis,top color=gray!10},
+innertopmargin=1\baselineskip,
+skipabove={\dimexpr0.5\baselineskip+\topskip\relax},
+needspace=3\baselineskip ,
+frametitlefont={\sffamily\bfseries},
+]{lemma}%
+{\color{IndianRed}Lemme}[chapter]
+
+\newmdtheoremenv[
+outerlinewidth=1pt,
+innerlinewidth=0pt,
+roundcorner=2pt,
+linecolor=black,
+shadow=true,
+tikzsetting={shading=axis,top color=gray!10},
+innertopmargin=1\baselineskip,
+skipabove={\dimexpr0.5\baselineskip+\topskip\relax},
+needspace=3\baselineskip ,
+frametitlefont={\sffamily\bfseries},
+]{corollary}%
+{\color{IndianRed}Corollaire}[chapter]
+
+
+\newmdtheoremenv[
+outerlinewidth=1pt,
+innerlinewidth=0pt,
+roundcorner=2pt,
+linecolor=black,
+shadow=true,
+tikzsetting={shading=axis,top color=gray!10},
+innertopmargin=1\baselineskip,
+skipabove={\dimexpr0.5\baselineskip+\topskip\relax},
+needspace=3\baselineskip ,
+frametitlefont={\sffamily\bfseries},
+]{definition}%
+{\color{ProcessBlue}Définition}[chapter]
+
+
+\newmdtheoremenv[
+outerlinewidth=1pt,
+innerlinewidth=0pt,
+roundcorner=2pt,
+linecolor=black,
+shadow=true,
+tikzsetting={shading=axis,top color=gray!10},
+innertopmargin=1\baselineskip,
+skipabove={\dimexpr0.5\baselineskip+\topskip\relax},
+needspace=3\baselineskip ,
+frametitlefont={\sffamily\bfseries},
+]{principe}%
+{\color{DarkGreen}Principe}[chapter]
+
+
+\makeatletter
+\def\newframedGtheorem#1{%
+\theoremprework{
+\renewcommand*\FrameCommand{%
+  {\color{DimGrey}\vrule width 3pt \hspace{2.5pt}}}
+  \framed}%
+\theorempostwork{\endframed}%
+\newtheorem@i{#1}%
+}
+\makeatother
+%%%
+
+
+%Définition des différents environnements
+\newframedGtheorem{rem}{\color{DimGrey}Remarque}[chapter]
+\newframedGtheorem{com}{\color{Blue}Commentaire}[chapter]
+\newtheorem{example}{\textbf Exemple}[chapter]
+\newtheorem{exercise}{\color{orange}\textbf Exercice}[chapter]
+\newtheorem{idee}{\textbf Idée}[chapter]
+\newtheorem{temps}{\color{gray} Temps}[chapter]
+
+
+\newtheorem{notion}{\textbf Notion}[chapter]
+\newtheorem{algo}{\textbf Algorithme}[chapter]
+
+
+\newtheorem{impl}{\textbf Implémentation}[chapter]
+\newtheorem{syntaxe}{\textbf Syntaxe}[chapter]
+\newtheorem{appl}{\textbf Application}[chapter]
+\newtheorem{idea}{\textbf Idée}[chapter]
+
+\newenvironment{proof}[1][\unskip]{\noindent \textit{Démonstration #1. }}{\hfill $\square$ \\}
+
+
+%Gestion de la hierarchie
+\setcounter{secnumdepth}{3}
+
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\Roman{subsection}}
+\renewcommand{\thesubsubsection}{\Alph{subsubsection}}
+
+
+\makeatletter
+\renewcommand{\@chapapp}{Leçon}
+\makeatother
+
+
+%En-tête des leçons 
+% utilisation : \debut{Auteurs}{niveau}{pré-requis}{références}
+\newcommand\debut[4]{
+\noindent \textbf{Auteur\textperiodcentered e\textperiodcentered s:} #1  \\
+\noindent\textbf{Niveau :} #2 \\
+\noindent\textbf{Pré-requis :} #3 \\
+\noindent\textbf{Références :} #4 \\
+}
+
+%En-tête des développements 
+% utilisation : \debut{Auteurs}{références}
+\newcommand\dev[2]{
+\noindent \textbf{Auteur\textperiodcentered e\textperiodcentered s:} #1  \\
+\noindent\textbf{Références :} #2 \\
+}
+
+%Commande personnalisées
+\newcommand{\N}{\ensuremath{\mathbb{N}}}
+\newcommand{\overarrow}[1]{\smash{\overset{#1}{\longrightarrow}}}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+		\node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+%Pour le listing de code
+\lstset{
+frame = single, 
+framexleftmargin=1pt,
+literate=
+{à}{{\`a}}1
+{é}{{\'e}}1
+{è}{{\`e}}1
+{ô}{{\^o}}1}
+
+\lstset{escapeinside={<@}{@>}}
+
+\definecolor{lightpink}{HTML}{f7d1d5}
+%Éviter le saut de page après un chapitre
+\renewcommand{\cleardoublepage}{\newpage}
+\newcommand\countme{\refstepcounter{\thechapter}\thechapter}
+
+\lstdefinestyle{CStyle}{
+	backgroundcolor=\color{backgroundColour},   
+	commentstyle=\color{mGreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{mGray},
+	stringstyle=\color{mPurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2,
+	language=C
+}
+%Copyright
+
+
+\newlength\mylen
+\newcommand\multientree[1]{%
+	\settowidth\mylen{\Entree{}}%
+	\setlength\hangindent{\mylen}%
+	\hspace*{\mylen}#1\\}
+	
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}

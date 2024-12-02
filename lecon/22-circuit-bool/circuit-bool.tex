@@ -1,0 +1,539 @@
+\debut{Emile Martinez}{Prépa / Première}{Représentation binaire et pour la première partie : induction, graphe}{}
+
+\section{Cadre théorique (Prépa)}
+
+\subsection{Expression booléenne}
+
+\begin{definition}
+	On définit l'ensemble $EB$ des expressions booléennes par induction avec la signature
+	\begin{itemize}[label=$\bullet$]
+		\item cas de bases : $\top, \,\bot, \,V$ un ensemble de variables
+		\item constructeurs :\begin{itemize}[label=$\star$]
+			\item $\neg$ un constructeur unaire
+			\item $\vee, \, \wedge$ deux constructeurs binaires
+		\end{itemize}
+	\end{itemize}
+\end{definition}
+
+Informellement : $\top, \bot, x \in V$ sont des expressions booléennes, et si $e_1$ et $e_2$ le sont, alors $\neg e_1$, $e_1\vee e_2$, et $e_1 \wedge e_2$ le sont.
+
+\begin{exercise}
+	Définir inductivement les variables apparaissant dans une formule et en déduire une définition rigoureuse du nombre de variables d'une fonction.
+\end{exercise}
+
+\begin{definition}
+	Une valuation est une fonction $\sigma :V \to \{0,1\}$.
+	\\
+	\\
+	On définit alors $[\,]_\sigma$ : $EB \to \{0, 1\}$ par induction sur EB par :\begin{itemize}[label=$\bullet$]
+		\item $[\bot]_\sigma = 0$, $[\top]_\sigma = 1$ et $[x]_\sigma = \sigma(x)$ pour $x \in V$
+		\item $[e_1 \vee e_2] = \max([e_1]_\sigma, [e_2]\sigma)$
+		\item $[e_1 \wedge e_2] = \min([e_1]_\sigma, [e_2]\sigma)$
+		\item $[\neg e_1]_\sigma = 1-[e_1]_\sigma$
+	\end{itemize}
+\end{definition}
+
+\begin{definition}
+	Pour $a, b \in EB$, on dit que $a$ et $b$ sont équivalentes noté $a \equiv b$, si $\forall \sigma :V \to \{0,1\}, [a]_\sigma = [b]_\sigma$
+\end{definition}
+
+\begin{definition}
+	On peut éventuellement définir le XOR (ou exclusif), avec $a\oplus b = (a\vee b)\wedge \neg(a\wedge b) \equiv (a\wedge \neg b)\vee (\neg a\wedge b)$
+\end{definition}
+
+\subsection{Fonctions booléennes}
+
+\label{22-1-2}
+
+\begin{definition}
+	Une fonction booléenne est une fonction de $\{0, 1\}^n \to \{0, 1\}^m$
+\end{definition}
+
+\begin{example}
+	$f : \{0,1\}^{64} \to \{0,1\}^{64}$ prenant en entrée le codage (en double) d'un flottant $x$, et renvoyant le codage du flottant de $e^x$
+\end{example}
+
+\begin{rem}
+	On se limite parfois à $f : \{0,1\}^n \to \{0, 1\}$ (en décomposant $f : \{O, 1\}^n \to \{0, 1\}^m$ en $m$ fonctions sur chaque dimension)
+\end{rem}
+
+\begin{definition}[Table de vérité]
+	La table de vérité d'une fonction booléenne est la donnée de sa valeur sur toutes ses entrées possibles. On représente la table de vérité de $f:\{0,1\}^n \to \{0,1\}^m$ dans un tableau avec $n+m$ colonnes, et pour chaque éléments de $\{0,1\}^n$, une ligne avec la valeur du $n$-uplets, et la valeur du $m$-uplets de sortie.
+\end{definition}
+
+\begin{rem}
+	La table a $2^n$ lignes
+\end{rem}
+
+\begin{com}
+	Bon là normalement il faudrait en mettre une, mais bon, il faut aussi que jeunesse se passe.
+\end{com}
+
+\begin{rem}
+	On se limite parfois à $f : \{0,1\}^n \to \{0, 1\}$ (en décomposant $f : \{O, 1\}^n \to \{0, 1\}^m$ en $m$ fonctions sur chaque dimension)
+\end{rem}
+
+On peut définir une fonction booléenne : \begin{itemize}
+	\item par extension (en donnant sa table de vérité)
+	\item par intention (en donnant ses propriétés (ex: 1 ssi le nombre de variables à 1 est un nombre premier))
+	\item par une expression booléenne.
+\end{itemize}
+
+\begin{theorem}
+	\label{22-equivalence}
+	Toute fonction $f:\{0,1\}^n -> \{0,1\}$ est équivalente à une expression booléenne.
+	
+	Plus rigoureusement, il existe une formule $e$ dont les variables sont $x_1, \dots, x_n$ et telle que pour toute valuation $\sigma$, $[e]_\sigma = f(\sigma(x_1), \dots, \sigma(x_n))$
+\end{theorem}
+
+\par{Développement :} Preuve du théorème \ref{22-equivalence} et discussion sur la complexité.
+
+\subsection{Représentation des expressions booléennes par des graphes orientés acycliques}
+
+\begin{definition}[Circuit booléen]
+	Un circuit est un graphe orienté acyclique (DAG) étiquetés par $V \cup \{\top,\bot, \neg, \wedge, \vee \}$ où un sommet d'étiquette $x$ a : \begin{itemize}[label=$\bullet$]
+		\item Un degré entrant 0 si $x \in V \cup \{\top, \bot\}$
+		\item Un degré entrant 1 si $x = \neg$
+		\item Un degré entrant 2 si $x \in \{\wedge, \vee\}$
+	\end{itemize}
+\end{definition}
+
+\begin{rem}
+	On peut ne pas prendre également des étiquettes supplémentaires (comme $\oplus$, le NAND, NOR, etc.)
+\end{rem}
+
+\begin{definition}
+	On définit l'évaluation d'un graphe par une valuation $\sigma :V \to \{0,1\}$ comme un étiquetage des nœuds où un nœud d'étiquette $a$ vaudra : \begin{itemize}[label=$\bullet$]
+		\item $[a]_\sigma$ si $a \in V \cup \{\top, \bot\}$
+		\item $1-y$ si $a = \neg$ et le sommet entrant de $a$ est évalué en $y$
+		\item $\min(y, z)$ (resp. $\max(y, z)$) si $a= \wedge$ (reps.$\vee$) et les sommets entrants sont évalués en $y$ et $z$
+	\end{itemize}
+\end{definition}
+
+\begin{proposition}
+	Cette définition est correcte (et ne boucle pas à l'infini)
+\end{proposition}
+
+\begin{rem}
+	\begin{itemize}[label=$\bullet$]
+		\item Les degrés sortants ne sont pas limités.
+		\item Si les degrés sortants sont exactement 1 sauf pour un sommet où c'est 0, on obtient exactement les expressions booléennes (avec leur représentation sous forme d'arbres)
+		\item Les circuits booléens correspondraient à un ensemble d'expressions booléennes où l'on aurait le droit de définir des alias
+	\end{itemize}
+\end{rem}
+
+\begin{personalise}[Conclusion]
+	Les circuits booléens peuvent représenter tout ce qu'on veut calculer de finis et qu'on peut coder en binaire.
+\end{personalise}
+
+\section{Dans un ordinateur}
+
+\subsection{Circuits combinatoires}
+
+\begin{definition}
+	Un bit est la plus petite unité d'information d'un ordinateur, ne pouvant prendre que deux valeurs (0V - +5V, 0 - 1, Ying - Yang, Ouvert - Fermé, \dots). Fixons nous sur 0-1.
+\end{definition}
+
+Dans les circuits électroniques, on arrive à manipuler des bits. Nous sommes par exemples capables de prendre un bit et de l'inverser, d'en prendre deux et de renvoyer 1 si au moins l'un des deux vaut 1, etc\dots
+
+\begin{definition}[porte logique]
+	Une porte logique est un circuit électronique réalisant des opérations logiques sur une séquence de bits
+\end{definition}
+
+\begin{example}
+	On est capable de faire les portes ET, OU, NON, \dots\\
+	\begin{tabular}{ccc}
+		\begin{circuitikz} \draw
+			(0,0) node[and port] (a) {}
+			;  
+		\end{circuitikz} & \begin{circuitikz} \draw
+		(0,0) node[or port] (a) {}
+		;  
+		\end{circuitikz} & \begin{circuitikz} \draw
+		(0,0) node[not port] (a) {}
+		;  
+		\end{circuitikz} \\
+		ET & OU & NON
+	\end{tabular}
+\end{example}
+
+\begin{definition}[circuits combinatoires]
+	Un circuit combinatoire est alors une succession de portes logiques dont la sortie de certaines sont branchés sur l'entrée d'autres, et sans cycles.
+\end{definition}
+
+\begin{rem}
+	C'est l'implémentation physique des circuits booléens.
+\end{rem}
+
+\begin{personalise}[Conclusion]
+	Les parties I-II, I-III et II-I nous donnent que l'on est capable électroniquement de calculer tous qui est représentable de manière fini par des bits.
+\end{personalise}
+
+\section{Mesure d'un circuit}
+
+\begin{idee}
+	Quand on fait un circuit booléens, on peut vouloir maximiser différents critères : \begin{itemize}[label=$\bullet$]
+		\item On veut, pour des raisons économiques, minimiser le nombre de transistors (et donc le nombre de portes)
+		\item On veut tirer des câbles courts, et donc avoir un circuit compact
+		\item Comme il y a un délai pour qu'une porte calcule sa sortie selon son entrée, on veut minimiser le délai total de mise à jour du circuit.
+	\end{itemize}
+\end{idee}
+
+\begin{definition}[chemin critique]
+	Le chemin critique d'un circuit booléen (et donc d'un circuit combinatoire) est le (un) plus long chemin entre une entrée (degré entrant 0) et une sortie (degré sortant  0). Le graphe étant acyclique, c'est donc un plus long chemin.
+\end{definition}
+
+\begin{idee}
+	Minimiser la longueur du chemin critique, qui est proportionnelle au délai que met un circuit combinatoire à effectuer un calcul.
+\end{idee}
+
+\begin{example}
+	$a \oplus b \oplus c$ peut-être représenté par deux XOR successifs \\
+	% les dessins ici sont plus ou moins exportées depuis https://circuit2tikz.tf.fau.de/designer/
+	\begin{tikzpicture}
+		% Paths, nodes and wires:
+		\draw node[american and port, red] at (5.136, 8.22) {};
+		\draw node[american and port] at (5.136, 6.28) {};
+		\draw node[ieeestd not port] at (2.877, 6) {};
+		\draw node[ieeestd not port, red] at (2.873, 7.94) {};
+		\draw node[circ] (N1) at (0.25, 8.5) {} node[anchor=east] at (N1.text){$a$};
+		\draw node[circ] (N2) at (0.25, 5.31) {} node[anchor=east] at (N2.text){$c$};
+		\draw[draw] (0.25, 8.5) -- (3.75, 8.5);
+		\draw[draw] (1, 8.5) -| (1.25, 6) -- (2, 6);
+		\draw[draw] (3.75, 6.56) -| (1.996, 7.94);
+		\draw node[circ] (N3) at (0.25, 7.94) {} node[anchor=east] at (N3.text){$b$};
+		\draw node[american or port, red] at (7.75, 7.25) {};
+		\draw[draw] (5.29, 6.28) -| (6.364, 6.97);
+		\draw node[american and port] at (12.79, 6.97) {};
+		\draw node[american and port, red] at (12.79, 5.03) {};
+		\draw node[ieeestd not port, red] at (10.531, 4.75) {};
+		\draw node[ieeestd not port] at (10.527, 6.69) {};
+		\draw[draw] (7.904, 7.25) -- (11.404, 7.25);
+		\draw node[american or port, red] at (15.404, 6) {};
+		\draw[draw] (12.944, 6.97) -| (14.018, 6.28);
+		\draw[draw] (11.404, 5.31) -| (9.65, 6.69) |- (0.25, 5.31);
+		
+		
+		%draw critical path
+		\draw[draw, red] (1.996, 7.94) -| (0.25, 7.94);
+		\draw[draw, red] (5.29, 8.22) -| (6.364, 7.53);
+		\draw[draw, red] (7.904, 7.25) -| (8.904, 4.75) -- (9.654, 4.75);
+		\draw[draw, red] (12.944, 5.03) -| (14.018, 5.72);
+	\end{tikzpicture}\\
+	On a alors 10 portes et un chemin critique de taille 6. On peut le diminuer à 5, en calculant directement la négation de $a \oplus b$, au lieu de réutiliser le résultat de $a \oplus b$
+	
+	
+	\noindent \begin{tikzpicture}
+		% Paths, nodes and wires:
+		\draw node[american and port] at (5.136, 8.22) {};
+		\draw node[american and port] at (5.136, 6.28) {};
+		\draw node[ieeestd not port] at (2.873, 7.94) {};
+		\draw node[circ] (N1) at (0.25, 8.5) {} node[anchor=east] at (N1.text){$a$};
+		\draw node[circ] (N2) at (0.25, 5.25) {} node[anchor=east] at (N2.text){$c$};
+		\draw[draw] (0.25, 8.5) -- (3.75, 8.5);
+		\draw[draw] (1, 8.5) -| (1.25, 6) -- (2, 6);
+		\draw[draw] (3.75, 6.56) -| (1.996, 7.94) -| (0.25, 8);
+		\draw node[circ] (N3) at (0.25, 7.94) {} node[anchor=east] at (N3.text){$b$};
+		\draw node[american or port] at (7.75, 7.25) {};
+		\draw[draw] (5.29, 8.22) -| (6.364, 7.53);
+		\draw[draw] (5.29, 6.28) -| (6.364, 6.97);
+		\draw node[american and port] at (11.763, 6.97) {};
+		\draw node[ieeestd not port] at (9.5, 6.69) {};
+		\draw[draw] (7.904, 7.25) -- (10.377, 7.25);
+		\draw node[american or port] at (13.886, 8.78) {};
+		\draw node[ieeestd not port] at (2.877, 6) {};
+		\draw[draw] (0.25, 5.25) -| (8.623, 6.69);
+		\draw node[ieeestd not port] at (2.127, 10.94) {};
+		\draw node[ieeestd not port] at (2.127, 9.69) {};
+		\draw[draw] (3, 10.94) -| (3.75, 10.5);
+		\draw[draw] (3.004, 9.69) -| (3.75, 9.94);
+		\draw node[american and port] at (5.136, 10.22) {};
+		\draw[draw] (0.75, 8.5) |- (1.25, 10.94);
+		\draw[draw] (1.25, 9.69) -| (1, 8) |- (0.613, 7.938);
+		\draw node[american and port] at (5.136, 12.03) {};
+		\draw[draw] (3.75, 12.31) -| (0.75, 12.25) -- (0.75, 10.94);
+		\draw[draw] (3.75, 11.75) |- (1, 11.75) -- (1, 9.69);
+		\draw node[american or port] at (7.75, 11.25) {};
+		\draw[draw] (5.29, 12.03) -| (6.364, 11.53);
+		\draw[draw] (5.29, 10.22) -| (6.364, 10.97);
+		\draw node[american and port] at (11.75, 10.5) {};
+		\draw[draw] (8.623, 6.69) |- (10.364, 10.22);
+		\draw[draw] (10.364, 10.78) -| (8.5, 11) |- (7.904, 11.25);
+		\draw[draw] (11.904, 10.5) -| (12.5, 9.06);
+		\draw[draw] (11.917, 6.97) -| (12.5, 8.5);
+	\end{tikzpicture}\\
+	Néanmoins, on a maintenant 14 portes.
+\end{example}
+
+\begin{com}
+	Cet exemple sur un exemple non trivial le fait que on peut raccourci le chemin critique, et le fait que on peut le faire potentiellement au détriment du nombre de noeuds. (il faut voir le deuxième comme le premier, sauf qu'on calcule directement la négation du xor). Mais bon, cet exemple est un peu gros à mettre dans le plan quoi. Si on veut un truc plus cours, on peut passer de $a \wedge (b \vee c) \wedge d$ à $(a \wedge d) \wedge (b \vee c)$ mais on rajoute pas de portes, et cet exemple est bateau et donc moins intéressant que le XOR ternaire. Mais bon, il faut savoir vivre avec son temps.
+\end{com}
+
+
+\section{Des circuits particuliers}
+
+\subsection{Additionneur n bits}
+
+\begin{algo}
+	On reprend l'algorithme classique d'addition, adapté au binaires :\\
+	\begin{algorithm}[H]
+		\caption{$Addition(x, y)$}
+		\Entree{$x$ et $y$ deux nombres de $n$ chiffres en binaire}
+		$r_{-1} \gets 0$\\
+		\Pour{$i = 0$ à $n-1$}
+		{
+			\tcp{$r_i$ est la $i$-ème retenue, $s_i$ le $i$-ème bit de sortie}
+			$r_i, s_i = AC(r_{i_1}, x_i, y_i)$
+		}
+	\end{algorithm}
+	avec AC (additionneur complet) faisant l'addition de trois chiffres (0 ou 1) définie par la table de vérité :\\
+	\begin{tabular}{|c|c|c||c|c|}
+		\hline
+		$r_{i-1}$ & $x_i$ & $y_i$ & $r_i$ & $s_i$  \\ \hline
+		0 & 0 & 0 & 0 & 0 \\ \hline
+		0 & 0 & 1 & 0 & 1 \\ \hline
+		0 & 1 & 0 & 0 & 1 \\ \hline
+		0 & 1 & 1 & 1 & 0 \\ \hline
+		1 & 0 & 0 & 0 & 1 \\ \hline
+		1 & 0 & 1 & 1 & 0 \\ \hline
+		1 & 1 & 0 & 1 & 0 \\ \hline
+		1 & 1 & 1 & 1 & 1\\ \hline
+	\end{tabular} \quad que l'on représente par \qquad \raisebox{-0.5\height}{\begin{tikzpicture}[->, node distance=0.3cm]
+		\node[rectangle, draw] (ac) {\quad$\substack{\\\\\\AC\\\\\\}$\enspace\enspace};
+		
+		\node[above left = 0.5cm and -0.7cm of ac] (xi) {$x_i$};
+		\node[below = 0.5cm of xi] (xi-faux) {};
+		\draw (xi) edge[] (xi-faux);
+		
+		\node[above right = 0.5cm and -0.7cm of ac] (yi) {$y_i$};
+		\node[below = 0.5cm of yi] (yi-faux) {};
+		\draw (yi) edge[] (yi-faux);
+		
+		\node[right = 0.5cm of ac] (ri-1) {$r_{i-1}$};
+		\node[left = 0.5cm of ri-1] (ri-1-faux) {};
+		\draw (ri-1) edge[] (ri-1-faux);
+		
+		\node[left = 0.5cm of ac] (ri) {$r_i$};
+		\node[right = 0.5cm of ri] (ri-faux) {};
+		\draw (ri-faux) edge[] (ri);
+		
+		\node[below = 0.5cm of ac] (si) {$s_i$};
+		\node[above = 0.5cm of si] (si-faux) {};
+		\draw (si-faux) edge[] (si);
+		
+	\end{tikzpicture}}
+	
+\end{algo}
+
+\begin{exercise}
+	Proposer un circuit booléen pour cette table.
+\end{exercise}
+
+En mettant plusieurs AC à la suite, on créer alors un additionneur $n$ bits : \begin{center}
+	\begin{tikzpicture}[->]
+		\node[rectangle, draw] (acn) {\quad$\substack{\\\\\\AC\\\\\\}$\enspace\enspace};
+		
+		\node[above left = 0.5cm and -0.7cm of acn] (xn) {$x_{n-1}$};
+		\node[below = 0.5cm of xn] (xn-faux) {};
+		\draw (xn) edge[] (xn-faux);
+		
+		\node[above right = 0.5cm and -0.7cm of acn] (yn) {$y_{n-1}$};
+		\node[below = 0.5cm of yn] (yn-faux) {};
+		\draw (yn) edge[] (yn-faux);
+		
+		\node[right = 0.5cm of acn] (rn-1) {$r_{n-2}$};
+		\node[left = 0.5cm of rn-1] (rn-1-faux) {};
+		\draw (rn-1) edge[] (rn-1-faux);
+		
+		\node[left = 0.5cm of acn] (rn) {$r_{n-1}$};
+		\node[right = 0.5cm of rn] (rn-faux) {};
+		\draw (rn-faux) edge[] (rn);
+		
+		\node[below = 0.5cm of acn] (sn) {$s_{n-1}$};
+		\node[above = 0.5cm of sn] (sn-faux) {};
+		\draw (sn-faux) edge[] (sn);
+		
+		\node[right = 1cm of rn-1] (points) {. . .};
+		
+		
+		\node[rectangle, draw, right = 2cm of points] (ac1) {\quad$\substack{\\\\\\AC\\\\\\}$\enspace\enspace};
+		
+		\node[above left = 0.5cm and -0.7cm of ac1] (x1) {$x_1$};
+		\node[below = 0.5cm of x1] (x1-faux) {};
+		\draw (x1) edge[] (x1-faux);
+		
+		\node[above right = 0.5cm and -0.7cm of ac1] (y1) {$y_1$};
+		\node[below = 0.5cm of y1] (y1-faux) {};
+		\draw (y1) edge[] (y1-faux);
+		
+		\node[right = 0.5cm of ac1] (r0) {};
+		\node[left = 0.5cm of r0] (r0-faux) {};
+		
+		\node[left = 0.5cm of ac1] (r1) {$r_1$};
+		\node[right = 0.5cm of r1] (r1-faux) {};
+		\draw (r1-faux) edge[] (r1);
+		
+		\node[below = 0.5cm of ac1] (s1) {$s_1$};
+		\node[above = 0.5cm of s1] (s1-faux) {};
+		\draw (s1-faux) edge[] (s1);
+		
+		
+		\node[rectangle, draw, right= 0cm of r0] (ac0) {\quad$\substack{\\\\\\AC\\\\\\}$\enspace\enspace};
+		
+		\draw (ac0) edge[above] node{$r_0$} (r0-faux);
+		
+		\node[above left = 0.5cm and -0.7cm of ac0] (x0) {$x_0$};
+		\node[below = 0.5cm of x0] (x0-faux) {};
+		\draw (x0) edge[] (x0-faux);
+		
+		\node[above right = 0.5cm and -0.7cm of ac0] (y0) {$y_0$};
+		\node[below = 0.5cm of y0] (y0-faux) {};
+		\draw (y0) edge[] (y0-faux);
+		
+		\node[right = 0.5cm of ac0] (r-1) {$r_{-1} = 0$};
+		\node[left = 0.5cm of r-1] (r-1-faux) {};
+		\draw (r-1) edge[] (r-1-faux);
+		
+		\node[below = 0.5cm of ac0] (s0) {$s_0$};
+		\node[above = 0.5cm of s0] (s0-faux) {};
+		\draw (s0-faux) edge[] (s0);
+		
+	\end{tikzpicture}
+\end{center}
+
+\begin{personalise}[Problème]
+	Le chemin critique est linéaire en $n$ (car il faut propager la retenue).
+\end{personalise}
+
+
+\paragraph{Développement :} Construction par une méthode D\&R d'un additionneur $n$ bits à retenue anticipée.
+
+\subsection{Multiplexeur}
+
+\begin{definition}
+	Un multiplexeur à deux entrées est un circuit booléen servant à sélectionner une entrée. Une troisième entrée de contrôle, determine si la sortie sera la première ou la deuxième entrée.\\
+	
+	On lui associe la table de vérité \begin{tabular}{|c|c|c||c|}
+		\hline
+		$e_0$ & $e_1$ & $c$ & $s$  \\ \hline
+		0 & 0 & 0 & 0 \\ \hline
+		0 & 0 & 1 & 0 \\ \hline
+		0 & 1 & 0 & 0 \\ \hline
+		0 & 1 & 1 & 1 \\ \hline
+		1 & 0 & 0 & 0 \\ \hline
+		1 & 0 & 1 & 1 \\ \hline
+		1 & 1 & 0 & 1 \\ \hline
+		1 & 1 & 1 & 1 \\ \hline
+	\end{tabular} \quad ($s = (c \wedge e_0) \vee (\neg c \wedge e_1)$)\\
+	représenté par \raisebox{-0.5\height}{\begin{tikzpicture}[->]
+			\node[trapezium, draw, shape border rotate=270, scale=4] (m) {};
+			
+			\node[above left = -0.3cm and 0.5cm of m] (e0) {$e_0$};
+			\node[right = 0.5cm of e0] (e0-faux) {};
+			\draw (e0) edge[] (e0-faux);
+			
+			\node[below left = -0.3cm and 0.5cm of m] (e1) {$e_1$};
+			\node[right = 0.5cm of e1] (e1-faux) {};
+			\draw (e1) edge[] (e1-faux);
+			
+			\node[below = 0.7cm of m] (c) {$c$};
+			\draw (c) edge[] (m);
+			
+			\node[right = 0.5cm of m] (s) {$s$};
+			\draw (m) edge[] (s);
+	\end{tikzpicture}}
+\end{definition}
+
+\begin{exercise}
+	Construire un circuit booléen pour le multiplexeur à deux entrées.
+\end{exercise}
+
+\begin{rem}
+	En combinant les multiplexeurs à deux entrées, on peut générer des multiplexeurs à $2^k$ entrées.
+\end{rem}
+
+\begin{example}[Multiplexeur à 4 entrées] \\
+	\begin{tikzpicture}[->]
+		\node[trapezium, draw, shape border rotate=270, scale=4] (m2) {};
+		
+		\node[above left = -0.3cm and 0.5cm of m2] (e2) {$e_2$};
+		\node[right = 0.5cm of e2] (e2-faux) {};
+		\draw (e2) edge[] (e2-faux);
+		
+		\node[below left = -0.3cm and 0.5cm of m2] (e3) {$e_3$};
+		\node[right = 0.5cm of e3] (e3-faux) {};
+		\draw (e3) edge[] (e3-faux);
+		
+		
+		\node[trapezium, draw, below = 2cm of m2, shape border rotate=270, scale=4] (m1) {};
+		
+		\node[above left = -0.3cm and 0.5cm of m1] (e0) {$e_0$};
+		\node[right = 0.5cm of e0] (e0-faux) {};
+		\draw (e0) edge[] (e0-faux);
+		
+		\node[below left = -0.3cm and 0.5cm of m1] (e1) {$e_1$};
+		\node[right = 0.5cm of e1] (e1-faux) {};
+		\draw (e1) edge[] (e1-faux);
+		
+		\node[trapezium, draw, below right = 1cm and 2cm of m2, shape border rotate=270, scale=4] (m3) {};
+	
+		\node[above left = -0.3cm and 0.5cm of m3] (e4) {};
+		\node[right = 0.5cm of e4] (e4-faux) {};
+		
+		\node[below left = -0.3cm and 0.5cm of m3] (e5) {};
+		\node[right = 0.5cm of e5] (e5-faux) {};
+		
+		\node[right = 0.5cm of m3] (s) {$s$};
+		\draw (m3) edge[] (s);
+		
+		\node[below = 1cm of m1] (c0) {$c_0$};
+		\node[right = 2.5cm of c0] (c1) {$c_1$};
+
+		%maintenant il faut tracer tous les traits à la con
+		
+		\node[above = 0.5cm of c0, minimum size = 0, inner sep=0] (i1) {};
+		\node[right = 0.7cm of i1, minimum size = 0, inner sep=0] (i2) {};
+		\node[above = 3.5cm of i2, minimum size = 0, inner sep=0] (i3) {};
+		\node[left = 0.7cm of i3, minimum size = 0, inner sep=0] (i4) {};
+		
+		
+		\node[right = 1cm of m1, minimum size = 0, inner sep=0] (i5) {};
+		\node[right = 1cm of m2, minimum size = 0, inner sep=0] (i6) {};
+		
+		\draw (c0) edge[] (m1);
+		\draw (c1) edge[] (m3);
+		
+		\draw (c0) -- (i1) -- (i2) -- (i3) -- (i4) -> (m2);
+		
+		\draw (m1) -- (i5) |- (e5-faux);
+		\draw (m2) -- (i6) |- (e4-faux);
+
+	\end{tikzpicture}
+\end{example}
+
+\begin{rem}
+	Si on interprète $c_1c_0$ comme un nombre en binaire, sa valeur correspond à l'entrée sélectionné.
+\end{rem}
+
+\begin{appl}
+	On peut alors créer un sélectionneur d'adresse avec un chemin critique de taille $O(\log n)$ ce qui est optimal.
+\end{appl}
+
+\begin{com}
+	Là si on a la place, pour insister sur l'aspect archi de la leçon, on peut parler plus longuement de cette application, en disant qu'on en met en parralèle pour avoir plus de données, qu'on le fait sur plus de bits d'adresse, sur le fait qu'on utilise qu'un nombre linéaire de portes.
+\end{com}
+
+\begin{exercise}
+	Faire un démultiplexeur à $2^k$ entrées.
+\end{exercise}
+
+
+
+
+
+
+
+
+
+
+
