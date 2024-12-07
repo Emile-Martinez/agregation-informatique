@@ -52,7 +52,7 @@
 	$\oplus(1, 1) \neq \otimes(1, 2) \neq \otimes(2, 1)$. On s'intéresse à l'expression et non au résultat.
 \end{rem}
 
-\noindent \textbf{Développement \ref{D?}} Validité de la construction d'un ensemble inductif (remarque \ref{4-3} et définition \ref{4-4})
+\paragraph{Développement :} Validité de la construction d'un ensemble inductif (remarque \ref{4-3} et définition \ref{4-4})
 
 \subsection{Induction structurelle}
 On prendra maintenant $(\mathcal B, (f_i)_{i \in I})$ une signature.
@@ -113,7 +113,7 @@ On prendra maintenant $(\mathcal B, (f_i)_{i \in I})$ une signature.
 \end{theorem}
 
 \begin{rem}
-	Cela étend le principe de réccurence forte.
+	Cela étend le principe de récurrence forte.
 \end{rem}
 
 \begin{definition}
@@ -263,6 +263,8 @@ and type arbre_liste = Vide | Cons arbre*arbre_liste
 	Dans la défense de plan, on peut parler ici des différentes définition des arbres (par coinduction, avec une infinité de constructeur (pour chaque $k \in \N^*$ d'arité $k$, pour les arbres à $k$ fils), par un constructeur $Ajout\_fils$ d'arité 2 où le premier argument est l'arbre sans son premier fils, et le dernier argument le premier fils (on en déduit les cas de bases))
 \end{com}
 
+\paragraph{Développement :} Équivalence des arbres binaires et des arbres généraux.
+
 \section{Ensembles inductifs}
 
 \subsection{Formules propositionnelles}
@@ -305,7 +307,7 @@ and type arbre_liste = Vide | Cons arbre*arbre_liste
 \subsection{Langages}
 
 \begin{com}
-	Ici comme exemple on aurait aussi pu prendre les langages réguliers, cela est plus pertinent comme construction, mais nécessite d'avoir déjà les définitions de bases sur les langages. Et de plus trouver des inductions parait non trivial
+	Ici comme exemple on aurait aussi pu prendre les langages réguliers, cela est plus pertinent comme construction, mais nécessite d'avoir déjà les définitions de bases sur les langages. Et de plus trouver des inductions parait non trivial.\\
 \end{com}
 
 \begin{definition}
@@ -320,12 +322,31 @@ and type arbre_liste = Vide | Cons arbre*arbre_liste
 \end{rem}
 
 \begin{definition}
-	La concaténation de deux mots $w_1, w_2 \in \Sigma^*$ se définit inductivement comme : \begin{itemize}
-		\item $concat(w_1, \varepsilon) = w_1$
-		\item $concat(w_1, w_2.a) = concat(w_1, w_2).a$
+	Soit $X$ un ensemble et $\delta : X \times \Sigma \to X$.\\
+	On définit alors $\delta^* : X \times \Sigma^* \to X$ inductivement par :\begin{itemize}
+		\item $\forall x \in X, \delta^*(x, \varepsilon) = x$
+		\item $\forall x \in X, \forall a \in \Sigma, \forall w\in \Sigma^*, \delta^*(x, w.a) = \delta(\delta^*(x, w), a)$
 	\end{itemize}
 \end{definition}
 
 \begin{exercise}
-	Montrer par induction structurelle que $concat(w_1, concat(a, w_2)) = concat(w_1.a, w_2)$ 
+	Montrer par induction structurelle que $\delta^*(x, a.w) = \delta^*( \delta(x, a), w)$
 \end{exercise}
+
+\begin{com}
+	On pourrait ici mettre plein d'exercices plus intéressants (vu qu'on est sur les automates) mais ca nécessiterait probablement d'introduire trop de choses (déjà qu'ici on utilise $a.w$ sans avoir défini la concaténation). Meme si on pourrait déjà commencé par $\delta^*$ est un morphisme de $\Sigma^*$ avec la concaténation dans $X \to X$ pour la composition (en gros, $\delta^*\circ \delta^* = \delta^*$).
+\end{com}
+
+\begin{com}
+	Si cette fonction est trop compliqué, on peut remplacer par l'exercice suivant
+	\begin{definition}
+		La concaténation de deux mots $w_1, w_2 \in \Sigma^*$ se définit inductivement comme : \begin{itemize}
+			\item $concat(w_1, \varepsilon) = w_1$
+			\item $concat(w_1, w_2.a) = concat(w_1, w_2).a$
+		\end{itemize}
+	\end{definition}
+	
+	\begin{exercise}
+		Montrer par induction structurelle que $concat(w_1, concat(a, w_2)) = concat(w_1.a, w_2)$ 
+	\end{exercise}
+\end{com}
