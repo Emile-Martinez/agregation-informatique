@@ -12,3 +12,7 @@ plan lecon 14 :
 plan lecon 15 :
 	Intérêt de la première définition ?
 	A la fin, faire les schémas
+
+plan lecon 4 :
+	passer la déf du début en informelle et mettre en remarque la déf formelle.
+	Remplacez le dev 1 par équivalence def par le haut et par le bas, et application à prouver le principe d'induction structurelle.
