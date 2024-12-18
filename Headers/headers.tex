@@ -248,6 +248,15 @@ innerbottommargin=5pt, % Marge interne en bas
 	\end{tstyleOrange}%
 }
 
+\newenvironment{tp}[1][\empty]{%
+	\refstepcounter{theoremcounter} % Incrémente le compteur
+	\begin{tstyleOrange}%
+		\textcolor{orange-exo}{\textbf{TP~\thetheoremcounter}%
+			\ifx#1\empty\else~(\textbf{#1})\fi :}~%
+	}{%
+	\end{tstyleOrange}%
+}
+
 \NewDocumentEnvironment{personalise}{O{} O{}}
 {%
 	\refstepcounter{theoremcounter} % Incrémente le compteur
