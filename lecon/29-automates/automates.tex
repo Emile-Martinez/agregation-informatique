@@ -1,0 +1,373 @@
+\debut{Emile Martinez}{MPI}{définition inductive, définition de base sur les langages}{}
+
+\begin{com}
+	On considère les définitions de bases sur les langages (mot vide, concaténation de deux mots, etc.) parce que on a déjà beaucoup de choses à dire, et que on peut le considérer antérieur à la leçon.
+\end{com}
+
+\begin{com}
+	Dans le dilemne classique de présenter d'abord les langages régulier ou d'abord les autoamtes, on choisit ici les langages, car la notion de langages est nécessaire pour parler de langage reconnu par un automate. Donc pour ne pas faire d'aller retour sur les notions de langages, on définit d'abord les langages réguliers.
+\end{com}
+
+\section{Langages réguliers}
+
+\subsection{Langages}
+
+\begin{definition}
+	Un langage sur un alphabet $\Sigma$ est une ensemble de mot de $\Sigma$
+\end{definition}
+
+\begin{example}
+	Pour $\Sigma = \{0,1\}, \emptyset, \{\varepsilon, 101, 1111\}, \{\varepsilon\}, \{\text{mot de taille paires}\}$ sont des langages sur $\Sigma$
+\end{example}
+
+\begin{definition}
+	On proloonge les définitions ensemblistes d'union, intersection et complémentaire sur les langages.On définit aussi : \begin{itemize}[label=$\star$]
+		\item la concaténation de $L_1$ et $L_2$ par $\{u.v / u \in L_1, v \in L_2\}$ noté $L_1.L_2$
+		\item inductivement $L^n$ par $L^0 = \{\varepsilon\}$ et $L^n = L^n-1 . L$
+		\item l'étoile de Kleene par $L^* = \bigcup\limits_{n \geq 0} L^n$
+	\end{itemize}
+\end{definition}
+
+\subsection{Langages réguliers}
+
+\begin{definition}
+	On définit par induction l'ensemble des expressions régulières sur $\Sigma$ par : \begin{itemize}[label=$\star$]
+		\item les cas de bases : $\empty$, $\varepsilon$, $a \in \Sigma$
+		\item le constructeur unaire ${}^*$
+		\item les constructeurs binaires $+$ et $.$ (en notation infixe)
+	\end{itemize}
+\end{definition}
+
+\begin{example}
+	$(0+1)^*.1.0$ est une expression régulière
+\end{example}
+
+\begin{definition}
+	Le langage $L(r)$ associé à une expression régulière est définit inductivement par : \begin{itemize}[label=$\bullet$]
+		\item $L(\emptyset) = \emptyset$, $L(\varepsilon) = \{\varepsilon\}$, $L(a) = \{a\}$ pour $a \in \Sigma$
+		\item $L(r_1 + r_2) = L(r_1) \cup L(r_2)$
+		\item $L(r_1.r_2) = L(r_1).L(r_2)$
+		\item $L(r^*) = L(r)^*$
+	\end{itemize}
+	On appelle $L(r)$ un langage régulier.
+\end{definition}
+
+\begin{example}
+	$L\big((0+1)^*.1.0\big)$ est l'ensemble mots représentant des nombres en binaires multiples de 2 et pas de 4.
+\end{example}
+
+\section{Automates}
+
+\subsection{Automates non déterministes}
+
+\begin{com}
+	On commence par les automates non déterministes et pas les déterministes, non pas car ils sont plus simples (la défintion peut l'être car on a pas la fonction partielle à gérer). Néanmoins, en s'autorisant les $\varepsilon$-transition, la définition d'un mot reconnu est plus complexe. On fait cela car la définition de DFA se dérive mieux de celle de NFA que l'inverse, et faire pleinement les deux définitions feraient beaucoup de répétitions. Ce qui peut etre appréciable ou pas suivant le niveau de la classe. (Pas dans un plan d'agreg avec une classe qui suit moyennenment, on pourrait faire dans l'autre sens, de manière à profiter de la répétition pour les familiariser avec le formalisme et les définitions).
+	
+	De plus beaucoup de définitions en sont aussi légèrement simplifiés par la suite (automates complet, équivalence DFA, NFA). Meme si ce dernier argument est pas tip top.
+\end{com}
+
+\begin{definition}
+	Un automate fini non déterministe (NFA) est un 5-uplet $(Q, \Sigma, q_0, F, \delta)$ où : \begin{itemize}
+		\item $Q$ est un ensemble fini d'états
+		\item $\Sigma$ est un alphabet
+		\item $q_0 \in Q$ l'état initial
+		\item $F \subset Q$ l'ensemble des états acceptants (ou finaux)
+		\item $\delta : Q × \{\Sigma \cup \varepsilon\} \to \mathcal P(Q)$ une fonction de transition
+	\end{itemize}
+\end{definition}
+
+\begin{rem}
+	$\delta(q, \varepsilon)$ est une $\varepsilon$-transition
+\end{rem}
+
+\begin{personalise}[Représentation]
+	Les états sont des cercles, les transitions des flèches étiquetées. Une flèche entrante dans l'état initial, sortante pour $q\in F$
+\end{personalise}
+
+\begin{example}
+	\label{29-eg}
+	\raisebox{-0.7\height}{
+	\begin{tikzpicture}[->]
+		\node (r1) {};
+		\node[state, right=of r1] (q0) {0};
+		\node[state, right=of q0] (q1) {1};
+		\node[state, right=of q1] (q2) {2};
+		\node[right=of q2] (r2) {};
+		
+		\draw (r1) edge[] (q0);
+		\draw (q0) edge[loop below] node{0, 1} (q0);
+		\draw (q0) edge[below] node{0} (q1);
+		\draw (q1) edge[below] node{1} (q2);
+		\draw (q2) edge[] (r2);
+	\end{tikzpicture}}
+\end{example}
+
+\begin{exercise}
+	Sur l'exemple précédent, définir formellement l'automate $(Q, \Sigma, q_0, F, \delta)$
+\end{exercise}
+
+\begin{definition}
+	Soit $\mathcal A = (Q, \Sigma, q_0, F, \delta)$ un NFA. On appelle $\varepsilon$-fermture de l'état $q$, noté $E(q)$ l'ensemble $\bigcup\limits_{n \geq 0} \delta^n_\varepsilon(\{q\})$ où \raisebox{-0.5\height}{$\begin{array}{rccl} 
+		\delta_\varepsilon : & \mathcal P(Q) & \to & \mathcal P(Q)\\
+		& A & \mapsto & \bigcup\limits_{q \in A} \delta(q, \varepsilon)
+	\end{array}$}
+\end{definition}
+
+\begin{idee}
+	$E(q)$ est l'ensemble des états accessibles depuis $q$ en empruntant seulement des $\varepsilon$-transition.
+\end{idee}
+\begin{definition}
+	On définit $\delta^*$ sur $Q\times \Sigma$ par induction sur les mots par :\begin{itemize}[label=$\star$]
+		\item $\delta^*(q, \varepsilon) = E(q)$
+		\item $\delta^*(q, wa) = E\left(\bigcup\limits_{q' \in \delta^*(q, w)} \delta^*(q', a)\right)$
+	\end{itemize}
+\end{definition}
+
+\begin{example}
+	Sur l'exemple \ref{29-eg}, $\delta^*(0, 10) = \{0, 2\}$
+\end{example}
+
+\begin{definition}
+	On dit que $w \in \Sigma^*$ est accepté par un NFA $\mathcal A$ si $F \cap \delta^*(q_0, w) \neq \emptyset$. On note $\mathcal L(\mathcal A)$ le langage des mots reconnu par $\mathcal A$. On dit que le langage $\mathcal L(\mathcal A)$ est reconnaissable.
+\end{definition}
+
+\begin{example}
+	Pour l'exemple \ref{29-eg}, $\mathcal L(\mathcal A) = \{w \in \{0, 1\}^* / w \text{ termine par } 01\}$
+\end{example}
+
+\begin{definition}
+	On dit que deux automates sont équivalents si ils reconnaissent le même langage.
+\end{definition}
+
+\subsection{Automates déterministes}
+
+\begin{definition}
+	Soit $\mathcal A$ un NFA. Si $\forall q \in Q, \forall a \in \Sigma, |\delta(q, a)| \leq 1$ et $\delta(q, \varepsilon)=\emptyset$, on dit que $\mathcal A$ est un automate fini déterministe (DFA)
+\end{definition}
+
+\begin{proposition}
+	Si $\mathcal A$ est un DFA, alors $\forall q \in Q, \forall w \in \Sigma^*, |\delta^*(q, w)| \leq 1$.
+\end{proposition}
+
+\begin{exercise}
+	Reprendre la définition d'un DFA (et d'un langage reconnu) avec des fonctions partielles dans $Q$ à la place de fonctions dans $\mathcal P(Q)$.
+\end{exercise}
+
+\begin{definition}
+	Un langage rationnel est un langage reconnu par un automate déterministe.
+\end{definition}
+
+\begin{example} DFA reconnaissant les mots sur $\Sigma=\{0, 1\}$ de longueur impaire\\
+	\begin{tikzpicture}[->]
+		\node (r1) {};
+		\node[state, right=of r1] (q0) {0};
+		\node[state, right=of q0] (q1) {1};
+		\node[right=of q1] (r2) {};
+		
+		\draw (r1) edge[] (q0);
+		\draw (q0) edge[bend left, above] node{0, 1} (q1);
+		\draw (q1) edge[bend left, below] node{0, 1} (q0);
+		\draw (q1) edge[] (r2);
+	\end{tikzpicture}
+\end{example}
+
+\begin{theorem}
+	Tout NFA est équivalent à un DFA.
+\end{theorem}
+
+\begin{proof}
+	Construction de l'automate des parties
+\end{proof}
+
+\begin{example}
+	
+	\begin{minipage}{0.5\linewidth}
+		\begin{tikzpicture}[->]
+			\node (r1) {};
+			\node[state, right=of r1] (q0) {0};
+			\node[state, right=of q0] (q1) {0, 1};
+			\node[state, right=of q1] (q2) {0, 2};
+			\node[right=of q2] (r2) {};
+			
+			\draw (r1) edge[] (q0);
+			\draw (q0) edge[loop above] node{0} (q0);
+			\draw (q0) edge[bend left, above] node{1} (q1);
+			\draw (q1) edge[bend left, below] node{1} (q0);
+			\draw (q1) edge[bend left, above] node{0} (q2);
+			\draw (q2) edge[bend left, below] node{1} (q1);
+			\draw (q2) edge[bend left=70, above] node{0} (q0);
+			\draw (q2) edge[] (r2);
+		\end{tikzpicture} 
+	\end{minipage} \begin{minipage}{0.4\linewidth}
+		est un DFA équivalent au NFA de l'exemple \ref{29-eg}
+	\end{minipage}
+	
+\end{example}
+
+\begin{rem}
+	Dans le pire des cas, déterminiser un NFA crée un nombre exponentiel d'états
+\end{rem}
+
+\begin{definition}
+	On dit que un DFA $\mathcal A$ est complet si $\forall q \in Q, \forall a \in \Sigma, |\delta(q, a)| = 1$
+\end{definition}
+
+\begin{theorem}
+	Tout DFA est équivalent à un DFA complet.
+\end{theorem}
+
+\section{Lien automate fini et langages réguliers}
+
+\begin{theorem}[Kleene]
+	Pour $L \in \Sigma^*$, $L$ régulier $\Leftrightarrow$ $L$ rationnel.
+\end{theorem}
+
+\begin{proof}
+	$\Leftarrow$ : Construction de Thompson
+	
+	$\Rightarrow$ : Algorithme d'élimination des parties (Brozowski)
+\end{proof}
+
+\paragraph{Développement :} Construction de Thompson
+
+\begin{rem}
+	L'algorithme de Thompson nous fournit un NFA avec beaucoup d'$\varepsilon$-transitions. On voudrait les éviter.
+\end{rem}
+
+\begin{definition}
+	Soit $L \subset \Sigma^*$ un langage. On définit : \begin{itemize}
+		\item $P(L) = \{a \in \Sigma | a.\Sigma^* \cap L \neq \emptyset\}$
+		\item $D(L) = \{a \in \Sigma | \Sigma^*.a \cap L \neq \emptyset\}$
+		\item $F(L) = \{(a,b) \in \Sigma \times \Sigma | \Sigma^*.ab.\Sigma* \cap L \neq \emptyset\}$
+	\end{itemize}
+	$L$ est local si $L\backslash \{\varepsilon\} = P(L)\Sigma^* \enspace \cap \enspace \Sigma^*D(L) \enspace \big\backslash \enspace \Sigma^*\left(\Sigma^2 \backslash F(L)\right) \Sigma^*$
+\end{definition}
+
+\begin{rem}
+	L est local si il est déterminé par ses premières et dernières lettres et par ses facteurs de 2 lettres.
+\end{rem}
+
+\begin{definition}
+	Soit $L \subset \Sigma^*$. On définit $Loc(L)$ l'automate $(Q_L, \Sigma, q_0, F_L, \delta_L)$ tel que : \begin{itemize}
+		\item $Q_L = \{q_a / a \in \Sigma\} \cup \{q_0\}$
+		\item $F_L = \{q_a / a \in D(L)\} \cup \{q_0 / \varepsilon \in L\}$
+		\item $\delta_L : \left\{ \begin{array}{ll} 
+			\delta(q_0, a) \mapsto q_a & \text{pour }a \in P(L)\\
+		\delta(q_a, b) \mapsto q_b & \text{pour } ab \in F(L)
+		\end{array} \right.$
+	\end{itemize}
+\end{definition}
+
+\begin{com}
+	Ici on a la défintion avec des fonctions partielles et non une fonction qui renvoie $\emptyset$ ou un singleton. On peut remplacer dans la définition, mais comme vu dans l'exercice juste après la définition, c'est la même chose.
+\end{com}
+
+\begin{theorem}
+	Si $L$ est local, alors $L = \mathcal L(Loc(L))$
+\end{theorem}
+
+\begin{algo}[Berry Sethi]
+	\textbf{Entrées :} $r$ une expression régulière\\
+	\textbf{Sorties :} Un NFA sans $\varepsilon$-transition qui reconnait $\mathcal (r)$
+	\begin{enumerate}
+		\item Linéariser $r$ en $r'$ (en marquant chaque lettre pour la rendre unique)
+		\item Construire $Loc_{\mathcal L(r')}$ (en calculant $P$, $D$, etc.)
+		\item Sur les transitions de l'automate, effacer les marquages
+	\end{enumerate}
+\end{algo}
+
+\subsection{Conséquences}
+
+La première conséquence évidente est de vérifier l'appartenance à un langage régulier. Mais il y a d'autres conséquences plus théoriques.
+
+\begin{theorem}
+	Les langages réguliers sont clos par complémentaire et intersection
+\end{theorem}
+
+\begin{theorem}[Lemme de l'étoile]
+	Soit $L \subset \Sigma^*$ régulier. Alors, $\exists n \in \N \: : \: \forall w \in L, \, |w| \geq n+1 \implies \exists x, y, z \: : \: w = x.y.z $ et \begin{enumerate}
+		\item $|xy| \leq n$
+		\item $|y|\geq 1$
+		\item $\forall i \in \N x.y^i.z \in L$
+	\end{enumerate} 
+\end{theorem}
+
+\begin{proof}
+	On prend le $\mathcal A$ le DFA tel que $\mathcal L(\mathcal A) = L$, $n$ son nombre d'états.
+\end{proof}
+
+\begin{rem}
+	Ce lemme est surtout utilisé pour prouver la non rationnalité d'un langage.
+\end{rem}
+
+\begin{example}
+	Montrer que $\{a^n b^n \: / \: n \in N\}$ n'est pas rationnel.
+\end{example}
+
+\section{Applications}
+
+\begin{com}
+	Si on veut on peut rajouter ici une partie  sur un exemple concret, pour voir l'utilité des automates. Par exemple pour la solution à un passage de rivière (ou on doit faire traverser une rivière à un chou une chèvre et un loup, on doit faire des allers retours en ne pouvant à chaque fois en emporter qu'un ou 0 dans le bateau, sans laisser sans surveillance la chèvre et le chou ou la chèvre et le loup). On représente alors les états comme ou sont les animaux et le bateau, les lettres comme qui traverse, les états finaux comme ve que l'on souhaite (tout le monde a traversé), les états ou l'on perd sont des puits, et on veut savoir si le langage reconnu est vide, et si il ne l'est pas, ca nous donne toutes les solutions possibles.  (on peut alors généraliser avec pas seulement trois animaux, etc.)\\
+	
+	Néanmoins, bien qu'intéressant pour illustrer la puissance de modélisation des automates (comme le suggère un peu le programme), cet exemple semble le premier à devoir sauter vu sa pertinence moindre dans un cadre purement informatique (on fait moins de liens avec des problèmes informatiques concrets)
+\end{com}
+
+\subsection{Analyse lexicale}
+
+Les expressions régulières et les DFA interviennent dans la compilation des langages de programmation, au niveau de l'analyse lexicale.
+
+\begin{principe}
+	Découper un programme en lexème, interprétables. Pour cela, on utilise un analyseur lexicale, qui est une liste d'automate que l'on exécute en parrallèle. Quand on bloque sur tous les automates, on prend l'automate dans l'état final de plus haute priorité.
+\end{principe}
+
+\begin{example} \\
+	lexème 1 : $(O..9)^+ . ','.(0..9)^*$ (flottant)\\
+	lexème 2 : $(0..9)^+$ (int) \\
+	lexème 3 : $if$ (IF) \\
+	lexème 4 : $then$ (THEN) \\
+	lexème 5 : $\Sigma \backslash '\enspace'$ (variables).\\\\
+	\texttt{if (1) then 42,5} est reconnu comme IF INT("5") THEN FLOAT(42,5)
+\end{example}
+
+\subsection{Expression régulière POSIX}
+
+\begin{personalise}[Motivation]
+	\texttt{grep 'reg\_exp' fichier} renvoie toutes les lignes de fichier ont une osus-chaîne est dans $\mathcal L(reg\_exp)$
+\end{personalise}
+
+\begin{syntaxe}
+	\begin{itemize}[label=$\bullet$]
+		\item un caractère représente lui-même en général
+		\item | représente le $+$
+		\item * représente l'étoile de Kleene
+	\end{itemize}
+	etc. (voir \texttt{man grep})
+\end{syntaxe}
+
+\subsection{Reconnaissance de motif dans un texte}
+
+Mais les automates, ont aussi des applications en eux-mêmes.\\
+
+On considère que $u$ est un sous mot de $w$ s'il existe $k \in \N$ tel que $u = w(k)...w(k+|u|-1)$
+
+\begin{personalise}[Motivation]
+	CTRL + F
+\end{personalise}
+
+\begin{personalise}[Solution naïve]
+	$O(|t| \times |w|)$ (On parcourt $t$ et on compare les lettres une à une)
+\end{personalise}
+
+\begin{personalise}[Autre solution]
+	On construit l'automate des motifs en $O(P(|w|))$ où $P$ est un polynôme, reconnaissant $\Sigma^*m\Sigma^*$, et on détecte ensuite si $w$ est un sous-mot de $t$ en $O(|t|)$.
+\end{personalise}
+
+\paragraph{Développement :} Construction de l'automate des motifs
+
+\subsection{Automates en architectures des ordinateurs}
+
+Une version modifiée des automates (sans états final, avec des sorties à chaque transition) est très utilisée en architecture des ordinateurs, servant à représenter comment doit agir un circuit électronique, et dont on peut parfois espérer déduire une manière de l'implémenter, ou a défaut, une manière de le spécifier.
+
+\begin{com}
+	Si on veut on peut s'étendre ici, en parlant de situation par lesquelles on peut implémenter un automate (par exemple le protocole MESI), ou de comment implémenter un automate par un circuit séquentiel (avec un registre qui stocke l'état, et la fonction de transition (et éventuellement une fonction de sortie))
+\end{com}
