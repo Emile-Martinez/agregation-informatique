@@ -1,0 +1,328 @@
+\debut{Emile Martinez}{}{}{}
+
+Les notions présentées ici le sont informellement. Les notions formelles existent mais des notions intuitives suffisent à cette leçon.
+
+\section{Introduction}
+
+\subsection{Problèmes de décision}
+
+\begin{definition}
+	Un problème de décision $\Pi$ est la donnée d'un ensemble $E$ d'instance et d'un ensemble $E^+\subset E$ d'instances positives.
+\end{definition}
+
+\begin{example}
+	\begin{itemize}[label=$\bullet$]
+		\item $E = \N$, $E^+ = \{n \in \N / n \text{ est premier}\}$
+		\item $E = \{\text{formules du premier ordre}\}$, $E^+ =\{\text{formules universellement vraies}\}$
+	\end{itemize}
+\end{example}
+
+\begin{personalise}[notation]
+	Un problème de décision est la donnée d'un ensemble $E$ d'instance et d'un ensemble $E^+\subset E$ d'instance positives.
+\end{personalise}
+
+
+\begin{example}
+	$SAT$ est le problème de savoir si une formule propositionnelle est satisfiable ou pas. On notera alors $x\wedge y \in SAT$ mais $x\wedge \neg x\notin SAT$.
+\end{example}
+
+\begin{example}[Problème APP]
+	\label{31-app}
+	\begin{itemize}
+		\item[Entrée] $T$ un tableau d'entiers, $x \in \N$
+		\item[Sortie] $x \in T$
+	\end{itemize}
+\end{example}
+
+\begin{exercise}
+	Réécrire le problème APP sous la forme $E,_, E^+$
+\end{exercise}
+
+\begin{rem}
+	Quand on considère un problème en informatique, on ne considère pas des objets mathématiques mais un codage de ces objets. Dans la définition d'un problème, on rajoute parfois le codage de ces objets, sinon, on considère un codage «raisonnable».
+\end{rem}
+
+\begin{definition}
+	La taille d'une instance d'un problème est la taille du codage de l'instance.
+\end{definition}
+
+\begin{example}
+	Des tailles pour des structures de données classiques sont :
+	\begin{itemize}	[label=$\star$]
+		\item $O(\log(n))$ pour un entier $n$
+		\item $O(|T| \times k)$ pour un tableau $T$ contenant des éléments de taille $k$
+		\item $O(|A|\times \log(|S|))$ pour un graphe $G = (S, A)$
+	\end{itemize}
+\end{example}
+
+\section{Algorithmes}
+
+Ce qu'on appelle ici algorithme, c'est un programme C, avec une mémoire infini.
+
+\begin{definition}
+	On dit qu'un algorithme résout un problème $\Pi$ si sur chaque entrée possible, l'algorithme termine et renvoie la sortie correspondante.
+\end{definition}
+
+\begin{example}
+	\label{31-pgcd}
+	L'algorithme qui calcule le PGCD par soustraction successive et compare le résultat à $1$ résout le problème premier entre eux : $E = \N^2$, $E^+ = \{(a, b)\in \N^2 | a\wedge b = 1\}$
+\end{example}
+
+\begin{definition}
+	On dit qu'un algorithme a une complexité en $f:E \times S \to \N$ quand pour toute entrée $e$ et sortie $s$, l'algorithme termine en moins de $f(e, s)$ opérations élémentaires.
+\end{definition}
+
+\begin{rem}
+	On définit informellement «opérations élémentaires» ici comme une opération raisonnable (opération arithmétique, affectation, etc.). Le formalisme vient avec les machines de Turing qui sont hors programme.
+\end{rem}
+
+\begin{example}
+	Dans l'exemple \ref{31-pgcd} l'algorithme a une complexité en \raisebox{-0.4\height}{$\begin{array}{lccl}
+		f: &\N\times \N & \to & \N \\
+		& (a,b) & \mapsto & a+b\end{array}$}
+\end{example}
+
+\begin{rem}
+	Si $g > f$ et $\mathcal A$ a une complexité en $f$, il l'a aussi en $g$. (Être linéaire, c'est aussi être quadratique avec notre définition)
+\end{rem}
+
+\section{Les classes P et NP}
+
+\subsection{La classe P}
+
+\begin{definition}
+	On dit qu'un algorithme $\mathcal A$ de complexité $f$ est polynomial, si il existe un polynôme $T$ tel que pour toute entrée et sortie $(e, s)$, $f(e, s) \leq T(|e|)$
+\end{definition}
+
+\begin{rem}
+	L'algorithme qui teste si $i$ divise $n$ pour tout $i \leq n$ a une complexité $O(n) = O (2^{|n|})$ donc n'est pas polynomial.
+\end{rem}
+
+\begin{definition}
+	La classe $P$ contient tous les problèmes de décision $\Pi$ pour lesquels il existe un algorithme polynomial qui résout $\Pi$.
+\end{definition}
+
+\begin{example}
+	$APP \in P$. Un algorithme polynomial le résolvant parcourt les éléments de T jusqu'à trouver $x$ (ou la fin de $T$), en $O(|T|)$
+\end{example}
+
+\begin{rem}
+	Attention, la classe $P$ contient des problèmes de décision, pas des algorithmes.
+\end{rem}
+
+\begin{example}
+	Pour le problème $APP$ sur l'instance $(T, x)$, si je fais une boucle de taille $2^{|T|}$ puis je recherche, j'ai un algorithme exponentielle, mais qui résout un problème qui est dans $P$.
+\end{example}
+
+\begin{com}
+	Là on prend exprès un exemple absurde, et pas par exemple la reconnaissance par une grammaire, parce que on veut illustrer le fait que on peut toujours trouver des algos plus nuls, nous ce qui nous intéresse c'est uniquement l'algo le plus efficace, que la notion de tous les algorithmes n'a à priori aucun intérêt.
+\end{com}
+
+\begin{definition}[réduction polynomiale]
+	Soit $\Pi_1$, $\Pi_2$ deux problèmes de décision. On dit que $\Pi_1$ se réduit polynomialement vers $\Pi_2$, s'il existe une fonction $f : E_1 \to E_2$ tel que : \begin{itemize}
+		\item Pour tout entrée $e_1 \in E_1$, $\Pi_1(e_1) = \Pi_2(f(e_1))$ (réponse préservée)
+		\item Il existe un algorithme polynomial qui calcule $f$ (en toute rigueur, on pourrait dire résout)
+	\end{itemize}
+	On note $\Pi_1 \leq \Pi_2$
+\end{definition}
+
+\begin{idee}
+	Informellement, le problème $\Pi_1$ est plus simple que le problème $\Pi_2$, à un polynome près.
+\end{idee}
+
+\begin{example}
+	Le problème $MAX_i$ qui à l'instance $(T, x)$ dit si $x$ est le maximum de $T$, se réduit polynomialement au problème $MIN_i$ en remplaçant tous les éléments de $T$ par leur opposé, et $x$ par $-x$.
+\end{example}
+
+\begin{proposition}
+	La relation «être une réduction polynomiale de» est transitive
+\end{proposition}
+
+\begin{proposition}
+	 Si $\Pi_1$ se réduit polynomialement en $\Pi_2$, et $\Pi_2 \in P$, alors $\Pi_1 \in P$.
+\end{proposition}
+
+\begin{com}
+	On pourrait faire le développement suivant :
+\paragraph{Développement :} $2-SAT \in P$, par réduction polynomiale vers composante connexe.
+
+	Néanmoins ce développement si il parle de la classe $P$ ce n'y est qu'anecdotique, et si on a une réduction, il faudrait le mettre bien en évidence. Les deux autres développements semble plus croustillants pour le premier, et plus inévitable pour le second.
+\end{com}
+\subsection{La classe NP}
+
+\begin{definition}[Vérificateur]
+	Un vérificateur associé à un pb de décision $\Pi : E \to \{0, 1\}$ est un algorithme qui prend en entrée un couple $(e, c) \in E\times C$ où $C$ est un ensemble d'éléments appelé certificat, et qui renvoie un booléen tel que $f(e) = 1 \Leftrightarrow \exists c \in C : v(e, c) = 1 $
+\end{definition}
+
+\begin{definition}[Classe NP]
+	La classe NP est la classe des problèmes de décision qui admettent un vérificateur en temps polynomial
+\end{definition}
+
+\begin{proposition}
+	$SAT \in NP$
+\end{proposition}
+\begin{proof}
+	Le vérificateur associé prend comme certificat les valeurs de vérité des variables et en déduit la valeur de la formule
+\end{proof}
+
+\begin{example}[Voyageur de commerce]
+	$E = \left\{(V, A), w : A \to \N, k \in \N \big/ (V, A) \text{ graphe complet non orienté}\right\}$\\
+	$E^+$ est l'ensemble des graphes complets non orienté dont il existe un cycle passant par tous les sommets une unique fois et de poids total $\leq k$.\\
+	C'est le problème du voyageur de commerce. Il est dans $NP$
+\end{example}
+
+\begin{rem}[$NP$ et $co-NP$]
+	$\Pi \in NP$ veut dire que tout instance positive admet un certificat polynomial. Le rôle entre $E^+$ (instances positives) et $E \backslash E^+$ (instances négatives) n'est pas symétriques. En les échangeant dans la définition, on obtient la classe co-NP.
+\end{rem}
+
+\begin{definition}
+	$\Pi_1 = (E, E^-) \in co-NP$ si $\Pi_2 = (E, E \backslash E^-) \in  NP$
+\end{definition}
+
+\begin{example}
+	Savoir si un nombre est premier est dans $co-NP$ (avec comme certificat un diviseur strict $\neq 1$) 
+\end{example}
+
+\begin{proposition}
+	$P \subset NP$ (et $P \subset co-NP$)
+\end{proposition}
+
+\begin{proof}
+	Soit $\Pi : E \to \{0, 1\} \in P$. Alors il existe un algorithme $\mathcal A$ polynomial qui résout $\Pi$. Le vérificateur $v: E\times\{*\} \to \{0, 1\}$ qui renvoie $\mathcal A(e)$ est polynomial. 
+\end{proof}
+
+\begin{rem}
+	Savoir si l'inclusion est stricte ou si $P = NP$ est un grand problème informatique ouvert.(Un des sept problèmes du millénaire selon l'institut Clay).
+\end{rem}
+
+\section{NP-complétude}
+
+\subsection{Définition}
+
+\begin{definition}
+	Un problème de décision $\Pi$ est $NP$-difficile si tout problème de $NP$ se réduit polynomialement vers lui.
+\end{definition}
+
+\begin{idee}
+	$\Pi$ est plus dur que tout problème de $NP$
+\end{idee}
+
+\begin{definition}
+	$\Pi$ est NP-complet si $\Pi$ est $NP$-difficile et $\Pi \in NP$
+\end{definition}
+
+\begin{theorem}[Théorème de Cook]
+	$SAT$ est NP-complet
+\end{theorem}
+
+\paragraph{Développement :} Illustration du théorème de Cook.
+
+\subsection{Quelques problèmes NP-complets}
+
+\begin{proposition}
+	$\Pi_1$ est NP-complet ssi $\Pi_1 \in NP$ et $\exists \Pi_2 NP-$complet $: \: \Pi_2 \leq \Pi_1$
+\end{proposition}
+
+\begin{personalise}[Méthode][Pour montrer $\Pi_1$ NP-complet]
+	\begin{enumerate}
+		\item Prouver $\Pi_1 \in NP$
+		\item Choisir $\Pi_2$ NP-complet
+		\item Construire une transformation polynomiale de $\Pi_2$ vers $\Pi_1$
+		\item Montrer que la réponse est préservée
+	\end{enumerate}
+\end{personalise}
+
+\paragraph{Développement :} $3-SAT$ est NP-complet (réduction depuis $SAT$)
+
+\begin{example}
+	\paragraph{Problème :} chemin hamiltonien
+	\paragraph{Entrée :} $G = (V, A)$ non orienté
+	\paragraph{Sortie :} Existe-t-il un cycle de $G$ qui passe une unique fois par chaque sommet ?
+\end{example}
+
+\begin{proposition}
+	Chemin hamiltonien est NP-complet
+\end{proposition}
+
+\begin{proof}
+	Réduction depuis $3-SAT$
+\end{proof}
+
+\begin{proposition}
+	Voyageur de commerce est NP-complet
+\end{proposition}
+\begin{proof}
+	Réduction depuis chemin hamiltonien
+\end{proof}
+
+\begin{com}
+	Par ces exemples on montre bien le côté pieuvre des problèmes NP-complets, où plus on connaît de problèmes NP-complets, plus il est facile de prouver qu'un nouveau problème l'est aussi. (Ici connaitre la NP-complétude de chemin hamiltonien nous débloque assez facilement la NP-complétude de voyageur de commerce). (On pourrait d'ailleurs mettre la proposition précédente en exercice).
+\end{com}
+
+\section{Classes P et NP en informatique}
+
+\subsection{Pour les problèmes qui ne sont pas de décisions ?}
+
+\begin{rem}
+	La classe P est s'étend bien aux problèmes qui ne sont pas des problèmes de décisions, mais qu'en est-il pour la classe NP ?
+\end{rem}
+
+\begin{personalise}[Méthode]
+	Pour les problèmes d'optimisation («trouver la valeur minimale/maximale de \dots») on se ramène à un problème de décision associé en ajoutant un seuil («existe-t-il une solution de valeur $\leq k$ ?»). En faisant une dichotomie sur le seuil, on fait le chemin inverse.
+\end{personalise}
+
+\begin{example}
+	Pour voyageur de commerce, si on sait résoudre le problème de décision, on se ramène au problème de minimisation en faisant une dichotomie sur $k$ (compris entre $0$ et $\sum\limits_{(i,j) \in A} w_{i,j}$), ce qui est polynomial car on lance l'algorithme $\log \left( \sum\limits_{(i,j) \in A} w_{i,j} \right)$
+\end{example}
+
+\begin{exercise}
+	Comment faire si $k$ à priori non borné ?
+\end{exercise}
+
+\subsection{P ou NP-complets}
+
+\begin{rem}
+	Il est souvent facile de montrer $\Pi\in NP$. On se demande alors plutôt $P$ ou $NP$-complet.
+\end{rem}
+
+\begin{tabular}{c|c}
+	Classe P & NP-complet \\ \hline
+	\begin{minipage}{0.45\linewidth}
+		\begin{itemize}[label=$\bullet$]
+			\item[]
+			\item Existence d'un cycle eulérien
+			\item Accessibilité dans un graphe
+			\item Reconnaissance d'un mot par une grammaire
+			\item Coupe minimale
+			\item Couplage dans un graphe biparti
+			\item 2-coloration
+			\item Composante (fortement) connexe
+			\item Indep(i) et Indep($+\infty$)
+		\end{itemize}
+	\end{minipage}
+	&\begin{minipage}{0.45\linewidth}
+		\begin{itemize}[label=$\bullet$]
+			\item Existence d'un cycle hamiltonien
+			\item Voyageur de commerce
+			\item Couverture par les sommets/arêtes
+			\item Somme sous ensemble
+			\item Coupe Maximale
+			\item 2-partition
+			\item $k$-coloration pour $k\geq 3$
+			\item clique (existence d'une clique de taille $k$)
+			\item Indep($p$) pour $p \in \llbracket 2, +\infty \llbracket$
+		\end{itemize}
+	\end{minipage}
+\end{tabular}
+
+\begin{com}
+	Pour faire écho à la remarque introductive de cette sous-partie on peut aussi parler du fait que si $P \neq NP$, on a des problèmes ni dans $P$ ni $NP$-complet, comme par exemple la factorisation en nombre premier ou l'isomorphisme de graphe. (Info à vérifier)
+\end{com}
+
+\subsection{Plus que NP}
+
+Il existe des problèmes qui ne sont mêmes pas dans NP. En effet, tous les problèmes de NP, sont résolvables en temps exponentiels (on teste tous les certificats). On a donc pas les problèmes indécidables, ni même les problèmes plus long à résoudre.
+
+\begin{example}
+	Savoir si une position du jeu d'échecs généralisés (ou l'échiquier est $n \times n$ et non $8 \times 8$) est gagnante ou pas (EXPTIIME-complete) ou encore le problème de l'arrêt (indécidable).
+\end{example}
