@@ -1,0 +1,288 @@
+\debut{Emile Martinez}{MPI}{Langages}{}
+
+\section{Cadre théorique}
+
+\subsection{Problèmes de décision}
+
+\begin{definition}
+	Un problème de décision $\Pi$ est la donnée d'un ensemble $E$ d'instance et d'un ensemble $E^+\subset E$ d'instances positives.
+\end{definition}
+
+\begin{example}
+	\begin{itemize}[label=$\bullet$]
+		\item $E = \N$, $E^+ = \{n \in \N / n \text{ est premier}\}$
+		\item $E = \{\text{formules du premier ordre}\}$, $E^+ =\{\text{formules universellement vraies}\}$
+	\end{itemize}
+\end{example}
+
+\begin{personalise}[notation]
+	Pour $\Pi$ un problème de décision $(E, E^+)$, on identife parfois $\Pi$ et $E^+$
+\end{personalise}
+
+\begin{example}
+	$SAT = \Big( \{\text{formules propositionnelles}, \: \{\text{formules propositionnelles satisfiables}\}\}\Big)$. On peut alors noter $x\wedge y \in SAT$ mais $x\wedge \neg x\notin SAT$.
+\end{example}
+
+\section{Modèle de calcul}
+
+\begin{definition}
+	Un modèle de calcul est la donnée de :
+	\begin{itemize}
+		\item un ensemble de «machines»
+		\item le comportement d'une machine sur une entrée (comment elle «s'exécute»)
+		\item si l'exécution renvoie une réponse, quelle est-elle ?
+	\end{itemize}
+\end{definition}
+
+\begin{rem}
+	Cette définition est volontairement large et flou pour pouvoir accueillir un grand nombre de concept différents
+\end{rem}
+
+\begin{rem}
+	L'exécution peut mener à un arrêt prématuré (ou erreur) ou ne jamais terminer
+\end{rem}
+
+\begin{example}
+	Les automates finis déterministes, qui prennent en entrée $w\in \Sigma^*$ et répondent un booléen ($w \in \mathcal L(A)$)
+\end{example}
+
+\begin{definition}
+	Une machine résout un problème si pour toute instance du problème, la machine retourne une sortie correspondant à l'entrée.
+\end{definition}
+
+\begin{example}
+	Un automate $\mathcal A$ sur $\Sigma = \{0, 1\}^3$ qui détermine si la somme de deux entiers binaires donne bien le troisième.
+	
+	$\mathcal L(A) = \left\{w_1w_2w_3 / w_i\in \{0, 1\}^3 \text{ et } w_1 + w_2 = w_3\right\}$ 
+\end{example}
+
+\begin{rem}
+	Certains problèmes de décision ne sont pas résolvables par des automates déterministes : l'appartenance d'un mot à $\{a^n b^n / n\in N\}$
+\end{rem}
+
+\begin{definition}
+	Autres modèles de calcul : les grammaires algébriques, les fonctions OCamL, les automates infinis
+\end{definition}
+
+\begin{exercise}
+	Classer ces modèles par puissance de calcul
+\end{exercise}
+
+\section{Notions de calculabilité et décidabilité}
+
+\subsection{Sérialisation}
+
+\begin{definition}
+	0n appelle sérialisation le processus consistant à transformer une donnée en chaînes de caractères, sans perte d'informations.
+\end{definition}
+
+\begin{rem}
+	Sans perte d'information veut dire que la fonction de conversion est injective.
+\end{rem}
+
+\begin{example}
+	Pour un arbre binaire, la chaîne de caractère composée de son parcours préfixe, en ajoutant un symbole pour les feuilles.
+\end{example}
+
+\begin{syntaxe}
+	On notera $<D>$ la sérialisation d'une donnée $D$
+\end{syntaxe}
+
+\begin{principe}
+	Toutes les données manipulés par un ordinateur sont sérialisables
+\end{principe}
+\begin{proof}
+	La donnée est stockée dans des cases mémoires, que l'on peut interpréter comme des caractères. On concatène alors tous les couples (adresse, caractère) (couple qui prend un nombre fixe de caractères) des cases concernées.
+\end{proof}
+
+\begin{example}
+	Pour stocker un couple de chaines de caratères, on peut stocker la taille de la premiere en caractère, puis \#, puis la premiere chaine sans le caractère de fin de chaine, puis la seconde.
+\end{example}
+
+On se limitera donc ici à E comme un ensemble de chaine de caractère.
+
+\subsection{Décidabilité}
+
+On se fixe alors comme modèle de calcul, les fonctions OCaml avec une mémoire infinie. Notons $\mathcal F$ l'ensemble de ces fonctions, que l'on appellera machine.
+
+\begin{rem}
+	Avec mémoire infinie revient en OCamL que l'on a jamais de débordement de pile, et que l'on a toujours de la place pour créer de nouvelles données. Par contre le code des fonctions doit être fini.
+\end{rem}
+
+\begin{rem}
+	Des cadres théoriques plus formels existent (comme les machines de Turing)
+\end{rem}
+
+\begin{definition}[décidable]
+	On dit alors qu'un problème $(E, E^+)$ est décidable s'il existe une machine de type : \texttt{string $\to$ bool} terminant toujours et renvoyant \texttt{true} sur $E^+$ et \texttt{false} sur $E \backslash E^+$.
+\end{definition}
+
+\begin{principe}[Thèse de Church]
+	La notion de décidabilité ne dépend pas du modèle de calcul, pour peu qu'il soit raisonnable.
+\end{principe}
+
+\begin{rem}
+	«Raisonnable»
+\end{rem}
+
+\begin{com}
+Ici, les modèles de calcul ne prennet pas forcément en entrée les mêmes types de données, mais il suffit qu'ils implement les chaines de caractères (qu'on puisse les injecter dans le modèle) pour avoir une notion qui a du sens (pour pouvoir comparer des modèles entre eux qui n'ont à priori rien à voir).
+\end{com}
+
+\begin{com}
+	On peut insister ici sur le fait que ce n'est qu'une thèse, et que ca dépend de ce qu'on entend par raisonnable, mais que néanmoins, cela semble quelque chose de très puissant et très clairement non trivial qui se vérifie toujours.
+\end{com}
+
+\begin{idee}
+	Tous les langages de programmation ont la même puissance de calcul théoriques (peuvent calculer les mêmes choses)
+\end{idee}
+
+\begin{com}
+	Ici le théorique vient car c'est vrai dans des modèles à mémoire infini, etc.
+\end{com}
+
+\paragraph{Équivalence entre C sans fonction et OCaml sans impératif}
+
+\begin{corollary}
+	On s'autorisera à écrire du pseudo-code et à décrire les programmes.
+\end{corollary}
+
+\begin{com}
+	Ce corollaire est important, et donne une raison supplémentaire de parler de la thèse de Church Turing, et de justifier pourquoi on s'abstrait aussi vite du modèle de calcul que l'on a décrit.
+\end{com}
+
+\subsection{Calculabilité}
+
+On considère des ensembles $A$ et $B$ sérialisables (et dont on peut vérifier qu'une chaine de caractère est un codage valide)
+
+\begin{definition}
+	On dit qu'une fonction $f : A \to B$  est calculable si il existe une machine $g : \texttt{string} \to  \texttt{string}$ tel que $\forall x\in A, g \text{ termine sur }<x>$ et $g <x> = <f(x)>$
+\end{definition}
+
+\begin{principe}
+	Les notions de calculabilité et de décidabilité sont équivalentes.
+\end{principe}
+
+\begin{proof}
+	$\boxed{\Rightarrow}$ Soit $\Pi = (E, E^+)$. Si $f_\Pi :$$\begin{array}{ccl}
+		E & \to & \mathbb B\\
+		e & \mapsto & \texttt{true} \text{ ssi } e\in E^+
+	\end{array}$ est calculable, alors $\Pi$ est décidable\\
+	
+	$\boxed{\Rightarrow}$ Soit $f : A \to B$. On pose $\Pi_f = (E_f, E_f^+)$ où $E_f = <A\times B>$ et $E_f^+ = \{<x, f(x)> / x \in A\}$. Alors si $\Pi_f$ est décidable, $f$ est décidable.
+\end{proof}
+
+\begin{proposition}
+	$\mathcal F(\Sigma^*, \Sigma^*)$ est indénombrable.
+\end{proposition}
+
+\begin{corollary}
+	Il existe des fonctions non calculables et donc des problèmes indécidables.
+\end{corollary}
+\begin{proof}
+	Les fonctions OCaml sont dénombrables et donc les fonctions calculables aussi (car on a plus de fonctions OCaml que de fonctions calculables).
+\end{proof}
+
+\begin{example}
+	Numérotons $f_0, f_1, \dots$ les fonctions calculables de $\N$ dans $\N$. On créer alors la fonction $f(n) = f_n(n)+1$. (On peut les numéroter car il y en a un nombre dénombrables, car il y a )
+\end{example}
+
+\section{Exemples}
+
+La plupart des problèmes que vous connaissez sont décidables. Dès qu'il existe un algorithme le décidant, peu importe sa complexité, le problème est décidable.
+
+\begin{example}
+	satisfiabilité d'une formule propositionnnelle, coloration d'un graphe, plus grande clique dans un graphe, présence d'un élément dans une liste, etc.
+\end{example}
+
+\subsection{Sur les programmes}
+
+\begin{definition}[Problème de l'arrêt]
+	Le problème de l'arrêt est le problème de savoir si une machine terminera sur une entrée.\\
+	
+	Formalisation : $E = \Sigma^*$, $\Sigma^+ = \{<f, w> / f \in \mathcal F, w\in \Sigma^*, f\text{ termine sur }w\}$
+\end{definition}
+
+\begin{theorem}
+	Le problème de l'arrêt est indécidable.
+\end{theorem}
+
+\begin{proof}
+	Par l'absurde. Soit $\texttt{A}$ décidant l'arrêt. Soit $\texttt{M}$ le programme suivant :
+	\begin{lstlisting}		
+let M x = if A x x then (while true do () done; true)
+                   else true;;
+\end{lstlisting}
+	On obtient alors une contradiction en regardant la terminaison de \texttt{M <(M, <M>)>}
+\end{proof}
+
+\begin{theorem}[Théorème de Rice]
+	Soit $\mathcal P$ une propriété non triviale sur les langages. Alors savoir si le langage reconnu par une machine $f$ vérifie $\mathcal P$ est indécidable
+\end{theorem}
+
+\begin{example}
+	Savoir si $f \enspace \varepsilon$ renvoie true est indécidable.
+\end{example}
+
+\begin{rem}
+	Même la correction partielle est indécidable
+\end{rem}
+
+\paragraph{Développement :} Preuve du théorème de Rice et de l'indécidabilité de la correction partielle.
+
+\begin{proposition}
+	Le problème $E^+ = \{<f, n, w> / f\text{ termine sur } w \text{ en moins de $n$ étapes}\}$ est décidable.
+\end{proposition}
+
+\begin{proposition}
+	Le problème $E^+ = \{<L, n> / L $ est un langage finit tel que il existe une machine décidant $L$ terminant toujours en moins de $n$ étapes$\}$ est décidable.
+\end{proposition}
+
+\begin{proof}
+	Il suffit de tester tous les $n$ premières étapes possibles pour un programme (y en a beaucoup, mais un nombre fini) et donnant toutes les valeurs possibles aux cases visitées, et voir si cela décide $L$.
+\end{proof}
+
+\begin{rem}
+	Avec cette preuve on se rend bien compte que la complexité ne rentre pas en compte dans la décidabilité.
+\end{rem}
+
+\subsection{Sur les langages}
+
+\noindent\begin{tabular}{c|c}
+	Décidable & Indécidable \\ \hline
+	\begin{minipage}{0.45\linewidth}
+		\begin{itemize}[label=$\bullet$]
+			\item[]
+			\item Un automate fini reconnaît un mot donné
+			\item Deux automates reconnaissent le même langage
+			\item Deux expressions régulières sont égales
+			\item Une grammaire accepte un mot donné
+		\end{itemize}
+	\end{minipage}
+	&\begin{minipage}{0.45\linewidth}
+		\begin{itemize}[label=$\bullet$]
+			\item Une grammaire ne reconnaît aucun mot
+			\item Une grammaire reconnait $\Sigma^*$
+			\item Deux grammaires ont le même langage
+			\item Une grammaire est ambigüe
+		\end{itemize}
+	\end{minipage}
+\end{tabular}
+
+\subsection{Autres domaines}
+
+\begin{proposition}
+	Déterminer si une théorie prouve un formule du premier ordre en déduction naturelle ($T \vdash F$) est indécidable.
+\end{proposition}
+
+\begin{proposition}
+	Déterminer si un jeu de tuiles fini pave le plan ($\mathbb Z \times \mathbb Z$) est indécidable
+\end{proposition}
+
+\begin{rem}
+	Certains sous problèmes sont décidables :\begin{itemize}[label=$\bullet$]
+		\item Déterminer si une théorie prouve une formule propositionnelle
+		\item Paver $\{1, \dots, n\} \times \{1, \dots, n\}$
+		\item Déterminer si une théorie complète (toute formule y est soit vraie soit fausse) prouve une formule du premier ordre en logique propositionnelle.
+	\end{itemize}
+\end{rem}

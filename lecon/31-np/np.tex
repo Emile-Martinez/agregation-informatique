@@ -18,20 +18,17 @@ Les notions présentées ici le sont informellement. Les notions formelles exist
 \end{example}
 
 \begin{personalise}[notation]
-	Un problème de décision est la donnée d'un ensemble $E$ d'instance et d'un ensemble $E^+\subset E$ d'instance positives.
+	Pour $\Pi$ un problème de décision $(E, E^+)$, on identife parfois $\Pi$ et $E^+$
 \end{personalise}
 
-
 \begin{example}
-	$SAT$ est le problème de savoir si une formule propositionnelle est satisfiable ou pas. On notera alors $x\wedge y \in SAT$ mais $x\wedge \neg x\notin SAT$.
+	$SAT = \Big( \{\text{formules propositionnelles}, \: \{\text{formules propositionnelles satisfiables}\}\}\Big)$. On peut alors noter $x\wedge y \in SAT$ mais $x\wedge \neg x\notin SAT$.
 \end{example}
 
-\begin{example}[Problème APP]
+\begin{example}[Problème APP]\\
 	\label{31-app}
-	\begin{itemize}
-		\item[Entrée] $T$ un tableau d'entiers, $x \in \N$
-		\item[Sortie] $x \in T$
-	\end{itemize}
+	\textbf{Entrée} $T$ un tableau d'entiers, $x \in \N$\\
+	\textbf{Sortie} $x \in T$
 \end{example}
 
 \begin{exercise}
@@ -235,9 +232,9 @@ Ce qu'on appelle ici algorithme, c'est un programme C, avec une mémoire infini.
 \paragraph{Développement :} $3-SAT$ est NP-complet (réduction depuis $SAT$)
 
 \begin{example}
-	\paragraph{Problème :} chemin hamiltonien
-	\paragraph{Entrée :} $G = (V, A)$ non orienté
-	\paragraph{Sortie :} Existe-t-il un cycle de $G$ qui passe une unique fois par chaque sommet ?
+	\textbf{Problème :} chemin hamiltonien\\
+	\textbf{Entrée :} $G = (V, A)$ non orienté\\
+	\textbf{Sortie :} Existe-t-il un cycle de $G$ qui passe une unique fois par chaque sommet ?
 \end{example}
 
 \begin{proposition}
@@ -285,7 +282,7 @@ Ce qu'on appelle ici algorithme, c'est un programme C, avec une mémoire infini.
 	Il est souvent facile de montrer $\Pi\in NP$. On se demande alors plutôt $P$ ou $NP$-complet.
 \end{rem}
 
-\begin{tabular}{c|c}
+\noindent\begin{tabular}{c|c}
 	Classe P & NP-complet \\ \hline
 	\begin{minipage}{0.45\linewidth}
 		\begin{itemize}[label=$\bullet$]
