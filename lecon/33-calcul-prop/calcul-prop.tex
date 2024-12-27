@@ -1,0 +1,282 @@
+\debut{Emile Martinez}{MP2I/MPI}{Induction, arbres}{}
+
+\section{Syntaxe (MP2I)}
+
+\subsection{Formules propositionnelles}
+
+\begin{definition}[Formules propositionnelles]
+	Soit $V$ un ensemble dénombrables de variables.
+	
+	On définit l'ensemble des formules propositionnelles comme l'ensemble inductif construit sur la signature : \begin{itemize}[label=$\star$]
+		\item cas de base : $V$, $\top$, $\bot$
+		\item constructeurs : $\neg$ d'arité 1, $\wedge$, $\vee$, $\rightarrow$, $\leftrightarrow$ d'arité 2
+	\end{itemize}
+\end{definition}
+
+\begin{example}
+	$\leftrightarrow(x, \neg(\neg(x)))$
+\end{example}
+
+\begin{exercise}
+	Définir inductivement l'ensemble des variables apparaissant dans une formule.
+\end{exercise}
+
+\subsection{Représentation diverses des formules}
+
+\noindent Il existe différentes façons de représenter les formules. Nous les illustrerons sur la formule $\leftrightarrow (\neg (\wedge(x, y)), \vee(\neg x, \neg y))$
+
+
+\begin{tabular}{M{0.3\linewidth}:M{0.3\linewidth}:M{0.3\linewidth}}
+	Définition & Exemple & Intérêts \\ \hdashline
+	
+	\multicolumn{3}{c}{\underline{Sous forme d'arbre}} \\
+	 
+	 chaque feuille est étiquetée par un cas de base, et chaque noeud interne par un constructeur. On l'appelle également arbre syntaxique. & \raisebox{-0.5\height}{\begin{tikzpicture}[->]
+	 	\node (q0) {$\leftrightarrow$};
+	 	\node[below left= 0.5cm and 0.5cm of q0] (q1) {$\neg$};
+	 	\node[below right= 0.5cm and 0.5cm of q0] (q2) {$\vee$};
+	 	\node[below = 0.5cm of q1] (q3) {$\wedge$};
+	 	\node[below left=0.5cm and 0.1cm of q2] (q4) {$\neg$};
+	 	\node[below right=0.5cm and 0.1cm of q2] (q5) {$\neg$};
+	 	\node[below left=0.5cm and 0.1cm of q3] (q6) {$x$};
+	 	\node[below right=0.5cm and 0.1cm of q3] (q7) {$y$};
+	 	\node[below = 0.5cm of q4] (q8) {$x$};
+	 	\node[below = 0.5cm of q5] (q9) {$y$};
+	 	
+	 	\draw (q0) -> (q1);
+	 	\draw (q0) -> (q2);
+	 	\draw (q1) -> (q3);
+	 	\draw (q2) -> (q4);
+	 	\draw (q2) -> (q5);
+	 	\draw (q3) -> (q6);
+	 	\draw (q3) -> (q7);
+	 	\draw (q4) -> (q8);
+	 	\draw (q5) -> (q9);
+	 \end{tikzpicture}} & Cette forme étant très explicite (et très proche de la définition inductive) elle permet de définir facilement des choses sur les formules comme par exemple la hauteur d'une formule, le concept de sous-formule, etc. mais aussi d'autres représentations\\ \hdashline
+	 
+	 \multicolumn{3}{c}{\underline{Forme préfixe}} \\
+	 
+	 On l'obtient par un parcours en profondeur préfixe de l'arbre syntaxique & $\leftrightarrow \neg \wedge x \, y \vee\neg x \,\neg y$ & \multirow{3}{\linewidth}{\parbox{\linewidth}{
+$\bullet$ Une représentation compacte\\
+$\bullet$ Une évaluation efficace (il suffit de dépiler par la fin en polonais inversé, par le début en préfixe)
+	 	}}\\ \cdashline{1-2}
+	 
+	 \multicolumn{3}{c}{\underline{Polonais inverse}} \\
+	 Comme précédemment mais par un parcours postfixe & $ x \, y \,\wedge \neg \, x \, \neg \, y \, \neg \, \vee \, \leftrightarrow $ & \\ \hdashline
+	 
+	 
+	 \multicolumn{3}{c}{\underline{Forme infixe}} \\
+	 On fait un parcours infixe mais on ajoute des parenthèses pour lever l'ambigüité : $\texttt{infixe} (N(cons, g, d))$ vaut $( \texttt{infixe} \enspace g \enspace cons \enspace \texttt{infixe} \enspace d)$ & $(((\neg(x\vee y)) \leftrightarrow((\neg x) \wedge (\neg y))))$ & C'est la représentation classique, la plus facilement lisible par l'humain.
+	 
+\end{tabular}
+
+\begin{com}
+	On peut ici mentionner les liens que l'on peut faire entre représentation en polonais inversé et compilation.
+\end{com}
+
+\section{Sémantique (MP2I)}
+
+\subsection{Valuation et Sémantique}
+
+\begin{definition}
+	Une valuation est une fonction $\sigma : V \to \mathbb B = \{0, 1\}$.\\
+	On définit la sémantique $[\varphi]_\sigma$ d'une formule $\varphi$ inductivement sur la structure de $\varphi$ : \begin{itemize}[label=$\star$]
+		\item $[\top]_\sigma = 1$, $[\bot]_\sigma = 0$, $[v]_\sigma = \sigma(v)$
+		\item $[\neg \varphi]_\sigma = 1 - [\varphi]_\sigma$
+		\item $[\varphi_1 \vee \varphi_2]_\sigma = \max ([\varphi_1]_\sigma, [\varphi_2]_\sigma)$
+		\item $[\varphi_1 \wedge \varphi_2]_\sigma = \min ([\varphi_1]_\sigma, [\varphi_2]_\sigma)$
+		\item $[\varphi_1 \rightarrow \varphi_2]_\sigma = 1$ ssi $[\varphi_1]_\sigma = 0$ ou $[\varphi_2]_\sigma = 1$
+		\item $[\varphi_1 \leftrightarrow \varphi_2]_\sigma = 1$ ssi $[\varphi_1]_\sigma = [\varphi_2]_\sigma $
+	\end{itemize} 
+\end{definition}
+
+\begin{definition}
+	Une table de vérité est une table où les colonnes sont étiquetées par les variables apparaissant dans la formule, la dernière colonne est étiquetée par $\varphi$. Chaque ligne correspond à une valuation $\sigma$ des variables et le résultat $[\varphi]_\sigma$.
+\end{definition}
+
+\begin{example}
+	$\varphi = (x\wedge y) \vee (x \wedge z)$\\
+	\begin{tabular}{|c|c|c|c|}
+		\hline $x$ & $y$ & $z$ & $\varphi$ \\ \hline
+		0 & 0 & 0 & 0 \\ \hline
+		0 & 0 & 1 & 0 \\ \hline
+		0 & 1 & 0 & 0 \\ \hline
+		0 & 1 & 1 & 1 \\ \hline
+		1 & 0 & 0 & 1 \\ \hline
+		1 & 0 & 1 & 1 \\ \hline
+		1 & 1 & 0 & 1 \\ \hline
+		1 & 1 & 1 & 1 \\ \hline
+	\end{tabular}
+\end{example}
+
+\begin{rem}
+	Si $\varphi$ contient $n$ variables distinctes, sa table de vérité contiendra $2^n$ lignes.
+\end{rem}
+
+%\subsection{Satisfiabilité}
+
+\begin{definition}
+	\begin{itemize}[label=$\star$]
+		\item Une formule $\varphi$ est dite \textbf{satisfiable} si $\exists \sigma \: : \: [\varphi]_\sigma = 1$
+		
+		\item Une formule $\sigma$ est une \textbf{tautologie} si $\forall \sigma, \,[\varphi]_\sigma = 1$
+		
+		\item Un ensemble $\Sigma$ de formules est \textbf{satisfiable} si $\exists \sigma \: : \: \forall \varphi \in \Sigma, \, [\varphi]_\sigma = 1$
+		
+		\item Deux formules sont dites \textbf{équivalentes}, noté $\varphi_1 \equiv \varphi_2$, si $\forall \sigma, \, [\varphi_1]_\sigma = [\varphi_2]_\sigma$
+	\end{itemize}
+\end{definition}
+
+\subsection{Formes Normales}
+
+\begin{definition}
+	\begin{itemize}[label=$\star$]
+		\item Un littéral est une formule de la forme $v$ ou $\neg v$ pour $v \in V$
+		
+		\item Une clause disjonctive (resp. conjonctive) est une formule de la forme $\bigvee\limits_{i=1}^n l_i$ pour des littéraux $(l_i)_{i \in \{1, \dots, n\}}$
+		
+		\item Une formule $\varphi$ est en forme normale conjonctive (resp. disjonctive) (FNC (resp. FND)) si elle est de la forme $\bigwedge\limits_{i = 1}^p C_i$ où les $C_i$ sont des clauses disjonctives (resp. conjonctives).
+	\end{itemize}
+\end{definition}
+
+\begin{proposition}
+	Toute formule est équivalente à une formule en FND.
+\end{proposition}
+\begin{proof}
+	\begin{enumerate}
+		\item On prend la table de vérité de la formule
+		\item On transforme chaque ligne en une conjonction de litéraux qui n'est à vrai que si on est dans la ligne
+		\item On fait la disjonction des conjonctions de toutes les clauses des lignes où la formule vaut 1
+	\end{enumerate}
+\end{proof}
+
+\begin{com}
+	On pourrait alors parler de la FND (et FNC) canonique, qui est celle issue de la transformation, et qui est unique, mais cela ne menerai pas à grand chose, car si l'unicité peut nous intéresser pour comparer deux formules, cela revient à comparer les tables de vérité.
+\end{com}
+
+\begin{exercise}
+	Donner un algorithme pour passer trouver une FNC équivalente. Quelle est sa complexité ?
+\end{exercise}
+
+La construction de la preuve de la proposition précédente utilise seulement la table de vérité, et pas la structure de la formule. On peut donc la généraliser.
+
+\begin{theorem}
+	\label{33-equiv}
+	Toute fonction $f : \{0, 1\}^n \to \{0, 1\}$ est équivalente à une formule propositionnelle, i.e. il existe une formule $e$ de variables $x_1, \dots, x_n$ telle que $\forall \sigma : V \to \{0, 1\}, \, [e]_\sigma = f(\sigma(x_1), \dots, \sigma(x_n))$
+\end{theorem}
+
+\begin{com}
+	On pourrait ici faire le développement \paragraph{Développement :} Équivalence entre expression booléenne et fonction booléenne.
+	
+	Cela convient assez bien à la leçon, mais légèrement moins que les deux autres à mes yeux.
+\end{com}
+
+\begin{appl}
+	Un circuit booléen est un graphe connexe acyclique, tel que chaque nœud est étiqueté par un symbole du calcul propositionnel, de degré sortant quelconque, et de degré entrant correspondant au symbole ($0$ pour $x\in V$, $1$ pour $\neg$, $2$ pour $\wedge$, etc.).\\
+\end{appl}
+
+\begin{theorem}
+	Les circuits booléens peuvent calculer toute fonction $f :\{0,1\}^n \to \{0,1\}^m$
+\end{theorem}
+\begin{proof}
+	Un arbre syntaxique est un circuit booléen. Les circuits booléens implémentent donc toutes les formules propositionnelles.
+\end{proof}
+
+\begin{example}
+	On peut implémenter un additionneur en binaire.
+\end{example}
+
+\begin{rem}
+	On peut physiquement implémenter les circuits booléens, qui sont alors à la base de nos ordinateurs.
+\end{rem}
+
+\section{SAT (MP2I/MPI)}
+
+\subsection{Définition}
+
+\begin{definition}
+	Le problème $SAT$ est un problème de décision :\\
+	\textbf{Entrée :} Une formule propositionnelle $\varphi$\\
+	\textbf{Sortie :} $\varphi$ est-elle satisfiable ?
+\end{definition}
+
+\begin{rem}
+	Le problème $n-SAT$ correspond au problème $SAT$ restreint aux formules sous FNC d'au plus $n$ littéraux par clause.
+\end{rem}
+
+\subsection{Puissance et complexité de SAT}
+
+\begin{appl}
+	Le problème SAT est central en algorithmique. En effet il peut représenter énormément de situation. Beaucoup de problèmes peuvent se réduire à tenter de satisfaire une formule booléenne.
+\end{appl}
+
+\paragraph{Développement : } Illustration de la puissance de SAT par réduction de 3-coloration et de SOMME-SOUS-ENSEMBLE
+
+\begin{theorem}[Cook]
+	$SAT$ est $NP$-complet
+\end{theorem}
+
+Il en est de même pour $n-SAT$ pour $n \geq 3$.
+
+\paragraph{Développement :} $2-SAT \in P$
+
+\subsection{Algorithme de Quine}
+
+\begin{com}
+	Suivant la place, on peut se limiter à beaucoup moins dans cette partie et seulement expliquer par des phrases l'idée de l'algorithme.
+\end{com}
+
+\begin{idee}
+	On peut résoudre le problème $SAT$ par retour sur trace pour $\varphi$ sous FNC (algorithme de Quine)
+\end{idee}
+
+\begin{algo}[Quine]\\
+	\begin{algorithm}[H]
+		\caption{$Quine(C)$}
+		\Entree{$C$, l'ensemble des clauses}
+		\Sortie{Vrai ssi $\varphi \in SAT$}
+		\Si{$C = \emptyset$}
+			{\Retour{Vrai}}
+		\Si{$\bot \in C$}
+			{\Retour{Faux}}
+		Choisir $x$ apparaissant dans une clause de $C$\\
+		\Si{$Quine(C[x \gets \bot])$}
+			{\Retour{Vrai}}
+		\Si{$Quine(C[w \gets \top])$}
+			{\Retour{Vrai}}
+		\Retour{Faux}
+	\end{algorithm}
+	où $C[x \gets \top]$ supprime les clauses contenant $x$ et enlevant $\neg x$ des autres.
+\end{algo}
+
+\begin{rem}
+	L'algorithme est exponentiel
+\end{rem}
+
+\begin{rem}
+	L'algorithme DPLL (hors programme) est une amélioration de Quine : Si une clause est réduite à un seul littéral, on impose la valeur du littéral. 
+\end{rem}
+
+\begin{exercise}
+	Prouver la terminaison de l'algorithme de Quine en donnant un variant.
+\end{exercise}
+
+\section{Dédcution naturelle (MPI)}
+
+\subsection{Séquent}
+
+Vérifier qu'une formule est une tautologie (ou même vrai sous certaines conditions) par sa TV est trop long quand le nombre de variables est trop grand. Néanmoins, dans la vraie vie, on a des règles sur les valeurs booléennes (ex : modus pones)
+
+La déduction naturelle formalise de telles règles.
+
+\begin{definition}
+	Un séquent est un couple $(\Gamma, F)$, noté $\Gamma \vdash F$.\\
+	
+	$\Gamma$ est appelé hypothèses, prémisses ou encore environnement. Il s'agit d'un ensemble de formules. F est une formule. $\Gamma \vdash F$ se lit «$\Gamma$ prouve $F$» et signifie que si l'on suppose $\Gamma$ alors $F$ est vrai.
+\end{definition}
+
+\subsection{Arbres de preuve et règles}
+
+\begin{com}
+	Bon la il faut faire les dessins de ça quoi.
+\end{com}
