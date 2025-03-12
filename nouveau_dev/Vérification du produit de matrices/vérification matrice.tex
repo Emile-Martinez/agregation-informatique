@@ -1,0 +1,97 @@
+\dev{Marin Malory (légérement modifié par Emile Martinez)}{Mitzenmacher}
+
+\textit{Ce développement présente un exemple d'utilisation d'aléatoire afin de vérifier si un produit de matrice est correct de manière efficace. Il s'intègre ainsi dans la leçon sur les tests de programmes et de part sa nature probabiliste, il illustre la leçon sur les algorithmes probabilistes. }
+
+
+\paragraph{Contexte} On suppose que l'on a un algorithme \texttt{produit} qui calcule le produit de matrice efficacement. On veut vérifier qu'il est correct sur de grandes entrées. Comment faire ?\\
+
+On pourrait calculer le produit, mais si les matrices sont grandes cela serait très long. On peut alors utiliser une méthode probabiliste.\\
+
+Notre problème est donc de vérifier, étant donné $A$, $B$ et $C$ si $A\times B = C$.\\
+On se concentrera ici sur des matrices d'entiers modulo 2.
+
+\paragraph{Rappel} $M_1 = M_2 \Leftrightarrow \forall r \in \{0,1\}^n, \, M_1r = M_2r$.
+
+\paragraph{Idée} Prendre des vecteurs au hasard, et vérifier que cela fonctionne.
+
+\paragraph{Intérets} Il se trouve que pour calculer $ABr$, on peut ne pas caluler $AB$, en utilisant l'associativité des matrices $\to$ $ABr = A \times (B \times r)$ $\to O(n^2)$ (car multiplier une matrice et un vecteur est $O(n^2)$). 
+
+\begin{theorem}\label{ThmVerif}
+Soient $A,B,C\in \{0,1\}^{n\times n}$. Si $AB\neq C$, et si $r$ est choisit uniformément dans $\{0,1\}^n$, alors 
+$$
+\mathbb{P}(ABr =Cr) \leq \frac{1}{2}
+$$
+\end{theorem}
+
+%Pour montrer ce théorème, on utilise le lemme suivant.
+%
+%\begin{lemma}
+%Choisir $r=(r_1, r_2,...,r_n) \in \{0,1\}^n$ aléatoirement et uniformément est équivalent à choisir chaque $r_i$ uniformément et indépendamment dans $\{0,1\}$.
+%\end{lemma}
+%
+%\begin{proof}
+%Si chaque $r_i$ est tiré uniformément et indépendamment, chacun des $2^n$ vecteurs de $\{0,1\}^n$ a une probabilité $2^{-n}$ d'être tiré.
+%\end{proof}
+
+\begin{proof}[]
+ L'événement considéré est \og $ABr=Cr$ \fg.  Soit $D=AB-C\neq 0$. Ainsi, $ABr=Cr$ implique $Dr=0$. Puisque $D\neq 0$, il existe au moins un coefficient non nul : on prend $d_{11}\neq 0$ sans perdre de généralité.
+ 
+Puisque $Dr=0$, on a :
+$$
+\sum_{j=1}^n d_{1j}r_j=0
+$$
+et de manière équivalente  :
+\begin{equation}
+r_1 = - \frac{\sum_{j=2}^n d_{1j}r_j}{d_{11}}
+\end{equation}
+
+On peut supposer que l'on choisit $(r_2,...,r_n)$ uniformément dans $\{0,1\}^{n-1}$ et $r_1$ uniformément dans $\{0,1\}$. Ces deux tirages sont réalisés de manière indépendante.
+
+D'après la formule des probabilités totales :
+
+\begin{align*}
+\mathbb{P}(ABr=Cr)
+&= \sum_{(x_2,...,x_n) \in \{0,1\}^{n-1}} \mathbb{P}(ABr=Cr \cap (r_2,...,r_n) = (x_2,...,x_n)) \\
+&\leq \sum_{(x_2,...,x_n) \in \{0,1\}^{n-1}} \mathbb{P}\left(r_1 = - \frac{\sum_{j=2}^n d_{1j}r_j}{d_{11}}
+\cap (r_2,...,r_n) = (x_2,...,x_n)\right) \\
+&= \sum_{(x_2,...,x_n) \in \{0,1\}^{n-1}} \mathbb{P}\left(r_1 = - \frac{\sum_{j=2}^n d_{1j}x_j}{d_{11}}
+\cap (r_2,...,r_n) = (x_2,...,x_n)\right) \\
+&= \sum_{(x_2,...,x_n) \in \{0,1\}^{n-1}} \mathbb{P}\left(r_1 = - \frac{\sum_{j=2}^n d_{1j}x_j}{d_{11}}\right) .
+\mathbb{P}\left( (r_2,...,r_n) = (x_2,...,x_n)\right) \\
+&= \sum_{(x_2,...,x_n) \in \{0,1\}^{n-1}} \frac{1}{2} .
+\mathbb{P}\left( (r_2,...,r_n) = (x_2,...,x_n)\right) \\
+&=\frac{1}{2}
+\end{align*}
+\end{proof}
+
+
+On amplifie alors le résultat.
+
+\begin{algorithm}[H]
+	\Pour{$i$ allant de $1$ à $k$}{	
+		Choisir uniformément $r$\\
+		\Si{$A\times (B\times r) \neq C \times r$}{
+			\Retour Faux\\
+		}
+	}
+	\Retour Vrai
+	\caption{verification($A$, $B$, $C$, $k$)}
+\end{algorithm}
+
+\paragraph{Efficacité} Si $AB = C$, l'algorithme renvoie la bonne réponse, sinon, les choix des $r$ étant indépendants, la probabilité de ne pas détecter une erreur est $\leq 2^{-k}$. Donc notre algorithme réussi avec probabilité au moins $1-2^k$, en $(Ok\times n^2)$
+
+\paragraph{En vrai} Ainsi, pour $k = 100$, on échoue avec probabilité $2^{-100}$ soit environ une chance sur 1 quintillion (donc jamais). Ainsi, on a un algorithme en $O(100 \times n^2)$ qui tant en théorie que en vrai, peut être considéré en $O(n^2)$ qui vérifie en gros sans erreur le produit de matrice.
+
+\begin{com}
+	Et si jamais c'est faux, on va probablement finir beaucoup plus vite que ça, car il y a aura souvent plusieurs coefficient faux.
+\end{com}
+
+\begin{com}
+	Pour éventuellement gagner un peu de temps
+\end{com}
+
+\paragraph{Question} Qu'en est il si on ne considère pas des entiers modulos 2 ? Et bien la probabilité de se tromper est encore plus faible, car on a plus de valeurs possibles.
+
+\begin{com}
+	Et au pire on peut également parler des flottants si vraiment on est trop en avance.
+\end{com}
